@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Offline — UniStocker</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: #0f0f1a; color: #f1f5f9; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem; }
+    .card { max-width: 400px; width: 100%; text-align: center; }
+    .icon { width: 80px; height: 80px; background: #6366f1; border-radius: 20px; margin: 0 auto 24px; display: flex; align-items: center; justify-content: center; font-size: 40px; }
+    h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 12px; }
+    p { color: #94a3b8; line-height: 1.6; margin-bottom: 24px; }
+    button { background: #6366f1; color: #fff; border: none; padding: 12px 28px; border-radius: 12px; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+    button:hover { background: #4f46e5; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">📦</div>
+    <h1>You're offline</h1>
+    <p>UniStocker needs an internet connection to sync your data. Your recent actions are saved and will sync when you reconnect.</p>
+    <button onclick="location.reload()">Try Again</button>
+  </div>
+</body>
+</html>
