@@ -447,7 +447,7 @@ export function ImportProductsModal({ userRole }: { userRole: UserRole }) {
               {!result && (
                 <button
                   onClick={handleImport}
-                  disabled={!canImport || status === "importing"}
+                  disabled={!canImport}
                   className="flex items-center gap-2 px-5 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:text-gray-500 dark:disabled:text-gray-400 text-white rounded-xl text-sm font-semibold transition disabled:cursor-not-allowed"
                 >
                   {status === "importing" ? (
