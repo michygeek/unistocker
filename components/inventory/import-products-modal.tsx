@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef } from "react";
 import {
   Upload, Download, X, FileText,
   AlertCircle, CheckCircle, Loader2, ChevronDown, ChevronUp,
@@ -104,7 +104,7 @@ export function ImportProductsModal({ userRole }: { userRole: UserRole }) {
     triggerDownload(csv, "product-import-template.csv");
   };
 
-  const handleFileSelect = useCallback(async (f: File) => {
+  const handleFileSelect = async (f: File) => {
     if (!f.name.toLowerCase().endsWith(".csv")) {
       alert("Please upload a .csv file.");
       return;
@@ -124,17 +124,14 @@ export function ImportProductsModal({ userRole }: { userRole: UserRole }) {
     const missing = required.filter((c) => !lh.includes(c));
     const totalRows = text.split(/\r?\n/).filter((l) => l.trim()).length - 1;
     setPreview({ headers, rows, totalRows: Math.max(0, totalRows), missingRequired: missing });
-  }, []);
+  };
 
-  const handleDrop = useCallback(
-    (e: React.DragEvent) => {
-      e.preventDefault();
-      setDragging(false);
-      const f = e.dataTransfer.files[0];
-      if (f) handleFileSelect(f);
-    },
-    [handleFileSelect],
-  );
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragging(false);
+    const f = e.dataTransfer.files[0];
+    if (f) handleFileSelect(f);
+  };
 
   const handleImport = async () => {
     if (!file) return;
