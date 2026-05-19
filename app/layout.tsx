@@ -29,7 +29,7 @@ import { PWARegister } from "@/components/pwa-register";
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full`}>
-      <body className="min-h-full antialiased">
+      <body className="min-h-full antialiased" suppressHydrationWarning>
         <PWARegister />
         {children}
       </body>
