@@ -67,10 +67,10 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   return (
     <div className="flex flex-col flex-1">
       <Header title="Product Details" unreadCount={unreadCount} />
-      <div className="flex-1 p-6 max-w-5xl mx-auto w-full space-y-6 animate-in">
+      <div className="flex-1 p-4 sm:p-6 max-w-5xl mx-auto w-full space-y-4 sm:space-y-6 animate-in">
 
         {/* Back + actions */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-3 flex-wrap">
           <Link href="/inventory" className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 dark:hover:text-white transition">
             <ArrowLeft size={16} /> Back to Inventory
           </Link>
@@ -88,7 +88,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
           <div className="flex flex-col sm:flex-row gap-6 p-6">
             {/* Image */}
-            <div className="flex-shrink-0">
+            <div className="shrink-0">
               {product.imageUrl ? (
                 <img src={product.imageUrl} alt={product.name} className="w-32 h-32 rounded-2xl object-cover border border-gray-100 dark:border-gray-800" />
               ) : (
@@ -186,15 +186,15 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
           ) : (
             <div className="divide-y divide-gray-50 dark:divide-gray-800">
               {transactions.map((tx) => (
-                <div key={tx.id} className="px-6 py-3.5 flex items-center gap-4">
-                  <span className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${TX_COLOR[tx.type] ?? "bg-gray-100 text-gray-600"}`}>
+                <div key={tx.id} className="px-4 sm:px-6 py-3.5 flex items-center gap-3 sm:gap-4">
+                  <span className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${TX_COLOR[tx.type] ?? "bg-gray-100 text-gray-600"}`}>
                     {TX_ICON[tx.type] ?? <RefreshCw size={13} />}
                   </span>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-800 dark:text-gray-200">{tx.type.replace("_", " ")}</p>
                     {tx.notes && <p className="text-xs text-gray-400 truncate">{tx.notes}</p>}
                   </div>
-                  <div className="text-right flex-shrink-0">
+                  <div className="text-right shrink-0">
                     <p className={`text-sm font-bold ${["STOCK_IN", "RETURN"].includes(tx.type) ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
                       {["STOCK_IN", "RETURN"].includes(tx.type) ? "+" : "-"}{tx.quantity}
                     </p>

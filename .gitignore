@@ -19,10 +19,9 @@ build/
 prisma/generated/
 
 # ── Environment variables ───────────────────────────────────────────────────────
-# Commit .env.example — ignore everything else
+# Ignore all env files
 .env
 .env.*
-!.env.example
 
 # ── Testing & coverage ─────────────────────────────────────────────────────────
 coverage/

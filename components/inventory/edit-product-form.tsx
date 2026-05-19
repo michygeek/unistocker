@@ -98,7 +98,7 @@ export function EditProductForm({ product, categories }: Props) {
       )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+        <div className="px-4 sm:px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
           <Link href={`/inventory/${product.id}`} className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 dark:hover:text-white transition">
             <ArrowLeft size={15} /> Back
           </Link>
@@ -106,7 +106,7 @@ export function EditProductForm({ product, categories }: Props) {
           <div className="w-16" />
         </div>
 
-        <div className="p-6 space-y-5">
+        <div className="p-4 sm:p-6 space-y-5">
           {/* Image */}
           <div className="flex justify-center">
             <label htmlFor="edit-product-image" className="cursor-pointer">
@@ -133,9 +133,9 @@ export function EditProductForm({ product, categories }: Props) {
             </label>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {fields.map((f) => (
-              <div key={f.name} className={f.colSpan ? "col-span-2" : ""}>
+              <div key={f.name} className={f.colSpan ? "sm:col-span-2" : ""}>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{f.label}</label>
                 <input
                   {...register(f.name)}
@@ -148,7 +148,7 @@ export function EditProductForm({ product, categories }: Props) {
             ))}
 
             {/* Barcode */}
-            <div className="col-span-2">
+            <div className="sm:col-span-2">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Barcode</label>
               <div className="flex gap-2">
                 <input
@@ -160,7 +160,7 @@ export function EditProductForm({ product, categories }: Props) {
                 <button
                   type="button"
                   onClick={() => setScannerOpen(true)}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-gray-300 dark:border-gray-700 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition text-sm font-medium flex-shrink-0"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-gray-300 dark:border-gray-700 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition text-sm font-medium shrink-0"
                 >
                   <Camera size={16} />
                   <span className="hidden sm:inline">Scan</span>
@@ -169,7 +169,7 @@ export function EditProductForm({ product, categories }: Props) {
             </div>
 
             {/* Description */}
-            <div className="col-span-2">
+            <div className="sm:col-span-2">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
               <textarea
                 {...register("description")}
@@ -180,7 +180,7 @@ export function EditProductForm({ product, categories }: Props) {
 
             {/* Category */}
             {categories.length > 0 && (
-              <div className="col-span-2">
+              <div className="sm:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category</label>
                 <select
                   {...register("categoryId")}

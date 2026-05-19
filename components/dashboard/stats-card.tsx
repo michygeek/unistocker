@@ -22,18 +22,19 @@ export function StatsCard({ title, value, change, changeType = "neutral", icon: 
   const colors = colorMap[color];
 
   return (
-    <div className={`stat-card rounded-2xl p-6 border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden relative`}>
-      <div className={`absolute -right-4 -top-4 w-24 h-24 ${colors.bg} rounded-full opacity-50`} />
+    <div className={`stat-card rounded-2xl p-4 sm:p-6 border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden relative`}>
+      <div className={`absolute -right-4 -top-4 w-20 h-20 sm:w-24 sm:h-24 ${colors.bg} rounded-full opacity-50`} />
       <div className="relative">
-        <div className="flex items-center justify-between mb-4">
-          <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{title}</p>
-          <div className={`w-10 h-10 ${colors.icon} rounded-xl flex items-center justify-center shadow-sm`}>
-            <Icon size={20} className="text-white" />
+        <div className="flex items-center justify-between mb-2 sm:mb-4">
+          <p className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 leading-tight">{title}</p>
+          <div className={`w-8 h-8 sm:w-10 sm:h-10 ${colors.icon} rounded-xl flex items-center justify-center shadow-sm shrink-0`}>
+            <Icon size={16} className="text-white sm:hidden" />
+            <Icon size={20} className="text-white hidden sm:block" />
           </div>
         </div>
-        <p className="text-3xl font-bold text-gray-900 dark:text-white">{value}</p>
+        <p className="text-lg sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white truncate">{value}</p>
         {change && (
-          <p className={`text-xs mt-2 flex items-center gap-1 ${
+          <p className={`text-xs mt-1 sm:mt-2 flex items-center gap-1 ${
             changeType === "up" ? "text-green-600" : changeType === "down" ? "text-red-500" : "text-gray-400"
           }`}>
             {changeType === "up" ? "↑" : changeType === "down" ? "↓" : "→"} {change}

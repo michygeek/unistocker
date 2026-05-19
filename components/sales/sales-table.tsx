@@ -20,14 +20,14 @@ export function SalesTable({ sales, total, page, limit }: Props) {
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400">
-                <th className="text-left px-6 py-3 font-medium">Receipt</th>
-                <th className="text-left px-4 py-3 font-medium">Cashier</th>
-                <th className="text-right px-4 py-3 font-medium">Subtotal</th>
-                <th className="text-right px-4 py-3 font-medium">Discount</th>
+                <th className="text-left px-4 sm:px-6 py-3 font-medium">Receipt</th>
+                <th className="text-left px-4 py-3 font-medium hidden sm:table-cell">Cashier</th>
+                <th className="text-right px-4 py-3 font-medium hidden md:table-cell">Subtotal</th>
+                <th className="text-right px-4 py-3 font-medium hidden md:table-cell">Discount</th>
                 <th className="text-right px-4 py-3 font-medium">Total</th>
-                <th className="text-right px-4 py-3 font-medium">Profit</th>
+                <th className="text-right px-4 py-3 font-medium hidden sm:table-cell">Profit</th>
                 <th className="text-right px-4 py-3 font-medium">Date</th>
-                <th className="w-10 px-4 py-3" />
+                <th className="w-8 sm:w-10 px-2 sm:px-4 py-3" />
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
@@ -46,34 +46,34 @@ export function SalesTable({ sales, total, page, limit }: Props) {
                     className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition cursor-pointer"
                     onClick={() => setExpanded(expanded === sale.id ? null : sale.id)}
                   >
-                    <td className="px-6 py-4">
+                    <td className="px-4 sm:px-6 py-3 sm:py-4">
                       <span className="font-mono text-xs text-indigo-600 dark:text-indigo-400 font-semibold">{sale.receiptNumber}</span>
                     </td>
-                    <td className="px-4 py-4 text-gray-600 dark:text-gray-400">{sale.user.name ?? sale.user.email}</td>
-                    <td className="px-4 py-4 text-right text-gray-600 dark:text-gray-400">₦{sale.subtotal.toFixed(2)}</td>
-                    <td className="px-4 py-4 text-right text-red-500">{sale.discount > 0 ? `-₦${sale.discount.toFixed(2)}` : "—"}</td>
-                    <td className="px-4 py-4 text-right font-semibold text-gray-900 dark:text-white">₦{sale.total.toFixed(2)}</td>
-                    <td className="px-4 py-4 text-right text-emerald-600 dark:text-emerald-400 font-medium">₦{sale.profit.toFixed(2)}</td>
+                    <td className="px-4 py-4 text-gray-600 dark:text-gray-400 text-sm hidden sm:table-cell">{sale.user.name ?? sale.user.email}</td>
+                    <td className="px-4 py-4 text-right text-gray-600 dark:text-gray-400 text-sm hidden md:table-cell">₦{sale.subtotal.toFixed(2)}</td>
+                    <td className="px-4 py-4 text-right text-red-500 text-sm hidden md:table-cell">{sale.discount > 0 ? `-₦${sale.discount.toFixed(2)}` : "—"}</td>
+                    <td className="px-4 py-4 text-right font-semibold text-gray-900 dark:text-white text-sm">₦{sale.total.toFixed(2)}</td>
+                    <td className="px-4 py-4 text-right text-emerald-600 dark:text-emerald-400 font-medium text-sm hidden sm:table-cell">₦{sale.profit.toFixed(2)}</td>
                     <td className="px-4 py-4 text-right text-xs text-gray-400">
-                      <div>{format(new Date(sale.createdAt), "MMM d, yyyy")}</div>
-                      <div>{format(new Date(sale.createdAt), "h:mm a")}</div>
+                      <div>{format(new Date(sale.createdAt), "MMM d")}</div>
+                      <div className="hidden sm:block">{format(new Date(sale.createdAt), "h:mm a")}</div>
                     </td>
-                    <td className="px-4 py-4 text-gray-400">
+                    <td className="px-2 sm:px-4 py-4 text-gray-400">
                       {expanded === sale.id ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                     </td>
                   </tr>
                   {expanded === sale.id && (
                     <tr key={`${sale.id}-expanded`} className="bg-indigo-50/50 dark:bg-indigo-950/30">
-                      <td colSpan={8} className="px-6 py-4">
+                      <td colSpan={8} className="px-4 sm:px-6 py-4">
                         <div className="space-y-1.5">
                           <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Items sold</p>
                           {sale.saleItems.map((item) => (
-                            <div key={item.id} className="flex items-center justify-between text-sm">
-                              <div>
-                                <span className="font-medium text-gray-800 dark:text-gray-200">{item.product.name}</span>
-                                <span className="text-gray-400 ml-2 text-xs">{item.product.sku}</span>
+                            <div key={item.id} className="flex items-start sm:items-center justify-between gap-2 text-sm">
+                              <div className="min-w-0">
+                                <span className="font-medium text-gray-800 dark:text-gray-200 block sm:inline truncate">{item.product.name}</span>
+                                <span className="text-gray-400 text-xs sm:ml-2">{item.product.sku}</span>
                               </div>
-                              <div className="flex gap-6 text-gray-600 dark:text-gray-400">
+                              <div className="flex flex-col sm:flex-row gap-1 sm:gap-6 text-gray-600 dark:text-gray-400 text-right shrink-0">
                                 <span>{item.quantity}x @ ₦{item.unitPrice.toFixed(2)}</span>
                                 <span className="font-semibold text-gray-900 dark:text-white">₦{item.total.toFixed(2)}</span>
                               </div>

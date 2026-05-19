@@ -22,21 +22,21 @@ export default async function SettingsPage() {
   return (
     <div className="flex flex-col flex-1">
       <Header title="Settings" />
-      <div className="flex-1 p-6 max-w-2xl animate-in">
+      <div className="flex-1 p-4 sm:p-6 max-w-2xl w-full animate-in">
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
-          <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-800">
+          <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-gray-100 dark:border-gray-800">
             <h2 className="font-semibold text-gray-900 dark:text-white">Account Settings</h2>
           </div>
-          <div className="p-6 space-y-4">
-            <div className="flex items-center gap-4 p-4 bg-indigo-50 dark:bg-indigo-950/30 rounded-xl">
-              <div className="w-14 h-14 bg-gradient-to-br from-indigo-400 to-purple-500 rounded-2xl flex items-center justify-center flex-shrink-0">
-                <span className="text-white text-xl font-bold">
+          <div className="p-4 sm:p-6 space-y-4">
+            <div className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-indigo-50 dark:bg-indigo-950/30 rounded-xl">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-indigo-400 to-purple-500 rounded-2xl flex items-center justify-center shrink-0">
+                <span className="text-white text-lg sm:text-xl font-bold">
                   {(user?.name ?? user?.email ?? "U").charAt(0).toUpperCase()}
                 </span>
               </div>
-              <div>
-                <p className="font-semibold text-gray-900 dark:text-white">{user?.name ?? "—"}</p>
-                <p className="text-sm text-gray-500">{user?.email}</p>
+              <div className="min-w-0">
+                <p className="font-semibold text-gray-900 dark:text-white truncate">{user?.name ?? "—"}</p>
+                <p className="text-sm text-gray-500 truncate">{user?.email}</p>
                 <div className="flex items-center gap-2 mt-1 flex-wrap">
                   <span className="text-xs bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 px-2 py-0.5 rounded-lg font-medium">
                     {user?.role}
@@ -50,7 +50,7 @@ export default async function SettingsPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-sm">
               {[
                 { label: "Name", value: user?.name ?? "—" },
                 { label: "Email", value: user?.email ?? "—" },

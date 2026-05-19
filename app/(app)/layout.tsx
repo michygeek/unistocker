@@ -20,7 +20,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         organizationName={session.user.organizationName}
         unreadCount={unreadCount}
       />
-      <main className="flex-1 lg:ml-64 min-h-screen flex flex-col">{children}</main>
+      <main className="flex-1 lg:ml-64 min-h-screen flex flex-col min-w-0">{children}</main>
     </div>
   );
 }

@@ -82,14 +82,14 @@ export function AddProductButton({ categories, userRole }: { categories: { id: s
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setOpen(false)} />
           <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto z-10">
-            <div className="sticky top-0 bg-white dark:bg-gray-900 px-6 py-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between rounded-t-2xl">
+            <div className="sticky top-0 bg-white dark:bg-gray-900 px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between rounded-t-2xl">
               <h2 className="font-semibold text-gray-900 dark:text-white">Add New Product</h2>
               <button onClick={() => setOpen(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
                 <X size={20} />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-5">
+            <form onSubmit={handleSubmit(onSubmit)} className="p-4 sm:p-6 space-y-5">
               <div className="flex flex-col items-center gap-1.5">
                 <label htmlFor="product-image" className="cursor-pointer">
                   <div className={`w-24 h-24 rounded-2xl border-2 border-dashed flex items-center justify-center overflow-hidden transition ${imageError ? "border-red-400" : "border-gray-300 dark:border-gray-700 hover:border-[#2EBD78]"}`}>
@@ -128,7 +128,7 @@ export function AddProductButton({ categories, userRole }: { categories: { id: s
                 )}
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {([
                   { name: "name", label: "Product Name", type: "text", colSpan: true },
                   { name: "sku", label: "SKU", type: "text", colSpan: false },
@@ -137,7 +137,7 @@ export function AddProductButton({ categories, userRole }: { categories: { id: s
                   { name: "quantity", label: "Initial Stock", type: "number", colSpan: false },
                   { name: "lowStockAlert", label: "Low Stock Threshold", type: "number", colSpan: false },
                 ] as Array<{ name: keyof z.infer<typeof schema>; label: string; type: string; colSpan: boolean }>).map((f) => (
-                  <div key={f.name} className={f.colSpan ? "col-span-2" : ""}>
+                  <div key={f.name} className={f.colSpan ? "sm:col-span-2" : ""}>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{f.label}</label>
                     <input
                       {...register(f.name as keyof z.infer<typeof schema>)}
@@ -152,7 +152,7 @@ export function AddProductButton({ categories, userRole }: { categories: { id: s
                 ))}
 
                 {/* Barcode — custom row with camera scan button */}
-                <div className="col-span-2">
+                <div className="sm:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Barcode</label>
                   <div className="flex gap-2">
                     <input
@@ -165,7 +165,7 @@ export function AddProductButton({ categories, userRole }: { categories: { id: s
                       type="button"
                       onClick={() => setScannerOpen(true)}
                       title="Scan with camera"
-                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-gray-300 dark:border-gray-700 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition text-sm font-medium flex-shrink-0"
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-gray-300 dark:border-gray-700 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition text-sm font-medium shrink-0"
                     >
                       <Camera size={16} />
                       <span className="hidden sm:inline">Scan</span>
@@ -176,7 +176,7 @@ export function AddProductButton({ categories, userRole }: { categories: { id: s
                   )}
                 </div>
 
-                <div className="col-span-2">
+                <div className="sm:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
                   <textarea
                     {...register("description")}
@@ -186,7 +186,7 @@ export function AddProductButton({ categories, userRole }: { categories: { id: s
                 </div>
 
                 {categories.length > 0 && (
-                  <div className="col-span-2">
+                  <div className="sm:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category</label>
                     <select
                       {...register("categoryId")}

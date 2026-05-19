@@ -71,7 +71,7 @@ export function StaffManagement({
 
   return (
     <div className="space-y-6 max-w-4xl">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Team Members</h2>
           <p className="text-sm text-gray-500 dark:text-gray-400">{staff.length} accounts</p>
@@ -92,7 +92,7 @@ export function StaffManagement({
           <h3 className="font-semibold text-gray-900 dark:text-white">Create New Staff Account</h3>
           {error && <p className="text-red-500 text-sm bg-red-50 dark:bg-red-950 px-3 py-2 rounded-lg">{error}</p>}
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {([
               { key: "name",     label: "Full Name", type: "text",     placeholder: "e.g. John Doe" },
               { key: "email",    label: "Email",     type: "email",    placeholder: "staff@company.com" },
@@ -153,18 +153,18 @@ export function StaffManagement({
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400">
-                <th className="text-left px-6 py-3 font-medium">Name</th>
-                <th className="text-left px-4 py-3 font-medium">Email</th>
+                <th className="text-left px-4 sm:px-6 py-3 font-medium">Name</th>
+                <th className="text-left px-4 py-3 font-medium hidden sm:table-cell">Email</th>
                 <th className="text-left px-4 py-3 font-medium">Role</th>
-                <th className="text-left px-4 py-3 font-medium">Status</th>
-                <th className="text-right px-6 py-3 font-medium">Actions</th>
+                <th className="text-left px-4 py-3 font-medium hidden sm:table-cell">Status</th>
+                <th className="text-right px-4 sm:px-6 py-3 font-medium">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
               {staff.map((member) => (
                 <tr key={member.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
+                  <td className="px-4 sm:px-6 py-3 sm:py-4">
+                    <div className="flex items-center gap-2 sm:gap-3">
                       <div
                         className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
                         style={{ background: "linear-gradient(135deg, #2EBD78, #1B3D4F)" }}
@@ -173,27 +173,30 @@ export function StaffManagement({
                           {(member.name ?? member.email).charAt(0).toUpperCase()}
                         </span>
                       </div>
-                      <span className="font-medium text-gray-900 dark:text-white">{member.name ?? "—"}</span>
+                      <div className="min-w-0">
+                        <span className="font-medium text-gray-900 dark:text-white block truncate">{member.name ?? "—"}</span>
+                        <span className="text-xs text-gray-400 truncate block sm:hidden">{member.email}</span>
+                      </div>
                     </div>
                   </td>
-                  <td className="px-4 py-4 text-gray-500 dark:text-gray-400">{member.email}</td>
-                  <td className="px-4 py-4">
+                  <td className="px-4 py-4 text-gray-500 dark:text-gray-400 text-sm hidden sm:table-cell">{member.email}</td>
+                  <td className="px-4 py-3 sm:py-4">
                     <span className={`text-xs font-semibold px-2 py-1 rounded-lg ${ROLE_COLORS[member.role]}`}>
                       {member.role}
                     </span>
                   </td>
-                  <td className="px-4 py-4">
+                  <td className="px-4 py-4 hidden sm:table-cell">
                     <span className={`flex items-center gap-1.5 text-xs font-medium ${member.isActive ? "text-green-600" : "text-gray-400"}`}>
                       {member.isActive ? <CheckCircle size={14} /> : <XCircle size={14} />}
                       {member.isActive ? "Active" : "Inactive"}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-right">
+                  <td className="px-4 sm:px-6 py-3 sm:py-4 text-right">
                     {canToggle(member) ? (
                       <button
                         onClick={() => handleToggle(member.id, member.isActive)}
                         disabled={loading === member.id}
-                        className={`text-xs px-3 py-1.5 rounded-lg font-medium transition disabled:opacity-50 ${
+                        className={`text-xs px-2.5 sm:px-3 py-1.5 rounded-lg font-medium transition disabled:opacity-50 ${
                           member.isActive
                             ? "bg-red-50 dark:bg-red-900/30 text-red-600 hover:bg-red-100"
                             : "bg-green-50 dark:bg-green-900/30 text-green-600 hover:bg-green-100"
@@ -202,9 +205,8 @@ export function StaffManagement({
                         {loading === member.id ? "…" : member.isActive ? "Deactivate" : "Activate"}
                       </button>
                     ) : member.role === "BOSS" && currentUserRole === "MANAGER" ? (
-                      /* Visual hint explaining why the button is absent */
                       <span className="inline-flex items-center gap-1 text-xs text-gray-400 dark:text-gray-600">
-                        <ShieldOff size={12} /> Protected
+                        <ShieldOff size={12} /> <span className="hidden sm:inline">Protected</span>
                       </span>
                     ) : null}
                   </td>

@@ -75,13 +75,13 @@ export function InventoryTable({ products, total, page, limit, userRole, search 
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400">
-                <th className="text-left px-6 py-3 font-medium">Product</th>
-                <th className="text-left px-4 py-3 font-medium">SKU</th>
-                <th className="text-right px-4 py-3 font-medium">Cost</th>
+                <th className="text-left px-4 sm:px-6 py-3 font-medium">Product</th>
+                <th className="text-left px-4 py-3 font-medium hidden sm:table-cell">SKU</th>
+                <th className="text-right px-4 py-3 font-medium hidden md:table-cell">Cost</th>
                 <th className="text-right px-4 py-3 font-medium">Price</th>
                 <th className="text-right px-4 py-3 font-medium">Qty</th>
-                <th className="text-left px-4 py-3 font-medium">Category</th>
-                <th className="text-right px-6 py-3 font-medium">Actions</th>
+                <th className="text-left px-4 py-3 font-medium hidden sm:table-cell">Category</th>
+                <th className="text-right px-4 sm:px-6 py-3 font-medium">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
@@ -95,30 +95,31 @@ export function InventoryTable({ products, total, page, limit, userRole, search 
               )}
               {products.map((p) => (
                 <tr key={p.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
+                  <td className="px-4 sm:px-6 py-3 sm:py-4">
+                    <div className="flex items-center gap-2 sm:gap-3">
                       {p.imageUrl ? (
-                        <img src={p.imageUrl} alt={p.name} className="w-10 h-10 rounded-lg object-cover flex-shrink-0" />
+                        <img src={p.imageUrl} alt={p.name} className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg object-cover shrink-0" />
                       ) : (
-                        <div className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center flex-shrink-0">
-                          <Package size={16} className="text-gray-400" />
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center shrink-0">
+                          <Package size={14} className="text-gray-400" />
                         </div>
                       )}
-                      <div>
-                        <p className="font-medium text-gray-900 dark:text-white">{p.name}</p>
-                        <p className="text-xs text-gray-400 truncate max-w-[180px]">{p.description}</p>
+                      <div className="min-w-0">
+                        <p className="font-medium text-gray-900 dark:text-white text-sm truncate max-w-30 sm:max-w-50">{p.name}</p>
+                        <p className="text-xs text-gray-400 truncate max-w-30 sm:max-w-45 hidden sm:block">{p.description}</p>
+                        <p className="text-xs font-mono text-gray-400 sm:hidden">{p.sku}</p>
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-4 font-mono text-xs text-gray-500">{p.sku}</td>
-                  <td className="px-4 py-4 text-right text-gray-600 dark:text-gray-400">₦{p.costPrice.toFixed(2)}</td>
-                  <td className="px-4 py-4 text-right font-medium text-gray-900 dark:text-white">₦{p.sellingPrice.toFixed(2)}</td>
+                  <td className="px-4 py-4 font-mono text-xs text-gray-500 hidden sm:table-cell">{p.sku}</td>
+                  <td className="px-4 py-4 text-right text-gray-600 dark:text-gray-400 hidden md:table-cell">₦{p.costPrice.toFixed(2)}</td>
+                  <td className="px-4 py-4 text-right font-medium text-gray-900 dark:text-white text-sm">₦{p.sellingPrice.toFixed(2)}</td>
                   <td className="px-4 py-4 text-right">
-                    <span className={`font-bold ${p.quantity <= p.lowStockAlert ? "text-red-600 dark:text-red-400" : p.quantity <= p.lowStockAlert * 2 ? "text-amber-600" : "text-gray-900 dark:text-white"}`}>
+                    <span className={`font-bold text-sm ${p.quantity <= p.lowStockAlert ? "text-red-600 dark:text-red-400" : p.quantity <= p.lowStockAlert * 2 ? "text-amber-600" : "text-gray-900 dark:text-white"}`}>
                       {p.quantity}
                     </span>
                   </td>
-                  <td className="px-4 py-4">
+                  <td className="px-4 py-4 hidden sm:table-cell">
                     {p.category ? (
                       <span className="text-xs bg-indigo-50 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 px-2 py-1 rounded-lg">
                         {p.category.name}
@@ -127,8 +128,8 @@ export function InventoryTable({ products, total, page, limit, userRole, search 
                       <span className="text-xs text-gray-400">—</span>
                     )}
                   </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center justify-end gap-1">
+                  <td className="px-3 sm:px-6 py-3 sm:py-4">
+                    <div className="flex items-center justify-end gap-0.5 sm:gap-1">
                       <button
                         onClick={() => handleAdjustStock(p.id, "STOCK_IN")}
                         disabled={loading === `${p.id}-STOCK_IN`}

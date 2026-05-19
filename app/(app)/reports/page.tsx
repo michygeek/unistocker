@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { Header } from "@/components/layout/header";
 import { StatsCard } from "@/components/dashboard/stats-card";
 import { SalesChart } from "@/components/dashboard/sales-chart";
+import { ExportReportsButton } from "@/components/reports/export-reports-button";
 import { Package, TrendingUp, ShoppingCart, DollarSign, BarChart3 } from "lucide-react";
 import { format, subDays, startOfDay, startOfMonth, endOfMonth } from "date-fns";
 import type { Metadata } from "next";
@@ -63,7 +64,14 @@ export default async function ReportsPage() {
   return (
     <div className="flex flex-col flex-1">
       <Header title="Reports & Analytics" />
-      <div className="flex-1 p-6 space-y-6 animate-in">
+      <div className="flex-1 p-4 sm:p-6 space-y-4 sm:space-y-6 animate-in">
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Analytics Overview</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Last 30 days and all-time stats</p>
+          </div>
+          <ExportReportsButton />
+        </div>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <StatsCard title="All-Time Revenue" value={`₦${Number(allTimeRevenue._sum.total ?? 0).toFixed(2)}`} icon={DollarSign} color="green" />
           <StatsCard title="All-Time Profit" value={`₦${Number(allTimeRevenue._sum.profit ?? 0).toFixed(2)}`} icon={TrendingUp} color="blue" />
@@ -80,7 +88,7 @@ export default async function ReportsPage() {
           <div className="divide-y divide-gray-50 dark:divide-gray-800">
             {topWithNames.map((item, i) => (
               <div key={item.productId} className="px-6 py-4 flex items-center gap-4">
-                <span className="w-7 h-7 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 text-sm font-bold flex items-center justify-center flex-shrink-0">
+                <span className="w-7 h-7 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 text-sm font-bold flex items-center justify-center shrink-0">
                   {i + 1}
                 </span>
                 <div className="flex-1">

@@ -72,7 +72,7 @@ export default async function DashboardPage() {
   return (
     <div className="flex flex-col flex-1">
       <Header title="Dashboard" unreadCount={unreadCount} />
-      <div className="flex-1 p-6 space-y-6 animate-in">
+      <div className="flex-1 p-4 sm:p-6 space-y-4 sm:space-y-6 animate-in">
         <div>
           <h2 className="text-gray-500 dark:text-gray-400 text-sm mb-1">
             Welcome back, <span className="text-gray-900 dark:text-white font-semibold">{session.user.name ?? session.user.email}</span>

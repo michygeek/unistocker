@@ -46,8 +46,8 @@ export default async function SalesPage({ searchParams }: { searchParams: Promis
   return (
     <div className="flex flex-col flex-1">
       <Header title="Sales" unreadCount={unreadCount} />
-      <div className="flex-1 p-6 animate-in">
-        <div className="flex items-center justify-between mb-6">
+      <div className="flex-1 p-4 sm:p-6 animate-in">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-4 sm:mb-6">
           <div>
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Sales Records</h2>
             <p className="text-sm text-gray-500 dark:text-gray-400">{total} total transactions</p>

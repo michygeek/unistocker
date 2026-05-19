@@ -21,7 +21,7 @@ export default async function StaffPage() {
   return (
     <div className="flex flex-col flex-1">
       <Header title="Staff Management" />
-      <div className="flex-1 p-6 animate-in">
+      <div className="flex-1 p-4 sm:p-6 animate-in">
         <StaffManagement staff={staff} currentUserId={session.user.id} currentUserRole={session.user.role} />
       </div>
     </div>
