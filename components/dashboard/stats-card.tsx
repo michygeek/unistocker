@@ -10,37 +10,79 @@ interface StatsCardProps {
 }
 
 const colorMap = {
-  indigo: { bg: "bg-indigo-50 dark:bg-indigo-950", icon: "bg-indigo-500", text: "text-indigo-600 dark:text-indigo-400" },
-  green:  { bg: "bg-green-50 dark:bg-green-950",   icon: "bg-green-500",  text: "text-green-600 dark:text-green-400"  },
-  yellow: { bg: "bg-yellow-50 dark:bg-yellow-950", icon: "bg-yellow-500", text: "text-yellow-600 dark:text-yellow-400"},
-  red:    { bg: "bg-red-50 dark:bg-red-950",       icon: "bg-red-500",    text: "text-red-600 dark:text-red-400"      },
-  blue:   { bg: "bg-blue-50 dark:bg-blue-950",     icon: "bg-blue-500",   text: "text-blue-600 dark:text-blue-400"   },
-  purple: { bg: "bg-purple-50 dark:bg-purple-950", icon: "bg-purple-500", text: "text-purple-600 dark:text-purple-400"},
+  indigo: { bg: "rgba(99,102,241,0.12)",  fg: "#818cf8" },
+  green:  { bg: "var(--accent-sub)",       fg: "var(--accent)" },
+  yellow: { bg: "rgba(245,158,11,0.12)",  fg: "#f59e0b" },
+  red:    { bg: "rgba(239,68,68,0.12)",   fg: "#f87171" },
+  blue:   { bg: "rgba(59,130,246,0.12)",  fg: "#60a5fa" },
+  purple: { bg: "rgba(168,85,247,0.12)",  fg: "#c084fc" },
 };
 
 export function StatsCard({ title, value, change, changeType = "neutral", icon: Icon, color }: StatsCardProps) {
-  const colors = colorMap[color];
+  const { bg, fg } = colorMap[color];
 
   return (
-    <div className={`stat-card rounded-2xl p-4 sm:p-6 border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden relative`}>
-      <div className={`absolute -right-4 -top-4 w-20 h-20 sm:w-24 sm:h-24 ${colors.bg} rounded-full opacity-50`} />
-      <div className="relative">
-        <div className="flex items-center justify-between mb-2 sm:mb-4">
-          <p className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 leading-tight">{title}</p>
-          <div className={`w-8 h-8 sm:w-10 sm:h-10 ${colors.icon} rounded-xl flex items-center justify-center shadow-sm shrink-0`}>
-            <Icon size={16} className="text-white sm:hidden" />
-            <Icon size={20} className="text-white hidden sm:block" />
-          </div>
+    <div
+      className="stat-card uni-card uni-card-hover"
+      style={{ padding: "20px", position: "relative", overflow: "hidden" }}
+    >
+      {/* Accent top line */}
+      <div style={{
+        position: "absolute", top: 0, left: 0, right: 0, height: 2,
+        background: `linear-gradient(90deg, ${fg}, transparent)`,
+        borderRadius: "var(--radius) var(--radius) 0 0",
+      }} />
+
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 16 }}>
+        {/* Icon */}
+        <div style={{
+          width: 42, height: 42, borderRadius: 12,
+          background: bg, display: "flex", alignItems: "center", justifyContent: "center",
+          flexShrink: 0,
+        }}>
+          <Icon size={20} style={{ color: fg }} />
         </div>
-        <p className="text-lg sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white truncate">{value}</p>
+
+        {/* Trend badge */}
         {change && (
-          <p className={`text-xs mt-1 sm:mt-2 flex items-center gap-1 ${
-            changeType === "up" ? "text-green-600" : changeType === "down" ? "text-red-500" : "text-gray-400"
-          }`}>
+          <span style={{
+            fontSize: 11, fontWeight: 700,
+            padding: "4px 8px", borderRadius: 7,
+            background: changeType === "up"
+              ? "var(--accent-sub)"
+              : changeType === "down"
+              ? "rgba(239,68,68,0.10)"
+              : "rgba(100,116,139,0.10)",
+            color: changeType === "up"
+              ? "var(--accent)"
+              : changeType === "down"
+              ? "var(--danger)"
+              : "var(--text-3)",
+          }}>
             {changeType === "up" ? "↑" : changeType === "down" ? "↓" : "→"} {change}
-          </p>
+          </span>
         )}
       </div>
+
+      {/* Value */}
+      <p style={{
+        fontSize: "clamp(20px, 2.5vw, 28px)",
+        fontWeight: 800,
+        color: "var(--text)",
+        letterSpacing: "-0.03em",
+        lineHeight: 1,
+        marginBottom: 6,
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        whiteSpace: "nowrap",
+      }}>
+        {value}
+      </p>
+
+      {/* Label */}
+      <p style={{ fontSize: 12, fontWeight: 500, color: "var(--text-2)" }}>
+        {title}
+      </p>
     </div>
   );
 }

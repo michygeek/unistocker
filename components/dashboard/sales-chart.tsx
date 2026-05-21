@@ -1,50 +1,79 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart,
+  AreaChart, Area, XAxis, YAxis, CartesianGrid,
+  Tooltip, ResponsiveContainer,
 } from "recharts";
 
-interface SalesData {
-  date: string;
-  revenue: number;
-  profit: number;
-}
+interface SalesData { date: string; revenue: number; profit: number; }
 
-interface Props {
-  data: SalesData[];
-}
+export function SalesChart({ data }: { data: SalesData[] }) {
+  const [isDark, setIsDark] = useState(false);
 
-export function SalesChart({ data }: Props) {
+  useEffect(() => {
+    const check = () => setIsDark(document.documentElement.classList.contains("dark"));
+    check();
+    const observer = new MutationObserver(check);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
+
+  const revenueColor = isDark ? "#2DD4BF" : "#0D9488";
+  const profitColor  = isDark ? "#60a5fa" : "#3b82f6";
+
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-6">
-      <h2 className="font-semibold text-gray-900 dark:text-white mb-6">Revenue & Profit (Last 7 Days)</h2>
-      <ResponsiveContainer width="100%" height={240}>
-        <AreaChart data={data} margin={{ top: 4, right: 4, left: -24, bottom: 0 }}>
+    <div className="uni-card" style={{ padding: "24px" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
+        <div>
+          <h2 style={{ fontSize: 15, fontWeight: 700, color: "var(--text)", margin: 0, letterSpacing: "-0.01em" }}>
+            Revenue &amp; Profit
+          </h2>
+          <p style={{ fontSize: 12, color: "var(--text-2)", marginTop: 3 }}>Last 7 days</p>
+        </div>
+        <div style={{ display: "flex", gap: 16 }}>
+          {[
+            { label: "Revenue", color: revenueColor },
+            { label: "Profit",  color: profitColor  },
+          ].map(({ label, color }) => (
+            <span key={label} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--text-2)" }}>
+              <span style={{ width: 8, height: 8, borderRadius: 99, background: color, display: "inline-block" }} />
+              {label}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <ResponsiveContainer width="100%" height={220}>
+        <AreaChart data={data} margin={{ top: 4, right: 4, left: -28, bottom: 0 }}>
           <defs>
-            <linearGradient id="revenueGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
-              <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+            <linearGradient id="gRev" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"   stopColor={revenueColor} stopOpacity={isDark ? 0.22 : 0.15} />
+              <stop offset="100%" stopColor={revenueColor} stopOpacity={0} />
             </linearGradient>
-            <linearGradient id="profitGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-              <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+            <linearGradient id="gProfit" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"   stopColor={profitColor} stopOpacity={0.15} />
+              <stop offset="100%" stopColor={profitColor} stopOpacity={0} />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-          <XAxis dataKey="date" tick={{ fontSize: 11, fill: "#9ca3af" }} />
-          <YAxis tick={{ fontSize: 11, fill: "#9ca3af" }} />
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+          <XAxis dataKey="date" tick={{ fontSize: 11, fill: "var(--text-3)" }} axisLine={false} tickLine={false} />
+          <YAxis tick={{ fontSize: 11, fill: "var(--text-3)" }} axisLine={false} tickLine={false} />
           <Tooltip
-            contentStyle={{ background: "#1f2937", border: "none", borderRadius: "8px", color: "#f9fafb", fontSize: 12 }}
-            formatter={(v) => [`₦${Number(v ?? 0).toFixed(2)}`, ""]}
+            contentStyle={{
+              background: "var(--bg-card-2)",
+              border: "1px solid var(--border-2)",
+              borderRadius: 10,
+              color: "var(--text)",
+              fontSize: 12,
+              boxShadow: "var(--shadow-lg)",
+            }}
+            formatter={(v) => [`₦${Number(v).toLocaleString()}`, ""]}
           />
-          <Area type="monotone" dataKey="revenue" stroke="#6366f1" strokeWidth={2} fill="url(#revenueGrad)" name="Revenue" />
-          <Area type="monotone" dataKey="profit" stroke="#10b981" strokeWidth={2} fill="url(#profitGrad)" name="Profit" />
+          <Area type="monotone" dataKey="revenue" stroke={revenueColor} strokeWidth={2.5} fill="url(#gRev)"    dot={false} name="Revenue" />
+          <Area type="monotone" dataKey="profit"  stroke={profitColor}  strokeWidth={2}   fill="url(#gProfit)" dot={false} name="Profit" />
         </AreaChart>
       </ResponsiveContainer>
-      <div className="flex gap-6 mt-4 justify-end">
-        <span className="flex items-center gap-2 text-xs text-gray-500"><span className="w-3 h-3 rounded-full bg-indigo-500 block" /> Revenue</span>
-        <span className="flex items-center gap-2 text-xs text-gray-500"><span className="w-3 h-3 rounded-full bg-emerald-500 block" /> Profit</span>
-      </div>
     </div>
   );
 }

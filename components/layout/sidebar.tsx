@@ -5,31 +5,23 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import {
-  LayoutDashboard, Package, ShoppingCart, BarChart3, Users, Settings,
-  Bell, LogOut, Menu, X, ChevronRight,
+  LayoutDashboard, Package, ShoppingCart, BarChart3,
+  Users, Settings, Bell, LogOut, Menu, X,
 } from "lucide-react";
 import { useState } from "react";
 import type { UserRole } from "@prisma/client";
 
-interface NavItem {
-  href: string;
-  label: string;
-  icon: React.ComponentType<{ size?: number; className?: string }>;
-  roles?: UserRole[];
-  badge?: number;
-}
-
-const NAV_ITEMS: NavItem[] = [
+const NAV = [
   { href: "/dashboard",      label: "Dashboard",     icon: LayoutDashboard },
   { href: "/inventory",      label: "Inventory",     icon: Package },
   { href: "/sales",          label: "Sales",         icon: ShoppingCart },
-  { href: "/reports",        label: "Reports",       icon: BarChart3,  roles: ["BOSS", "MANAGER"] },
+  { href: "/reports",        label: "Reports",       icon: BarChart3,  roles: ["BOSS","MANAGER"] },
   { href: "/notifications",  label: "Notifications", icon: Bell },
-  { href: "/settings/staff", label: "Staff",         icon: Users,      roles: ["BOSS", "MANAGER"] },
-  { href: "/settings",       label: "Settings",      icon: Settings },
-];
+  { href: "/settings/staff", label: "Staff",         icon: Users,      roles: ["BOSS","MANAGER"] },
+  { href: "/settings",       label: "My Account",    icon: Settings },
+] as const;
 
-interface SidebarProps {
+interface Props {
   userRole: UserRole;
   userName?: string | null;
   userEmail?: string;
@@ -37,103 +29,113 @@ interface SidebarProps {
   unreadCount?: number;
 }
 
-export function Sidebar({ userRole, userName, userEmail, organizationName, unreadCount = 0 }: SidebarProps) {
+const S = {
+  sidebar:     { background: "var(--sidebar)", width: 256, height: "100%", display: "flex", flexDirection: "column" as const },
+  brand:       { padding: "20px 16px 16px", borderBottom: "1px solid rgba(255,255,255,0.05)", display: "flex", alignItems: "center", gap: 10 },
+  logoBox:     { width: 36, height: 36, borderRadius: 10, background: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 },
+  orgName:     { fontWeight: 700, color: "#fff", fontSize: 14, margin: 0, lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const },
+  poweredBy:   { fontSize: 10, color: "rgba(255,255,255,0.28)", margin: "3px 0 0", letterSpacing: "0.02em" },
+  nav:         { flex: 1, padding: "10px 10px", display: "flex", flexDirection: "column" as const, gap: 1, overflowY: "auto" as const },
+  footer:      { padding: "10px 10px 14px", borderTop: "1px solid rgba(255,255,255,0.05)" },
+  userRow:     { display: "flex", alignItems: "center", gap: 10, padding: "9px 10px", marginBottom: 2 },
+  avatar:      { width: 34, height: 34, borderRadius: "50%", background: "linear-gradient(135deg, #0D9488, #042F2E)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 },
+  avatarText:  { color: "#FFFFFF", fontSize: 13, fontWeight: 700 },
+  userName:    { color: "#fff", fontSize: 13, fontWeight: 600, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const },
+  userEmail:   { color: "rgba(255,255,255,0.30)", fontSize: 11, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const },
+};
+
+function NavLink({ href, label, Icon, active, badge }: { href: string; label: string; Icon: React.ComponentType<{size?: number}>; active: boolean; badge?: number }) {
+  return (
+    <Link
+      href={href}
+      style={{
+        display: "flex", alignItems: "center", gap: 10,
+        padding: "9px 12px", borderRadius: 10, textDecoration: "none",
+        fontSize: 13.5, fontWeight: 500, transition: "all 0.15s",
+        background: active ? "var(--accent)" : "transparent",
+        color: active ? "var(--accent-fg)" : "var(--sidebar-text)",
+        boxShadow: active ? "var(--shadow-accent)" : "none",
+        position: "relative",
+      }}
+      className="sidebar-link"
+    >
+      <Icon size={16} />
+      <span style={{ flex: 1 }}>{label}</span>
+      {badge != null && badge > 0 && (
+        <span style={{
+          background: "#ef4444", color: "#fff", fontSize: 10, fontWeight: 700,
+          padding: "2px 6px", borderRadius: 99, minWidth: 18, textAlign: "center",
+        }}>
+          {badge > 99 ? "99+" : badge}
+        </span>
+      )}
+    </Link>
+  );
+}
+
+export function Sidebar({ userRole, userName, userEmail, organizationName, unreadCount = 0 }: Props) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const visibleItems = NAV_ITEMS.filter(
-    (item) => !item.roles || item.roles.includes(userRole)
-  );
+  const visible = NAV.filter((i) => !("roles" in i) || (i.roles as readonly string[]).includes(userRole));
 
-  const NavContent = () => (
-    <div className="flex flex-col h-full">
-      {/* Logo / Brand */}
-      <div style={{
-        display: "flex", alignItems: "center", gap: 10,
-        padding: "20px 16px 16px", borderBottom: "1px solid rgba(255,255,255,0.07)",
-      }}>
-        <Image src="/Uniwhite.png" alt="UniStocker" width={32} height={32} style={{ objectFit: "contain" }} />
+  const Content = () => (
+    <div style={S.sidebar}>
+      {/* Brand */}
+      <div style={S.brand}>
+        <div style={S.logoBox}>
+          <Image src="/Uniwhite.png" alt="UniStocker" width={22} height={22} style={{ objectFit: "contain" }} />
+        </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ fontWeight: 700, color: "#fff", fontSize: 14, margin: 0, lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-            {organizationName ?? "UniStocker"}
-          </p>
-          <p style={{ fontSize: 11, color: "#4E8A78", margin: "3px 0 0" }}>
-            powered by <span style={{ color: "#2EBD78", fontWeight: 600 }}>UniStocker</span>
-          </p>
+          <p style={S.orgName}>{organizationName ?? "UniStocker"}</p>
+          <p style={S.poweredBy}>UniStocker · Inventory Platform</p>
         </div>
       </div>
 
-      {/* Nav links */}
-      <nav style={{ flex: 1, padding: "12px 10px", display: "flex", flexDirection: "column", gap: 2, overflowY: "auto" }}>
-        {visibleItems.map((item) => {
-          const active = pathname === item.href || pathname.startsWith(item.href + "/");
-          const Icon = item.icon;
-          const count = item.href === "/notifications" ? unreadCount : 0;
-
+      {/* Nav */}
+      <nav style={S.nav}>
+        <style>{`.sidebar-link:not([style*="background: var(--accent)"]):hover{background:rgba(255,255,255,0.06)!important;color:#fff!important}`}</style>
+        {visible.map((item) => {
+          const hasChild = visible.some(
+            (other) => other.href !== item.href && other.href.startsWith(item.href + "/")
+          );
+          const active = pathname === item.href || (!hasChild && pathname.startsWith(item.href + "/"));
           return (
-            <Link
+            <NavLink
               key={item.href}
               href={item.href}
-              onClick={() => setMobileOpen(false)}
-              style={{
-                display: "flex", alignItems: "center", gap: 10,
-                padding: "10px 12px", borderRadius: 10, textDecoration: "none",
-                fontSize: 14, fontWeight: 500, transition: "all 0.15s",
-                background: active ? "#2EBD78" : "transparent",
-                color: active ? "#fff" : "#7EB8A8",
-              }}
-              onMouseEnter={(e) => { if (!active) { (e.currentTarget as HTMLAnchorElement).style.background = "rgba(46,189,120,0.1)"; (e.currentTarget as HTMLAnchorElement).style.color = "#fff"; } }}
-              onMouseLeave={(e) => { if (!active) { (e.currentTarget as HTMLAnchorElement).style.background = "transparent"; (e.currentTarget as HTMLAnchorElement).style.color = "#7EB8A8"; } }}
-            >
-              <Icon size={17} />
-              <span style={{ flex: 1 }}>{item.label}</span>
-              {count > 0 && (
-                <span style={{
-                  background: "#ef4444", color: "#fff", fontSize: 10, fontWeight: 700,
-                  padding: "2px 6px", borderRadius: 99, minWidth: 18, textAlign: "center",
-                }}>
-                  {count > 99 ? "99+" : count}
-                </span>
-              )}
-              {active && <ChevronRight size={13} style={{ opacity: 0.7 }} />}
-            </Link>
+              label={item.label}
+              Icon={item.icon}
+              active={active}
+              badge={item.href === "/notifications" ? unreadCount : undefined}
+            />
           );
         })}
       </nav>
 
-      {/* User footer */}
-      <div style={{ padding: "12px 10px", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", marginBottom: 4 }}>
-          <div style={{
-            width: 32, height: 32, borderRadius: "50%",
-            background: "linear-gradient(135deg, #2EBD78, #1B3D4F)",
-            display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-          }}>
-            <span style={{ color: "#fff", fontSize: 13, fontWeight: 700 }}>
-              {(userName ?? userEmail ?? "U").charAt(0).toUpperCase()}
-            </span>
+      {/* Footer */}
+      <div style={S.footer}>
+        <div style={S.userRow}>
+          <div style={S.avatar}>
+            <span style={S.avatarText}>{(userName ?? userEmail ?? "U").charAt(0).toUpperCase()}</span>
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <p style={{ color: "#fff", fontSize: 13, fontWeight: 600, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-              {userName ?? "User"}
-            </p>
-            <p style={{ color: "#4E8A78", fontSize: 11, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-              {userEmail}
-            </p>
+            <p style={S.userName}>{userName ?? "User"}</p>
+            <p style={S.userEmail}>{userEmail}</p>
           </div>
         </div>
         <button
           onClick={() => signOut({ callbackUrl: "/auth/login" })}
+          className="signout-btn"
           style={{
             width: "100%", display: "flex", alignItems: "center", gap: 10,
             padding: "9px 12px", borderRadius: 10, border: "none", cursor: "pointer",
-            background: "transparent", color: "#7EB8A8", fontSize: 14, fontWeight: 500,
-            transition: "all 0.15s", textAlign: "left",
+            background: "transparent", color: "rgba(255,255,255,0.38)",
+            fontSize: 13.5, fontWeight: 500, transition: "all 0.15s", textAlign: "left",
           }}
-          onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(239,68,68,0.15)"; (e.currentTarget as HTMLButtonElement).style.color = "#f87171"; }}
-          onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "transparent"; (e.currentTarget as HTMLButtonElement).style.color = "#7EB8A8"; }}
         >
-          <LogOut size={16} />
+          <style>{`.signout-btn:hover{background:rgba(239,68,68,0.12)!important;color:#f87171!important}`}</style>
+          <LogOut size={15} />
           Sign out
         </button>
       </div>
@@ -145,42 +147,39 @@ export function Sidebar({ userRole, userName, userEmail, organizationName, unrea
       {/* Mobile toggle */}
       <button
         onClick={() => setMobileOpen(true)}
+        className="lg:hidden"
         style={{
           position: "fixed", top: 16, left: 16, zIndex: 50,
-          width: 40, height: 40, background: "#2EBD78", borderRadius: 10,
+          width: 40, height: 40, background: "var(--accent)", borderRadius: 10,
           display: "flex", alignItems: "center", justifyContent: "center",
-          border: "none", cursor: "pointer", boxShadow: "0 4px 12px rgba(46,189,120,0.4)",
+          border: "none", cursor: "pointer", boxShadow: "var(--shadow-accent)",
         }}
-        className="lg:hidden"
       >
-        <Menu size={20} color="white" />
+        <Menu size={20} style={{ color: "var(--accent-fg)" }} />
       </button>
 
-      {/* Mobile overlay */}
+      {/* Mobile drawer */}
       {mobileOpen && (
         <div className="lg:hidden" style={{ position: "fixed", inset: 0, zIndex: 40, display: "flex" }}>
           <div
-            style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}
+            style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(6px)" }}
             onClick={() => setMobileOpen(false)}
           />
-          <aside style={{ position: "relative", width: 272, background: "#0F2030", display: "flex", flexDirection: "column", zIndex: 50 }}>
+          <aside style={{ position: "relative", width: 264, zIndex: 50, display: "flex", flexDirection: "column" }}>
             <button
               onClick={() => setMobileOpen(false)}
-              style={{ position: "absolute", top: 16, right: 16, background: "none", border: "none", cursor: "pointer", color: "#7EB8A8" }}
+              style={{ position: "absolute", top: 14, right: 14, background: "rgba(255,255,255,0.07)", border: "none", cursor: "pointer", color: "rgba(255,255,255,0.5)", borderRadius: 8, padding: 6, zIndex: 10 }}
             >
-              <X size={20} />
+              <X size={18} />
             </button>
-            <NavContent />
+            <Content />
           </aside>
         </div>
       )}
 
-      {/* Desktop sidebar */}
-      <aside
-        className="hidden lg:flex"
-        style={{ width: 256, background: "#0F2030", flexDirection: "column", position: "fixed", top: 0, bottom: 0, left: 0, zIndex: 30 }}
-      >
-        <NavContent />
+      {/* Desktop */}
+      <aside className="hidden lg:block" style={{ width: 256, position: "fixed", top: 0, bottom: 0, left: 0, zIndex: 30 }}>
+        <Content />
       </aside>
     </>
   );

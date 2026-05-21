@@ -36,11 +36,9 @@ export function NewSaleButton({ products }: { products: Product[] }) {
 
   const handleScan = (code: string) => {
     setScannerOpen(false);
-    const match = products.find(
-      (p) => p.barcode === code || p.sku === code
-    );
+    const match = products.find((p) => p.barcode === code || p.sku === code);
     if (!match) {
-      setScanError(`No product found for code: ${code}`);
+      setScanError(`No product found for: ${code}`);
       setTimeout(() => setScanError(""), 3000);
       return;
     }
@@ -54,91 +52,96 @@ export function NewSaleButton({ products }: { products: Product[] }) {
   };
 
   const subtotal = cart.reduce((s, i) => s + i.sellingPrice * i.cartQty, 0);
-  const discountAmt = discount;
   const taxAmt = subtotal * (tax / 100);
-  const total = subtotal - discountAmt + taxAmt;
+  const total = subtotal - discount + taxAmt;
 
   const handleSubmit = async () => {
     if (!cart.length) { setError("Cart is empty"); return; }
-    setLoading(true);
-    setError("");
-
+    setLoading(true); setError("");
     const result = await recordSale({
       items: cart.map((i) => ({ productId: i.id, quantity: i.cartQty, unitPrice: i.sellingPrice })),
-      discount: discountAmt,
-      tax,
-      notes,
+      discount, tax, notes,
     });
-
     setLoading(false);
     if ("error" in result) {
       setError(typeof result.error === "string" ? result.error : "Failed to record sale");
     } else {
-      setCart([]);
-      setDiscount(0);
-      setTax(0);
-      setNotes("");
-      setOpen(false);
-      router.refresh();
+      setCart([]); setDiscount(0); setTax(0); setNotes(""); setOpen(false); router.refresh();
     }
   };
 
   return (
     <>
-      <button
-        onClick={() => setOpen(true)}
-        className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl font-medium text-sm transition shadow-sm"
-      >
-        <Plus size={18} /> New Sale
+      <button onClick={() => setOpen(true)} className="uni-btn uni-btn-primary">
+        <Plus size={16} /> New Sale
       </button>
 
-      {scannerOpen && (
-        <BarcodeScanner onScan={handleScan} onClose={() => setScannerOpen(false)} />
-      )}
+      {scannerOpen && <BarcodeScanner onScan={handleScan} onClose={() => setScannerOpen(false)} />}
 
       {open && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-8">
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setOpen(false)} />
-          <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden z-10 flex flex-col">
-            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
-              <h2 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                <ShoppingCart size={18} /> New Sale
+        <div className="uni-overlay" style={{ alignItems: "flex-start", paddingTop: 32 }}>
+          <div className="uni-overlay-backdrop" onClick={() => setOpen(false)} />
+          <div className="uni-modal" style={{ maxWidth: 780, display: "flex", flexDirection: "column", maxHeight: "90vh" }}>
+            {/* Header */}
+            <div style={{
+              padding: "16px 20px",
+              borderBottom: "1px solid var(--border)",
+              display: "flex", alignItems: "center", justifyContent: "space-between",
+              flexShrink: 0,
+            }}>
+              <h2 style={{ fontSize: 15, fontWeight: 700, color: "var(--text)", margin: 0, display: "flex", alignItems: "center", gap: 8 }}>
+                <ShoppingCart size={16} style={{ color: "var(--accent)" }} /> New Sale
               </h2>
-              <button onClick={() => setOpen(false)} className="text-gray-400 hover:text-gray-600">
+              <button onClick={() => setOpen(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-3)", display: "flex" }}>
                 <X size={20} />
               </button>
             </div>
 
-            <div className="flex flex-1 overflow-hidden">
-              {/* Products */}
-              <div className="w-1/2 border-r border-gray-200 dark:border-gray-800 overflow-y-auto">
-                <div className="p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Products</p>
+            {/* Split body */}
+            <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
+              {/* ── Left: Products ── */}
+              <div style={{ width: "50%", borderRight: "1px solid var(--border)", overflowY: "auto" }}>
+                <div style={{ padding: 16 }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+                    <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--text-2)" }}>
+                      Products
+                    </p>
                     <button
-                      type="button"
-                      onClick={() => setScannerOpen(true)}
-                      className="flex items-center gap-1.5 text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition font-medium"
+                      type="button" onClick={() => setScannerOpen(true)}
+                      style={{ fontSize: 12, color: "var(--accent)", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 4, fontWeight: 600 }}
                     >
-                      <Camera size={13} /> Scan barcode
+                      <Camera size={13} /> Scan
                     </button>
                   </div>
                   {scanError && (
-                    <p className="text-xs text-red-500 mb-2 bg-red-50 dark:bg-red-900/20 px-2 py-1.5 rounded-lg">{scanError}</p>
+                    <p style={{ fontSize: 12, color: "var(--danger)", padding: "6px 10px", background: "rgba(239,68,68,0.08)", borderRadius: 8, marginBottom: 10 }}>
+                      {scanError}
+                    </p>
                   )}
-                  <div className="space-y-1.5">
+                  <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                     {products.map((p) => (
                       <button
                         key={p.id}
                         onClick={() => addToCart(p)}
                         disabled={p.quantity === 0}
-                        className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition disabled:opacity-40 disabled:cursor-not-allowed text-left border border-transparent hover:border-indigo-200 dark:hover:border-indigo-800"
+                        style={{
+                          display: "flex", alignItems: "center", justifyContent: "space-between",
+                          padding: "10px 12px", borderRadius: 10,
+                          border: "1px solid var(--border)",
+                          background: "transparent",
+                          cursor: p.quantity === 0 ? "not-allowed" : "pointer",
+                          opacity: p.quantity === 0 ? 0.45 : 1,
+                          textAlign: "left", transition: "all 0.15s",
+                          width: "100%",
+                        }}
+                        onMouseEnter={(e) => { if (p.quantity > 0) { (e.currentTarget as HTMLButtonElement).style.background = "var(--accent-sub)"; (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--accent-glow)"; } }}
+                        onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "transparent"; (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border)"; }}
                       >
-                        <div>
-                          <p className="text-sm font-medium text-gray-800 dark:text-gray-200">{p.name}</p>
-                          <p className="text-xs text-gray-400">{p.sku} · {p.quantity} in stock</p>
+                        <div style={{ minWidth: 0 }}>
+                          <p style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</p>
+                          <p style={{ fontSize: 11, color: "var(--text-3)", marginTop: 2 }}>{p.sku} · {p.quantity} in stock</p>
                         </div>
-                        <span className="text-sm font-semibold text-indigo-600 dark:text-indigo-400 ml-2">
+                        <span style={{ fontSize: 13, fontWeight: 700, color: "var(--accent)", marginLeft: 8, flexShrink: 0 }}>
                           ₦{p.sellingPrice.toFixed(2)}
                         </span>
                       </button>
@@ -147,43 +150,51 @@ export function NewSaleButton({ products }: { products: Product[] }) {
                 </div>
               </div>
 
-              {/* Cart */}
-              <div className="w-1/2 flex flex-col">
-                <div className="flex-1 overflow-y-auto p-4">
-                  <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-3 uppercase tracking-wide">Cart</p>
+              {/* ── Right: Cart ── */}
+              <div style={{ width: "50%", display: "flex", flexDirection: "column" }}>
+                {/* Cart items */}
+                <div style={{ flex: 1, overflowY: "auto", padding: 16 }}>
+                  <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--text-2)", marginBottom: 12 }}>
+                    Cart ({cart.length} items)
+                  </p>
                   {cart.length === 0 ? (
-                    <p className="text-sm text-gray-400 text-center mt-8">Add items from the left</p>
+                    <p style={{ fontSize: 13, color: "var(--text-3)", textAlign: "center", marginTop: 32 }}>Add items from the left</p>
                   ) : (
-                    <div className="space-y-2">
+                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                       {cart.map((item) => (
-                        <div key={item.id} className="flex items-center gap-2 p-2.5 bg-gray-50 dark:bg-gray-800 rounded-xl">
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">{item.name}</p>
-                            <p className="text-xs text-gray-400">₦{item.sellingPrice.toFixed(2)} each</p>
+                        <div key={item.id} style={{
+                          display: "flex", alignItems: "center", gap: 8,
+                          padding: "10px 12px", borderRadius: 10,
+                          background: "var(--bg-input)", border: "1px solid var(--border)",
+                        }}>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <p style={{ fontSize: 12, fontWeight: 600, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.name}</p>
+                            <p style={{ fontSize: 11, color: "var(--text-3)", marginTop: 2 }}>₦{item.sellingPrice.toFixed(2)} each</p>
                           </div>
-                          <div className="flex items-center gap-1">
+                          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
                             <button
                               onClick={() => updateQty(item.id, item.cartQty - 1)}
-                              className="w-6 h-6 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 flex items-center justify-center text-sm font-bold hover:bg-gray-300 dark:hover:bg-gray-600 transition"
+                              style={{ width: 24, height: 24, borderRadius: 6, border: "1px solid var(--border)", background: "var(--bg-card)", color: "var(--text-2)", cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center" }}
                             >-</button>
                             <input
-                              type="number"
-                              value={item.cartQty}
+                              type="number" value={item.cartQty}
                               onChange={(e) => updateQty(item.id, Number(e.target.value))}
-                              className="w-12 text-center text-sm border border-gray-200 dark:border-gray-700 rounded-lg py-0.5 bg-white dark:bg-gray-900"
-                              min={1}
-                              max={item.quantity}
+                              style={{ width: 44, textAlign: "center", fontSize: 12, border: "1px solid var(--border)", borderRadius: 6, padding: "2px 4px", background: "var(--bg-card)", color: "var(--text)" }}
+                              min={1} max={item.quantity}
                             />
                             <button
                               onClick={() => updateQty(item.id, item.cartQty + 1)}
-                              className="w-6 h-6 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 flex items-center justify-center text-sm font-bold hover:bg-gray-300 dark:hover:bg-gray-600 transition"
+                              style={{ width: 24, height: 24, borderRadius: 6, border: "1px solid var(--border)", background: "var(--bg-card)", color: "var(--text-2)", cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center" }}
                             >+</button>
                           </div>
-                          <span className="text-sm font-semibold text-gray-900 dark:text-white w-16 text-right">
+                          <span style={{ fontSize: 12, fontWeight: 700, color: "var(--text)", width: 64, textAlign: "right" }}>
                             ₦{(item.sellingPrice * item.cartQty).toFixed(2)}
                           </span>
-                          <button onClick={() => updateQty(item.id, 0)} className="text-red-400 hover:text-red-600">
-                            <Trash2 size={14} />
+                          <button
+                            onClick={() => updateQty(item.id, 0)}
+                            style={{ background: "none", border: "none", cursor: "pointer", color: "var(--danger)", display: "flex" }}
+                          >
+                            <Trash2 size={13} />
                           </button>
                         </div>
                       ))}
@@ -191,66 +202,56 @@ export function NewSaleButton({ products }: { products: Product[] }) {
                   )}
                 </div>
 
-                <div className="p-4 border-t border-gray-100 dark:border-gray-800 space-y-3">
-                  <div className="grid grid-cols-2 gap-2">
+                {/* Totals + checkout */}
+                <div style={{ padding: 16, borderTop: "1px solid var(--border)", display: "flex", flexDirection: "column", gap: 10 }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                     <div>
-                      <label className="text-xs text-gray-500">Discount (₦)</label>
-                      <input
-                        type="number"
-                        value={discount}
-                        onChange={(e) => setDiscount(Number(e.target.value))}
-                        min={0}
-                        className="w-full px-2 py-1.5 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800"
-                      />
+                      <label style={{ fontSize: 11, color: "var(--text-3)", display: "block", marginBottom: 4 }}>Discount (₦)</label>
+                      <input type="number" value={discount} onChange={(e) => setDiscount(Number(e.target.value))} min={0} className="uni-input" style={{ padding: "6px 10px" }} />
                     </div>
                     <div>
-                      <label className="text-xs text-gray-500">Tax (%)</label>
-                      <input
-                        type="number"
-                        value={tax}
-                        onChange={(e) => setTax(Number(e.target.value))}
-                        min={0}
-                        max={100}
-                        className="w-full px-2 py-1.5 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800"
-                      />
+                      <label style={{ fontSize: 11, color: "var(--text-3)", display: "block", marginBottom: 4 }}>Tax (%)</label>
+                      <input type="number" value={tax} onChange={(e) => setTax(Number(e.target.value))} min={0} max={100} className="uni-input" style={{ padding: "6px 10px" }} />
                     </div>
                   </div>
 
                   <textarea
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    placeholder="Notes (optional)"
-                    rows={1}
-                    className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 resize-none"
+                    value={notes} onChange={(e) => setNotes(e.target.value)}
+                    placeholder="Notes (optional)" rows={1}
+                    className="uni-input" style={{ resize: "none" }}
                   />
 
-                  <div className="bg-indigo-50 dark:bg-indigo-950/50 rounded-xl p-3 space-y-1">
-                    <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                  {/* Order summary */}
+                  <div style={{ background: "var(--bg-input)", borderRadius: 10, padding: "12px 14px", display: "flex", flexDirection: "column", gap: 6 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--text-2)" }}>
                       <span>Subtotal</span><span>₦{subtotal.toFixed(2)}</span>
                     </div>
-                    {discountAmt > 0 && (
-                      <div className="flex justify-between text-sm text-red-600">
-                        <span>Discount</span><span>-₦{discountAmt.toFixed(2)}</span>
+                    {discount > 0 && (
+                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--danger)" }}>
+                        <span>Discount</span><span>-₦{discount.toFixed(2)}</span>
                       </div>
                     )}
                     {taxAmt > 0 && (
-                      <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--text-2)" }}>
                         <span>Tax</span><span>+₦{taxAmt.toFixed(2)}</span>
                       </div>
                     )}
-                    <div className="flex justify-between font-bold text-gray-900 dark:text-white border-t border-indigo-200 dark:border-indigo-800 pt-1 mt-1">
-                      <span>Total</span><span>₦{total.toFixed(2)}</span>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 800, fontSize: 14, color: "var(--text)", borderTop: "1px solid var(--border)", paddingTop: 8, marginTop: 2 }}>
+                      <span>Total</span><span style={{ color: "var(--accent)" }}>₦{total.toFixed(2)}</span>
                     </div>
                   </div>
 
-                  {error && <p className="text-red-500 text-xs">{error}</p>}
+                  {error && <p style={{ fontSize: 12, color: "var(--danger)" }}>{error}</p>}
 
                   <button
                     onClick={handleSubmit}
                     disabled={loading || cart.length === 0}
-                    className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white rounded-xl font-medium text-sm transition flex items-center justify-center gap-2"
+                    className="uni-btn uni-btn-primary"
+                    style={{ width: "100%", padding: "10px 16px", fontSize: 14 }}
                   >
-                    {loading ? <><Loader2 size={16} className="animate-spin" /> Processing...</> : `Complete Sale · ₦${total.toFixed(2)}`}
+                    {loading
+                      ? <><Loader2 size={15} className="animate-spin" /> Processing…</>
+                      : `Complete Sale · ₦${total.toFixed(2)}`}
                   </button>
                 </div>
               </div>

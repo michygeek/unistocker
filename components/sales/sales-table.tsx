@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { formatDistanceToNow, format } from "date-fns";
+import { format } from "date-fns";
+import { formatDistanceToNow } from "date-fns";
 import { ChevronDown, ChevronUp, Receipt } from "lucide-react";
 
 interface SaleItem { id: string; quantity: number; unitPrice: number; costPrice: number; total: number; product: { name: string; sku: string }; }
@@ -14,28 +15,28 @@ export function SalesTable({ sales, total, page, limit }: Props) {
   const totalPages = Math.ceil(total / limit);
 
   return (
-    <div className="space-y-4">
-      <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      <div className="uni-card" style={{ overflow: "hidden" }}>
+        <div style={{ overflowX: "auto" }}>
+          <table className="uni-table">
             <thead>
-              <tr className="bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400">
-                <th className="text-left px-4 sm:px-6 py-3 font-medium">Receipt</th>
-                <th className="text-left px-4 py-3 font-medium hidden sm:table-cell">Cashier</th>
-                <th className="text-right px-4 py-3 font-medium hidden md:table-cell">Subtotal</th>
-                <th className="text-right px-4 py-3 font-medium hidden md:table-cell">Discount</th>
-                <th className="text-right px-4 py-3 font-medium">Total</th>
-                <th className="text-right px-4 py-3 font-medium hidden sm:table-cell">Profit</th>
-                <th className="text-right px-4 py-3 font-medium">Date</th>
-                <th className="w-8 sm:w-10 px-2 sm:px-4 py-3" />
+              <tr>
+                <th style={{ paddingLeft: 20 }}>Receipt</th>
+                <th className="hidden sm:table-cell">Cashier</th>
+                <th className="hidden md:table-cell" style={{ textAlign: "right" }}>Subtotal</th>
+                <th className="hidden md:table-cell" style={{ textAlign: "right" }}>Discount</th>
+                <th style={{ textAlign: "right" }}>Total</th>
+                <th className="hidden sm:table-cell" style={{ textAlign: "right" }}>Profit</th>
+                <th style={{ textAlign: "right" }}>Date</th>
+                <th style={{ width: 40, paddingRight: 16 }} />
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
+            <tbody>
               {sales.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="px-6 py-12 text-center text-gray-400">
-                    <Receipt size={32} className="mx-auto mb-2 opacity-40" />
-                    No sales recorded yet
+                  <td colSpan={8} style={{ textAlign: "center", padding: "48px 24px", color: "var(--text-3)" }}>
+                    <Receipt size={32} style={{ margin: "0 auto 8px", opacity: 0.4 }} />
+                    <p>No sales recorded yet</p>
                   </td>
                 </tr>
               )}
@@ -43,47 +44,76 @@ export function SalesTable({ sales, total, page, limit }: Props) {
                 <>
                   <tr
                     key={sale.id}
-                    className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition cursor-pointer"
+                    style={{ cursor: "pointer" }}
                     onClick={() => setExpanded(expanded === sale.id ? null : sale.id)}
                   >
-                    <td className="px-4 sm:px-6 py-3 sm:py-4">
-                      <span className="font-mono text-xs text-indigo-600 dark:text-indigo-400 font-semibold">{sale.receiptNumber}</span>
+                    <td style={{ paddingLeft: 20 }}>
+                      <span style={{ fontFamily: "monospace", fontSize: 12, fontWeight: 700, color: "var(--accent)" }}>
+                        {sale.receiptNumber}
+                      </span>
                     </td>
-                    <td className="px-4 py-4 text-gray-600 dark:text-gray-400 text-sm hidden sm:table-cell">{sale.user.name ?? sale.user.email}</td>
-                    <td className="px-4 py-4 text-right text-gray-600 dark:text-gray-400 text-sm hidden md:table-cell">₦{sale.subtotal.toFixed(2)}</td>
-                    <td className="px-4 py-4 text-right text-red-500 text-sm hidden md:table-cell">{sale.discount > 0 ? `-₦${sale.discount.toFixed(2)}` : "—"}</td>
-                    <td className="px-4 py-4 text-right font-semibold text-gray-900 dark:text-white text-sm">₦{sale.total.toFixed(2)}</td>
-                    <td className="px-4 py-4 text-right text-emerald-600 dark:text-emerald-400 font-medium text-sm hidden sm:table-cell">₦{sale.profit.toFixed(2)}</td>
-                    <td className="px-4 py-4 text-right text-xs text-gray-400">
-                      <div>{format(new Date(sale.createdAt), "MMM d")}</div>
-                      <div className="hidden sm:block">{format(new Date(sale.createdAt), "h:mm a")}</div>
+                    <td className="hidden sm:table-cell" style={{ color: "var(--text-2)", fontSize: 13 }}>
+                      {sale.user.name ?? sale.user.email}
                     </td>
-                    <td className="px-2 sm:px-4 py-4 text-gray-400">
-                      {expanded === sale.id ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                    <td className="hidden md:table-cell" style={{ textAlign: "right", color: "var(--text-2)" }}>
+                      ₦{sale.subtotal.toFixed(2)}
+                    </td>
+                    <td className="hidden md:table-cell" style={{ textAlign: "right", color: "var(--danger)" }}>
+                      {sale.discount > 0 ? `-₦${sale.discount.toFixed(2)}` : "—"}
+                    </td>
+                    <td style={{ textAlign: "right", fontWeight: 700, color: "var(--text)" }}>
+                      ₦{sale.total.toFixed(2)}
+                    </td>
+                    <td className="hidden sm:table-cell" style={{ textAlign: "right", fontWeight: 600, color: "var(--accent)" }}>
+                      ₦{sale.profit.toFixed(2)}
+                    </td>
+                    <td style={{ textAlign: "right" }}>
+                      <div style={{ fontSize: 12, color: "var(--text-2)" }}>{format(new Date(sale.createdAt), "MMM d")}</div>
+                      <div className="hidden sm:block" style={{ fontSize: 11, color: "var(--text-3)" }}>{format(new Date(sale.createdAt), "h:mm a")}</div>
+                    </td>
+                    <td style={{ textAlign: "center", paddingRight: 16 }}>
+                      {expanded === sale.id
+                        ? <ChevronUp size={15} style={{ color: "var(--text-3)" }} />
+                        : <ChevronDown size={15} style={{ color: "var(--text-3)" }} />}
                     </td>
                   </tr>
+
                   {expanded === sale.id && (
-                    <tr key={`${sale.id}-expanded`} className="bg-indigo-50/50 dark:bg-indigo-950/30">
-                      <td colSpan={8} className="px-4 sm:px-6 py-4">
-                        <div className="space-y-1.5">
-                          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Items sold</p>
+                    <tr key={`${sale.id}-expanded`}>
+                      <td colSpan={8} style={{ background: "var(--bg-card-2)", padding: "16px 20px", borderBottom: "1px solid var(--border)" }}>
+                        <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--text-3)", marginBottom: 12 }}>
+                          Items sold
+                        </p>
+                        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                           {sale.saleItems.map((item) => (
-                            <div key={item.id} className="flex items-start sm:items-center justify-between gap-2 text-sm">
-                              <div className="min-w-0">
-                                <span className="font-medium text-gray-800 dark:text-gray-200 block sm:inline truncate">{item.product.name}</span>
-                                <span className="text-gray-400 text-xs sm:ml-2">{item.product.sku}</span>
+                            <div key={item.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+                              <div style={{ minWidth: 0 }}>
+                                <span style={{ fontWeight: 600, fontSize: 13, color: "var(--text)" }}>{item.product.name}</span>
+                                <span style={{ fontSize: 11, color: "var(--text-3)", marginLeft: 8 }}>{item.product.sku}</span>
                               </div>
-                              <div className="flex flex-col sm:flex-row gap-1 sm:gap-6 text-gray-600 dark:text-gray-400 text-right shrink-0">
-                                <span>{item.quantity}x @ ₦{item.unitPrice.toFixed(2)}</span>
-                                <span className="font-semibold text-gray-900 dark:text-white">₦{item.total.toFixed(2)}</span>
+                              <div style={{ display: "flex", gap: 20, fontSize: 13, color: "var(--text-2)", flexShrink: 0 }}>
+                                <span>{item.quantity}× @ ₦{item.unitPrice.toFixed(2)}</span>
+                                <span style={{ fontWeight: 700, color: "var(--text)" }}>₦{item.total.toFixed(2)}</span>
                               </div>
                             </div>
                           ))}
-                          {sale.notes && (
-                            <p className="text-xs text-gray-400 mt-2 border-t border-indigo-200 dark:border-indigo-800 pt-2">
-                              Note: {sale.notes}
-                            </p>
+                        </div>
+                        {sale.notes && (
+                          <p style={{ fontSize: 12, color: "var(--text-3)", marginTop: 12, paddingTop: 12, borderTop: "1px solid var(--border)" }}>
+                            Note: {sale.notes}
+                          </p>
+                        )}
+                        {/* Summary row */}
+                        <div style={{ display: "flex", gap: 20, marginTop: 12, paddingTop: 12, borderTop: "1px solid var(--border)", fontSize: 12 }}>
+                          {sale.discount > 0 && (
+                            <span style={{ color: "var(--danger)" }}>Discount: -₦{sale.discount.toFixed(2)}</span>
                           )}
+                          {sale.tax > 0 && (
+                            <span style={{ color: "var(--text-2)" }}>Tax: ₦{sale.tax.toFixed(2)}</span>
+                          )}
+                          <span style={{ color: "var(--text-2)", marginLeft: "auto" }}>
+                            {formatDistanceToNow(new Date(sale.createdAt), { addSuffix: true })}
+                          </span>
                         </div>
                       </td>
                     </tr>
@@ -95,11 +125,26 @@ export function SalesTable({ sales, total, page, limit }: Props) {
         </div>
 
         {totalPages > 1 && (
-          <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between text-sm">
-            <span className="text-gray-400">Showing {(page - 1) * limit + 1}–{Math.min(page * limit, total)} of {total}</span>
-            <div className="flex gap-2">
-              {page > 1 && <a href={`/sales?page=${page - 1}`} className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition">Prev</a>}
-              {page < totalPages && <a href={`/sales?page=${page + 1}`} className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition">Next</a>}
+          <div style={{
+            padding: "12px 20px",
+            borderTop: "1px solid var(--border)",
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            fontSize: 12, color: "var(--text-3)",
+          }}>
+            <span>Showing {(page - 1) * limit + 1}–{Math.min(page * limit, total)} of {total}</span>
+            <div style={{ display: "flex", gap: 8 }}>
+              {page > 1 && (
+                <a href={`/sales?page=${page - 1}`} style={{
+                  padding: "5px 12px", borderRadius: 8, border: "1px solid var(--border)",
+                  color: "var(--text-2)", fontSize: 12, textDecoration: "none", background: "var(--bg-input)",
+                }}>Prev</a>
+              )}
+              {page < totalPages && (
+                <a href={`/sales?page=${page + 1}`} style={{
+                  padding: "5px 12px", borderRadius: 8, border: "1px solid var(--border)",
+                  color: "var(--text-2)", fontSize: 12, textDecoration: "none", background: "var(--bg-input)",
+                }}>Next</a>
+              )}
             </div>
           </div>
         )}

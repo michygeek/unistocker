@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { Header } from "@/components/layout/header";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Settings" };
+export const metadata: Metadata = { title: "My Account" };
 export const dynamic = "force-dynamic";
 
 export default async function SettingsPage() {
@@ -19,30 +19,59 @@ export default async function SettingsPage() {
     },
   });
 
+  const roleBg: Record<string, string> = {
+    BOSS: "rgba(168,85,247,0.10)", MANAGER: "rgba(59,130,246,0.10)", STAFF: "rgba(100,116,139,0.10)",
+  };
+  const roleColor: Record<string, string> = {
+    BOSS: "#c084fc", MANAGER: "var(--info)", STAFF: "var(--text-2)",
+  };
+  const role = user?.role ?? "STAFF";
+
   return (
-    <div className="flex flex-col flex-1">
-      <Header title="Settings" />
-      <div className="flex-1 p-4 sm:p-6 max-w-2xl w-full animate-in">
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
-          <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-gray-100 dark:border-gray-800">
-            <h2 className="font-semibold text-gray-900 dark:text-white">Account Settings</h2>
+    <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
+      <Header title="My Account" />
+      <div className="animate-in" style={{ flex: 1, padding: "24px", maxWidth: 640 }}>
+        <div className="uni-card" style={{ overflow: "hidden" }}>
+          {/* Card header */}
+          <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--border)" }}>
+            <h2 style={{ fontSize: 15, fontWeight: 700, color: "var(--text)", margin: 0 }}>My Account</h2>
           </div>
-          <div className="p-4 sm:p-6 space-y-4">
-            <div className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-indigo-50 dark:bg-indigo-950/30 rounded-xl">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-indigo-400 to-purple-500 rounded-2xl flex items-center justify-center shrink-0">
-                <span className="text-white text-lg sm:text-xl font-bold">
+
+          <div style={{ padding: 20, display: "flex", flexDirection: "column", gap: 20 }}>
+            {/* Profile banner */}
+            <div style={{
+              display: "flex", alignItems: "center", gap: 16, padding: 16,
+              background: "var(--accent-sub)", borderRadius: 12,
+              border: "1px solid var(--accent-glow)",
+            }}>
+              <div style={{
+                width: 56, height: 56, borderRadius: 16, flexShrink: 0,
+                background: "linear-gradient(135deg, #0D9488, #042F2E)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>
+                <span style={{ color: "#FFFFFF", fontSize: 22, fontWeight: 800 }}>
                   {(user?.name ?? user?.email ?? "U").charAt(0).toUpperCase()}
                 </span>
               </div>
-              <div className="min-w-0">
-                <p className="font-semibold text-gray-900 dark:text-white truncate">{user?.name ?? "—"}</p>
-                <p className="text-sm text-gray-500 truncate">{user?.email}</p>
-                <div className="flex items-center gap-2 mt-1 flex-wrap">
-                  <span className="text-xs bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 px-2 py-0.5 rounded-lg font-medium">
-                    {user?.role}
+              <div style={{ minWidth: 0 }}>
+                <p style={{ fontWeight: 700, fontSize: 15, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {user?.name ?? "—"}
+                </p>
+                <p style={{ fontSize: 13, color: "var(--text-2)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {user?.email}
+                </p>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 6, flexWrap: "wrap" }}>
+                  <span style={{
+                    fontSize: 11, fontWeight: 700, padding: "3px 9px", borderRadius: 6,
+                    background: roleBg[role], color: roleColor[role],
+                  }}>
+                    {role}
                   </span>
                   {user?.organization?.name && (
-                    <span className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 px-2 py-0.5 rounded-lg font-medium">
+                    <span style={{
+                      fontSize: 11, fontWeight: 600, padding: "3px 9px", borderRadius: 6,
+                      background: "var(--bg-input)", color: "var(--text-2)",
+                    }}>
                       {user.organization.name}
                     </span>
                   )}
@@ -50,17 +79,25 @@ export default async function SettingsPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-sm">
+            {/* Info grid */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
               {[
-                { label: "Name", value: user?.name ?? "—" },
-                { label: "Email", value: user?.email ?? "—" },
+                { label: "Name",         value: user?.name ?? "—" },
+                { label: "Email",        value: user?.email ?? "—" },
                 { label: "Organization", value: user?.organization?.name ?? "—" },
-                { label: "Role", value: user?.role ?? "—" },
-                { label: "Branch", value: user?.branch?.name ?? "All branches" },
+                { label: "Role",         value: user?.role ?? "—" },
+                { label: "Branch",       value: user?.branch?.name ?? "All branches" },
               ].map((f) => (
-                <div key={f.label} className="p-3 bg-gray-50 dark:bg-gray-800 rounded-xl">
-                  <p className="text-xs text-gray-400 mb-1">{f.label}</p>
-                  <p className="font-medium text-gray-900 dark:text-white">{f.value}</p>
+                <div key={f.label} style={{
+                  padding: "12px 14px",
+                  background: "var(--bg-input)",
+                  borderRadius: 10,
+                  border: "1px solid var(--border)",
+                }}>
+                  <p style={{ fontSize: 11, color: "var(--text-3)", marginBottom: 4, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                    {f.label}
+                  </p>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{f.value}</p>
                 </div>
               ))}
             </div>

@@ -165,111 +165,92 @@ export function ImportProductsModal({ userRole }: { userRole: UserRole }) {
 
   return (
     <>
-      <button
-        onClick={() => setOpen(true)}
-        className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition"
-      >
+      <button onClick={() => setOpen(true)} className="uni-btn uni-btn-ghost">
         <Upload size={15} /> Import
       </button>
 
       {open && (
-        <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-2 sm:p-4">
-          <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm"
-            onClick={handleClose}
-          />
-          <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto z-10 flex flex-col">
+        <div className="uni-overlay" style={{ alignItems: "flex-start", paddingTop: 16 }}>
+          <div className="uni-overlay-backdrop" onClick={handleClose} />
+          <div className="uni-modal" style={{ maxWidth: 640, display: "flex", flexDirection: "column" }}>
 
-            {/* ── Modal header ── */}
-            <div className="sticky top-0 bg-white dark:bg-gray-900 px-5 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between rounded-t-2xl z-10">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 bg-indigo-100 dark:bg-indigo-900/50 rounded-xl flex items-center justify-center shrink-0">
-                  <Upload size={16} className="text-indigo-600 dark:text-indigo-400" />
+            {/* Header */}
+            <div style={{
+              position: "sticky", top: 0, zIndex: 2,
+              background: "var(--bg-card)",
+              padding: "16px 20px",
+              borderBottom: "1px solid var(--border)",
+              display: "flex", alignItems: "center", justifyContent: "space-between",
+              borderRadius: "var(--radius-lg) var(--radius-lg) 0 0",
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <div style={{ width: 36, height: 36, borderRadius: 10, background: "var(--accent-sub)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <Upload size={16} style={{ color: "var(--accent)" }} />
                 </div>
                 <div>
-                  <h2 className="font-semibold text-gray-900 dark:text-white">Import Products</h2>
-                  <p className="text-xs text-gray-400 mt-0.5">Add products in bulk from a CSV file</p>
+                  <h2 style={{ fontSize: 15, fontWeight: 700, color: "var(--text)", margin: 0 }}>Import Products</h2>
+                  <p style={{ fontSize: 11, color: "var(--text-3)", marginTop: 2 }}>Add products in bulk from a CSV file</p>
                 </div>
               </div>
-              <button
-                onClick={handleClose}
-                className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
-              >
+              <button onClick={handleClose} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-3)", display: "flex" }}>
                 <X size={18} />
               </button>
             </div>
 
-            {/* ── Body ── */}
-            <div className="p-5 sm:p-6 space-y-4 flex-1">
+            {/* Body */}
+            <div style={{ padding: 20, display: "flex", flexDirection: "column", gap: 16, flex: 1 }}>
 
-              {/* Step 1 — Download template */}
-              <div className="flex items-start gap-3 p-4 bg-indigo-50 dark:bg-indigo-950/40 rounded-xl border border-indigo-100 dark:border-indigo-900/60">
-                <span className="w-6 h-6 bg-indigo-600 text-white rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
-                  1
-                </span>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                    Download the CSV template
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    Start with our template to guarantee the correct column format. Two sample rows are included.
-                  </p>
+              {/* Step 1 */}
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 12, padding: 14, background: "var(--accent-sub)", borderRadius: 12, border: "1px solid var(--accent-glow)" }}>
+                <span style={{ width: 24, height: 24, borderRadius: "50%", background: "var(--accent)", color: "#fff", fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>1</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: 13, fontWeight: 700, color: "var(--text)", margin: 0 }}>Download the CSV template</p>
+                  <p style={{ fontSize: 12, color: "var(--text-2)", marginTop: 4 }}>Start with our template to guarantee the correct column format.</p>
                   <button
                     onClick={handleTemplateDownload}
-                    className="mt-2.5 inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition"
+                    style={{ marginTop: 8, display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, fontWeight: 700, color: "var(--accent)", background: "none", border: "none", cursor: "pointer", padding: 0 }}
                   >
-                    <Download size={13} />
-                    product-import-template.csv
+                    <Download size={13} /> product-import-template.csv
                   </button>
                 </div>
               </div>
 
-              {/* Step 2 — Column reference (collapsible) */}
-              <div className="border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden">
+              {/* Step 2 — Collapsible column guide */}
+              <div style={{ border: "1px solid var(--border)", borderRadius: 12, overflow: "hidden" }}>
                 <button
                   onClick={() => setGuideOpen(!guideOpen)}
-                  className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition text-left"
+                  style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", background: "none", border: "none", cursor: "pointer", textAlign: "left" }}
                 >
-                  <div className="flex items-center gap-2.5">
-                    <span className="w-6 h-6 bg-amber-500 text-white rounded-full flex items-center justify-center text-xs font-bold shrink-0">
-                      2
-                    </span>
-                    <span>Column reference</span>
-                    <span className="text-xs text-gray-400 font-normal hidden sm:inline">
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <span style={{ width: 24, height: 24, borderRadius: "50%", background: "var(--warning)", color: "#fff", fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>2</span>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>Column reference</span>
+                    <span className="hidden sm:inline" style={{ fontSize: 11, color: "var(--text-3)" }}>
                       — {FIELD_GUIDE.filter((f) => f.req).length} required · {FIELD_GUIDE.filter((f) => !f.req).length} optional
                     </span>
                   </div>
-                  {guideOpen
-                    ? <ChevronUp size={15} className="text-gray-400 shrink-0" />
-                    : <ChevronDown size={15} className="text-gray-400 shrink-0" />}
+                  {guideOpen ? <ChevronUp size={14} style={{ color: "var(--text-3)" }} /> : <ChevronDown size={14} style={{ color: "var(--text-3)" }} />}
                 </button>
-
                 {guideOpen && (
-                  <div className="border-t border-gray-200 dark:border-gray-800 overflow-x-auto">
-                    <table className="w-full text-xs">
-                      <thead className="bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400">
-                        <tr>
-                          <th className="text-left px-4 py-2.5 font-medium">Column</th>
-                          <th className="text-left px-4 py-2.5 font-medium">Required</th>
-                          <th className="text-left px-4 py-2.5 font-medium">Description</th>
-                          <th className="text-left px-4 py-2.5 font-medium hidden sm:table-cell">Example</th>
+                  <div style={{ borderTop: "1px solid var(--border)", overflowX: "auto" }}>
+                    <table style={{ width: "100%", fontSize: 11, borderCollapse: "collapse" }}>
+                      <thead>
+                        <tr style={{ background: "var(--bg-card-2)" }}>
+                          {["Column", "Required", "Description", "Example"].map((h) => (
+                            <th key={h} style={{ textAlign: "left", padding: "8px 14px", fontWeight: 600, color: "var(--text-2)", borderBottom: "1px solid var(--border)" }}>{h}</th>
+                          ))}
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
-                        {FIELD_GUIDE.map((f) => (
-                          <tr key={f.col} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
-                            <td className="px-4 py-2.5">
-                              <code className="font-mono text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 px-1.5 py-0.5 rounded">
-                                {f.col}
-                              </code>
+                      <tbody>
+                        {FIELD_GUIDE.map((f, i) => (
+                          <tr key={f.col} style={{ borderBottom: i < FIELD_GUIDE.length - 1 ? "1px solid var(--border)" : "none" }}>
+                            <td style={{ padding: "8px 14px" }}>
+                              <code style={{ fontFamily: "monospace", fontSize: 11, padding: "2px 6px", borderRadius: 5, background: "var(--accent-sub)", color: "var(--accent)" }}>{f.col}</code>
                             </td>
-                            <td className="px-4 py-2.5">
-                              {f.req
-                                ? <span className="font-semibold text-red-500">Yes</span>
-                                : <span className="text-gray-400">No</span>}
+                            <td style={{ padding: "8px 14px", fontWeight: f.req ? 700 : 400, color: f.req ? "var(--danger)" : "var(--text-3)" }}>
+                              {f.req ? "Yes" : "No"}
                             </td>
-                            <td className="px-4 py-2.5 text-gray-600 dark:text-gray-400">{f.desc}</td>
-                            <td className="px-4 py-2.5 text-gray-400 font-mono hidden sm:table-cell">{f.ex}</td>
+                            <td style={{ padding: "8px 14px", color: "var(--text-2)" }}>{f.desc}</td>
+                            <td style={{ padding: "8px 14px", color: "var(--text-3)", fontFamily: "monospace" }}>{f.ex}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -280,107 +261,83 @@ export function ImportProductsModal({ userRole }: { userRole: UserRole }) {
 
               {/* Step 3 — Upload */}
               <div>
-                <div className="flex items-center gap-2.5 mb-3">
-                  <span className="w-6 h-6 bg-emerald-500 text-white rounded-full flex items-center justify-center text-xs font-bold shrink-0">
-                    3
-                  </span>
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Upload your file
-                  </span>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+                  <span style={{ width: 24, height: 24, borderRadius: "50%", background: "#34d399", color: "#fff", fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>3</span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>Upload your file</span>
                 </div>
-
                 <div
                   onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
                   onDragLeave={() => setDragging(false)}
                   onDrop={handleDrop}
                   onClick={() => fileRef.current?.click()}
-                  className={`cursor-pointer rounded-xl border-2 border-dashed p-8 text-center transition ${
-                    dragging
-                      ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-950/30"
-                      : file
-                      ? "border-emerald-400 bg-emerald-50 dark:bg-emerald-950/20"
-                      : "border-gray-300 dark:border-gray-700 hover:border-indigo-400 dark:hover:border-indigo-600 hover:bg-gray-50 dark:hover:bg-gray-800/40"
-                  }`}
+                  style={{
+                    cursor: "pointer", borderRadius: 12, padding: 32, textAlign: "center",
+                    border: `2px dashed ${dragging ? "var(--accent)" : file ? "#34d399" : "var(--border-2)"}`,
+                    background: dragging ? "var(--accent-sub)" : file ? "rgba(52,211,153,0.06)" : "var(--bg-input)",
+                    transition: "all 0.15s",
+                  }}
                 >
-                  <input
-                    ref={fileRef}
-                    type="file"
-                    accept=".csv"
-                    className="hidden"
-                    onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFileSelect(f); }}
-                  />
+                  <input ref={fileRef} type="file" accept=".csv" style={{ display: "none" }} onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFileSelect(f); }} />
                   {file ? (
-                    <div className="flex flex-col items-center gap-2">
-                      <FileText size={32} className="text-emerald-500" />
-                      <p className="text-sm font-semibold text-gray-900 dark:text-white">{file.name}</p>
-                      <p className="text-xs text-gray-400">
-                        {(file.size / 1024).toFixed(1)} KB · Click to replace
-                      </p>
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+                      <FileText size={32} style={{ color: "#34d399" }} />
+                      <p style={{ fontSize: 13, fontWeight: 700, color: "var(--text)" }}>{file.name}</p>
+                      <p style={{ fontSize: 11, color: "var(--text-3)" }}>{(file.size / 1024).toFixed(1)} KB · Click to replace</p>
                     </div>
                   ) : (
-                    <div className="flex flex-col items-center gap-2">
-                      <Upload size={32} className="text-gray-300 dark:text-gray-600" />
-                      <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Drop your CSV file here
-                      </p>
-                      <p className="text-xs text-gray-400">or click to browse — .csv files only, max 5 MB</p>
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+                      <Upload size={32} style={{ color: "var(--text-3)" }} />
+                      <p style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>Drop your CSV file here</p>
+                      <p style={{ fontSize: 11, color: "var(--text-3)" }}>or click to browse — .csv files only, max 5 MB</p>
                     </div>
                   )}
                 </div>
               </div>
 
-              {/* Preview table (after file selected, before import) */}
+              {/* Preview */}
               {preview && !result && (
-                <div className="space-y-3">
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                   {preview.missingRequired.length > 0 && (
-                    <div className="flex items-start gap-3 p-3.5 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 rounded-xl">
-                      <AlertCircle size={16} className="text-red-500 shrink-0 mt-0.5" />
+                    <div style={{ display: "flex", alignItems: "flex-start", gap: 12, padding: "12px 14px", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.20)", borderRadius: 10 }}>
+                      <AlertCircle size={15} style={{ color: "var(--danger)", flexShrink: 0, marginTop: 1 }} />
                       <div>
-                        <p className="text-sm font-semibold text-red-700 dark:text-red-400">
-                          Missing required columns
-                        </p>
-                        <p className="text-xs text-red-600 dark:text-red-500 mt-1 flex flex-wrap gap-1">
+                        <p style={{ fontSize: 13, fontWeight: 700, color: "var(--danger)", margin: 0 }}>Missing required columns</p>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 6 }}>
                           {preview.missingRequired.map((c) => (
-                            <code key={c} className="font-mono bg-red-100 dark:bg-red-900/50 px-1.5 py-0.5 rounded">
-                              {c}
-                            </code>
+                            <code key={c} style={{ fontFamily: "monospace", fontSize: 11, padding: "2px 6px", borderRadius: 5, background: "rgba(239,68,68,0.12)", color: "var(--danger)" }}>{c}</code>
                           ))}
-                        </p>
+                        </div>
                       </div>
                     </div>
                   )}
-
-                  <div className="flex items-center justify-between">
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      <span className="font-medium text-gray-700 dark:text-gray-300">{preview.totalRows} rows</span> detected
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <p style={{ fontSize: 12, color: "var(--text-3)" }}>
+                      <span style={{ fontWeight: 700, color: "var(--text)" }}>{preview.totalRows} rows</span> detected
                       {preview.rows.length > 0 && ` — preview of first ${preview.rows.length}`}
                     </p>
                     {preview.missingRequired.length === 0 && (
-                      <span className="flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400 font-medium">
-                        <CheckCircle size={13} /> Columns look good
+                      <span style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 12, fontWeight: 600, color: "var(--accent)" }}>
+                        <CheckCircle size={13} /> Columns OK
                       </span>
                     )}
                   </div>
-
                   {preview.rows.length > 0 && (
-                    <div className="border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden">
-                      <div className="overflow-x-auto">
-                        <table className="w-full text-xs">
-                          <thead className="bg-gray-50 dark:bg-gray-800/60 text-gray-500 dark:text-gray-400">
-                            <tr>
+                    <div className="uni-card" style={{ overflow: "hidden" }}>
+                      <div style={{ overflowX: "auto" }}>
+                        <table style={{ width: "100%", fontSize: 11, borderCollapse: "collapse" }}>
+                          <thead>
+                            <tr style={{ background: "var(--bg-card-2)" }}>
                               {preview.headers.map((h, i) => (
-                                <th key={i} className="text-left px-3 py-2.5 font-medium whitespace-nowrap">
-                                  {h}
-                                </th>
+                                <th key={i} style={{ textAlign: "left", padding: "8px 12px", fontWeight: 600, color: "var(--text-2)", borderBottom: "1px solid var(--border)", whiteSpace: "nowrap" }}>{h}</th>
                               ))}
                             </tr>
                           </thead>
-                          <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                          <tbody>
                             {preview.rows.map((row, ri) => (
-                              <tr key={ri} className="hover:bg-gray-50 dark:hover:bg-gray-800/30">
+                              <tr key={ri} style={{ borderBottom: ri < preview.rows.length - 1 ? "1px solid var(--border)" : "none" }}>
                                 {row.map((cell, ci) => (
-                                  <td key={ci} className="px-3 py-2 text-gray-700 dark:text-gray-300 whitespace-nowrap">
-                                    {cell || <span className="text-gray-300 dark:text-gray-600 italic">empty</span>}
+                                  <td key={ci} style={{ padding: "7px 12px", color: cell ? "var(--text)" : "var(--text-3)", fontStyle: cell ? "normal" : "italic", whiteSpace: "nowrap" }}>
+                                    {cell || "empty"}
                                   </td>
                                 ))}
                               </tr>
@@ -393,36 +350,32 @@ export function ImportProductsModal({ userRole }: { userRole: UserRole }) {
                 </div>
               )}
 
-              {/* Import result */}
+              {/* Result */}
               {result && (
-                <div className="space-y-3">
-                  <div className="flex items-start gap-3 p-4 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900 rounded-xl">
-                    <CheckCircle size={18} className="text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  <div style={{ display: "flex", alignItems: "flex-start", gap: 12, padding: 16, background: "var(--accent-sub)", border: "1px solid var(--accent-glow)", borderRadius: 12 }}>
+                    <CheckCircle size={18} style={{ color: "var(--accent)", flexShrink: 0, marginTop: 1 }} />
                     <div>
-                      <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-300">
-                        Import complete
-                      </p>
-                      <p className="text-xs text-emerald-700 dark:text-emerald-400 mt-0.5">
-                        {result.created} product{result.created !== 1 ? "s" : ""} added to inventory
-                        {result.skipped.length > 0 &&
-                          ` · ${result.skipped.length} row${result.skipped.length !== 1 ? "s" : ""} skipped`}
+                      <p style={{ fontSize: 13, fontWeight: 700, color: "var(--text)", margin: 0 }}>Import complete</p>
+                      <p style={{ fontSize: 12, color: "var(--text-2)", marginTop: 4 }}>
+                        {result.created} product{result.created !== 1 ? "s" : ""} added
+                        {result.skipped.length > 0 && ` · ${result.skipped.length} row${result.skipped.length !== 1 ? "s" : ""} skipped`}
                       </p>
                     </div>
                   </div>
-
                   {result.skipped.length > 0 && (
-                    <div className="border border-amber-200 dark:border-amber-900 rounded-xl overflow-hidden">
-                      <div className="px-4 py-2.5 bg-amber-50 dark:bg-amber-950/30 border-b border-amber-200 dark:border-amber-900">
-                        <p className="text-xs font-semibold text-amber-800 dark:text-amber-400">
-                          Skipped rows — {result.skipped.length} issue{result.skipped.length !== 1 ? "s" : ""}
+                    <div className="uni-card" style={{ overflow: "hidden" }}>
+                      <div style={{ padding: "10px 16px", background: "rgba(245,158,11,0.08)", borderBottom: "1px solid var(--border)" }}>
+                        <p style={{ fontSize: 12, fontWeight: 700, color: "var(--warning)", margin: 0 }}>
+                          Skipped — {result.skipped.length} issue{result.skipped.length !== 1 ? "s" : ""}
                         </p>
                       </div>
-                      <div className="divide-y divide-gray-50 dark:divide-gray-800 max-h-44 overflow-y-auto">
+                      <div style={{ maxHeight: 176, overflowY: "auto" }}>
                         {result.skipped.map((s, i) => (
-                          <div key={i} className="px-4 py-2.5 flex items-center gap-3 text-xs">
-                            <span className="text-gray-400 shrink-0 tabular-nums">Row {s.row}</span>
-                            <code className="font-mono text-gray-600 dark:text-gray-400 truncate">{s.sku}</code>
-                            <span className="text-red-500 shrink-0">{s.reason}</span>
+                          <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "8px 16px", fontSize: 12, borderBottom: i < result.skipped.length - 1 ? "1px solid var(--border)" : "none" }}>
+                            <span style={{ color: "var(--text-3)", flexShrink: 0 }}>Row {s.row}</span>
+                            <code style={{ fontFamily: "monospace", color: "var(--text-2)", overflow: "hidden", textOverflow: "ellipsis" }}>{s.sku}</code>
+                            <span style={{ color: "var(--danger)", flexShrink: 0 }}>{s.reason}</span>
                           </div>
                         ))}
                       </div>
@@ -432,31 +385,28 @@ export function ImportProductsModal({ userRole }: { userRole: UserRole }) {
               )}
             </div>
 
-            {/* ── Footer ── */}
-            <div className="sticky bottom-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 px-5 sm:px-6 py-4 flex items-center justify-between gap-3 rounded-b-2xl">
-              <button
-                onClick={handleClose}
-                className="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition"
-              >
+            {/* Footer */}
+            <div style={{
+              position: "sticky", bottom: 0, zIndex: 2,
+              background: "var(--bg-card)",
+              borderTop: "1px solid var(--border)",
+              padding: "14px 20px",
+              display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10,
+              borderRadius: "0 0 var(--radius-lg) var(--radius-lg)",
+            }}>
+              <button onClick={handleClose} className="uni-btn uni-btn-ghost">
                 {result ? "Done" : "Cancel"}
               </button>
-
               {!result && (
-                <button
-                  onClick={handleImport}
-                  disabled={!canImport}
-                  className="flex items-center gap-2 px-5 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:text-gray-500 dark:disabled:text-gray-400 text-white rounded-xl text-sm font-semibold transition disabled:cursor-not-allowed"
-                >
-                  {status === "importing" ? (
-                    <><Loader2 size={15} className="animate-spin" /> Importing…</>
-                  ) : (
-                    <>
-                      <Upload size={15} />
-                      {preview && preview.missingRequired.length === 0 && preview.totalRows > 0
-                        ? `Import ${preview.totalRows} product${preview.totalRows !== 1 ? "s" : ""}`
-                        : "Import products"}
-                    </>
-                  )}
+                <button onClick={handleImport} disabled={!canImport} className="uni-btn uni-btn-primary">
+                  {status === "importing"
+                    ? <><Loader2 size={14} className="animate-spin" /> Importing…</>
+                    : <>
+                        <Upload size={14} />
+                        {preview && preview.missingRequired.length === 0 && preview.totalRows > 0
+                          ? `Import ${preview.totalRows} product${preview.totalRows !== 1 ? "s" : ""}`
+                          : "Import products"}
+                      </>}
                 </button>
               )}
             </div>

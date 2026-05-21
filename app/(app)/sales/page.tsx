@@ -44,13 +44,13 @@ export default async function SalesPage({ searchParams }: { searchParams: Promis
   ]);
 
   return (
-    <div className="flex flex-col flex-1">
+    <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
       <Header title="Sales" unreadCount={unreadCount} />
-      <div className="flex-1 p-4 sm:p-6 animate-in">
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-4 sm:mb-6">
+      <div className="animate-in" style={{ flex: 1, padding: "24px" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12, marginBottom: 20 }}>
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Sales Records</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">{total} total transactions</p>
+            <h2 style={{ fontSize: 16, fontWeight: 700, color: "var(--text)", margin: 0 }}>Sales Records</h2>
+            <p style={{ fontSize: 13, color: "var(--text-2)", marginTop: 2 }}>{total} total transactions</p>
           </div>
           <NewSaleButton products={products.map((p) => ({ ...p, sellingPrice: Number(p.sellingPrice) }))} />
         </div>

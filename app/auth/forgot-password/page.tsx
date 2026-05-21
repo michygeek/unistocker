@@ -36,7 +36,7 @@ export default function ForgotPasswordPage() {
             ].map(({ icon: Icon, text }) => (
               <div key={text} className="auth-feature">
                 <div className="auth-feature-icon">
-                  <Icon size={15} color="#2EBD78" />
+                  <Icon size={15} color="#2DD4BF" />
                 </div>
                 {text}
               </div>
@@ -47,7 +47,7 @@ export default function ForgotPasswordPage() {
         <div className="auth-left-footer">
           <p style={{ fontSize: 12, color: "#3D6B5E" }}>
             Remember your password?{" "}
-            <Link href="/auth/login" style={{ color: "#2EBD78", fontWeight: 600, textDecoration: "none" }}>
+            <Link href="/auth/login" style={{ color: "#2DD4BF", fontWeight: 600, textDecoration: "none" }}>
               Sign in
             </Link>
           </p>

@@ -38,9 +38,6 @@ export async function createProduct(formData: FormData) {
 
   const data = parsed.data;
 
-  const existing = await db.product.findUnique({ where: { sku: data.sku } });
-  if (existing) return { error: { sku: ["SKU already exists"] } };
-
   let imageUrl: string | undefined;
   let imagePublicId: string | undefined;
 
@@ -59,15 +56,24 @@ export async function createProduct(formData: FormData) {
     imagePublicId = result.public_id;
   }
 
-  const product = await db.product.create({
-    data: {
-      ...data,
-      imageUrl,
-      imagePublicId,
-      createdById: session.user.id,
-      branchId: session.user.branchId ?? undefined,
-    },
-  });
+  // DB unique constraint on sku handles duplicates — no pre-check needed
+  let product;
+  try {
+    product = await db.product.create({
+      data: {
+        ...data,
+        imageUrl,
+        imagePublicId,
+        createdById: session.user.id,
+        branchId: session.user.branchId ?? undefined,
+      },
+    });
+  } catch (e: unknown) {
+    if (e && typeof e === "object" && "code" in e && (e as { code: string }).code === "P2002") {
+      return { error: { sku: ["SKU already exists"] } };
+    }
+    throw e;
+  }
 
   if (product.quantity > 0) {
     await db.inventoryTransaction.create({
@@ -81,7 +87,8 @@ export async function createProduct(formData: FormData) {
     });
   }
 
-  await addActivityLogJob({
+  // Background tasks — do not block the response
+  void addActivityLogJob({
     userId: session.user.id,
     action: "CREATE",
     entity: "Product",
@@ -89,7 +96,7 @@ export async function createProduct(formData: FormData) {
     description: `Created product "${product.name}" (SKU: ${product.sku}) with ${product.quantity} units`,
   });
 
-  await notifyAllBossUsers(
+  void notifyAllBossUsers(
     "New Product Added",
     `${session.user.name ?? session.user.email} added "${product.name}" to inventory`,
     "PRODUCT_CREATED",
@@ -140,7 +147,8 @@ export async function updateProduct(productId: string, formData: FormData) {
     data: { ...parsed.data, imageUrl, imagePublicId },
   });
 
-  await addActivityLogJob({
+  // Background tasks — do not block the response
+  void addActivityLogJob({
     userId: session.user.id,
     action: "UPDATE",
     entity: "Product",
@@ -150,7 +158,7 @@ export async function updateProduct(productId: string, formData: FormData) {
   });
 
   if (priceChanged) {
-    await notifyAllBossUsers(
+    void notifyAllBossUsers(
       "Product Price Changed",
       `"${product.name}" price changed from ₦${existing.sellingPrice} to ₦${product.sellingPrice} by ${session.user.name ?? session.user.email}`,
       "PRICE_CHANGE",

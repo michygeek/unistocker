@@ -44,7 +44,7 @@ export default async function LoginPage({ searchParams }: Props) {
             {FEATURES.map(({ icon: Icon, text }) => (
               <div key={text} className="auth-feature">
                 <div className="auth-feature-icon">
-                  <Icon size={15} color="#2EBD78" />
+                  <Icon size={15} color="#2DD4BF" />
                 </div>
                 {text}
               </div>

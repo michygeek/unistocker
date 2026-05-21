@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Search, Edit, Trash2, Plus, Minus, Eye, Package } from "lucide-react";
 import { deleteProduct, adjustStock } from "@/lib/actions/products";
 import type { UserRole } from "@prisma/client";
@@ -52,124 +52,136 @@ export function InventoryTable({ products, total, page, limit, userRole, search 
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex gap-3">
-        <form onSubmit={handleSearch} className="flex-1 flex gap-2">
-          <div className="relative flex-1">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input
-              value={searchVal}
-              onChange={(e) => setSearchVal(e.target.value)}
-              placeholder="Search products, SKU, barcode..."
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
-          </div>
-          <button type="submit" className="px-4 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-medium hover:bg-indigo-700 transition">
-            Search
-          </button>
-        </form>
-      </div>
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      {/* Search bar */}
+      <form onSubmit={handleSearch} style={{ display: "flex", gap: 10 }}>
+        <div style={{ position: "relative", flex: 1 }}>
+          <Search size={15} style={{
+            position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)",
+            color: "var(--text-3)", pointerEvents: "none",
+          }} />
+          <input
+            value={searchVal}
+            onChange={(e) => setSearchVal(e.target.value)}
+            placeholder="Search products, SKU, barcode…"
+            className="uni-input"
+            style={{ paddingLeft: 38 }}
+          />
+        </div>
+        <button type="submit" className="uni-btn uni-btn-primary">
+          Search
+        </button>
+      </form>
 
-      <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+      {/* Table card */}
+      <div className="uni-card" style={{ overflow: "hidden" }}>
+        <div style={{ overflowX: "auto" }}>
+          <table className="uni-table">
             <thead>
-              <tr className="bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400">
-                <th className="text-left px-4 sm:px-6 py-3 font-medium">Product</th>
-                <th className="text-left px-4 py-3 font-medium hidden sm:table-cell">SKU</th>
-                <th className="text-right px-4 py-3 font-medium hidden md:table-cell">Cost</th>
-                <th className="text-right px-4 py-3 font-medium">Price</th>
-                <th className="text-right px-4 py-3 font-medium">Qty</th>
-                <th className="text-left px-4 py-3 font-medium hidden sm:table-cell">Category</th>
-                <th className="text-right px-4 sm:px-6 py-3 font-medium">Actions</th>
+              <tr>
+                <th style={{ paddingLeft: 20 }}>Product</th>
+                <th className="hidden sm:table-cell">SKU</th>
+                <th className="hidden md:table-cell" style={{ textAlign: "right" }}>Cost</th>
+                <th style={{ textAlign: "right" }}>Price</th>
+                <th style={{ textAlign: "right" }}>Qty</th>
+                <th className="hidden sm:table-cell">Category</th>
+                <th style={{ textAlign: "right", paddingRight: 20 }}>Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
+            <tbody>
               {products.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center text-gray-400">
-                    <Package size={32} className="mx-auto mb-2 opacity-40" />
-                    No products found
+                  <td colSpan={7} style={{ textAlign: "center", padding: "48px 24px", color: "var(--text-3)" }}>
+                    <Package size={32} style={{ margin: "0 auto 8px", opacity: 0.4 }} />
+                    <p>No products found</p>
                   </td>
                 </tr>
               )}
               {products.map((p) => (
-                <tr key={p.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition">
-                  <td className="px-4 sm:px-6 py-3 sm:py-4">
-                    <div className="flex items-center gap-2 sm:gap-3">
+                <tr key={p.id}>
+                  <td style={{ paddingLeft: 20 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                       {p.imageUrl ? (
-                        <img src={p.imageUrl} alt={p.name} className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg object-cover shrink-0" />
+                        <img src={p.imageUrl} alt={p.name} style={{ width: 36, height: 36, borderRadius: 8, objectFit: "cover", flexShrink: 0 }} />
                       ) : (
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center shrink-0">
-                          <Package size={14} className="text-gray-400" />
+                        <div style={{
+                          width: 36, height: 36, borderRadius: 8, background: "var(--bg-input)",
+                          display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                        }}>
+                          <Package size={14} style={{ color: "var(--text-3)" }} />
                         </div>
                       )}
-                      <div className="min-w-0">
-                        <p className="font-medium text-gray-900 dark:text-white text-sm truncate max-w-30 sm:max-w-50">{p.name}</p>
-                        <p className="text-xs text-gray-400 truncate max-w-30 sm:max-w-45 hidden sm:block">{p.description}</p>
-                        <p className="text-xs font-mono text-gray-400 sm:hidden">{p.sku}</p>
+                      <div style={{ minWidth: 0 }}>
+                        <p style={{ fontWeight: 600, fontSize: 13, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 160 }}>{p.name}</p>
+                        <p className="hidden sm:block" style={{ fontSize: 11, color: "var(--text-3)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 140 }}>{p.description}</p>
+                        <p className="sm:hidden" style={{ fontSize: 11, fontFamily: "monospace", color: "var(--text-3)" }}>{p.sku}</p>
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-4 font-mono text-xs text-gray-500 hidden sm:table-cell">{p.sku}</td>
-                  <td className="px-4 py-4 text-right text-gray-600 dark:text-gray-400 hidden md:table-cell">₦{p.costPrice.toFixed(2)}</td>
-                  <td className="px-4 py-4 text-right font-medium text-gray-900 dark:text-white text-sm">₦{p.sellingPrice.toFixed(2)}</td>
-                  <td className="px-4 py-4 text-right">
-                    <span className={`font-bold text-sm ${p.quantity <= p.lowStockAlert ? "text-red-600 dark:text-red-400" : p.quantity <= p.lowStockAlert * 2 ? "text-amber-600" : "text-gray-900 dark:text-white"}`}>
+                  <td className="hidden sm:table-cell" style={{ fontFamily: "monospace", fontSize: 11, color: "var(--text-2)" }}>{p.sku}</td>
+                  <td className="hidden md:table-cell" style={{ textAlign: "right", color: "var(--text-2)" }}>₦{p.costPrice.toFixed(2)}</td>
+                  <td style={{ textAlign: "right", fontWeight: 600, color: "var(--text)" }}>₦{p.sellingPrice.toFixed(2)}</td>
+                  <td style={{ textAlign: "right" }}>
+                    <span style={{
+                      fontWeight: 700, fontSize: 13,
+                      color: p.quantity <= p.lowStockAlert
+                        ? "var(--danger)"
+                        : p.quantity <= p.lowStockAlert * 2
+                        ? "var(--warning)"
+                        : "var(--text)",
+                    }}>
                       {p.quantity}
                     </span>
                   </td>
-                  <td className="px-4 py-4 hidden sm:table-cell">
+                  <td className="hidden sm:table-cell">
                     {p.category ? (
-                      <span className="text-xs bg-indigo-50 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 px-2 py-1 rounded-lg">
+                      <span style={{
+                        fontSize: 11, fontWeight: 600, padding: "3px 8px", borderRadius: 6,
+                        background: "var(--accent-sub)", color: "var(--accent)",
+                      }}>
                         {p.category.name}
                       </span>
                     ) : (
-                      <span className="text-xs text-gray-400">—</span>
+                      <span style={{ color: "var(--text-3)", fontSize: 12 }}>—</span>
                     )}
                   </td>
-                  <td className="px-3 sm:px-6 py-3 sm:py-4">
-                    <div className="flex items-center justify-end gap-0.5 sm:gap-1">
-                      <button
+                  <td style={{ paddingRight: 12 }}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 2 }}>
+                      <ActionBtn
                         onClick={() => handleAdjustStock(p.id, "STOCK_IN")}
                         disabled={loading === `${p.id}-STOCK_IN`}
-                        className="p-1.5 rounded-lg text-green-600 hover:bg-green-50 dark:hover:bg-green-900/30 transition"
-                        title="Add stock"
+                        color="var(--accent)" hoverBg="var(--accent-sub)" title="Add stock"
                       >
-                        <Plus size={15} />
-                      </button>
-                      <button
+                        <Plus size={14} />
+                      </ActionBtn>
+                      <ActionBtn
                         onClick={() => handleAdjustStock(p.id, "STOCK_OUT")}
                         disabled={loading === `${p.id}-STOCK_OUT`}
-                        className="p-1.5 rounded-lg text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/30 transition"
-                        title="Remove stock"
+                        color="#fb923c" hoverBg="rgba(251,146,60,0.10)" title="Remove stock"
                       >
-                        <Minus size={15} />
-                      </button>
-                      <a
+                        <Minus size={14} />
+                      </ActionBtn>
+                      <ActionBtn
                         href={`/inventory/${p.id}`}
-                        className="p-1.5 rounded-lg text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition"
-                        title="View details"
+                        color="var(--info)" hoverBg="rgba(59,130,246,0.10)" title="View details"
                       >
-                        <Eye size={15} />
-                      </a>
+                        <Eye size={14} />
+                      </ActionBtn>
                       {canEdit && (
                         <>
-                          <a
+                          <ActionBtn
                             href={`/inventory/${p.id}/edit`}
-                            className="p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
-                            title="Edit"
+                            color="var(--text-2)" hoverBg="var(--bg-card-2)" title="Edit"
                           >
-                            <Edit size={15} />
-                          </a>
-                          <button
+                            <Edit size={14} />
+                          </ActionBtn>
+                          <ActionBtn
                             onClick={() => handleDelete(p.id, p.name)}
                             disabled={loading === p.id}
-                            className="p-1.5 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 transition"
-                            title="Delete"
+                            color="var(--danger)" hoverBg="rgba(239,68,68,0.10)" title="Delete"
                           >
-                            <Trash2 size={15} />
-                          </button>
+                            <Trash2 size={14} />
+                          </ActionBtn>
                         </>
                       )}
                     </div>
@@ -181,18 +193,29 @@ export function InventoryTable({ products, total, page, limit, userRole, search 
         </div>
 
         {totalPages > 1 && (
-          <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between text-sm">
-            <span className="text-gray-400">
-              Showing {(page - 1) * limit + 1}–{Math.min(page * limit, total)} of {total}
-            </span>
-            <div className="flex gap-2">
+          <div style={{
+            padding: "12px 20px",
+            borderTop: "1px solid var(--border)",
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            fontSize: 12, color: "var(--text-3)",
+          }}>
+            <span>Showing {(page - 1) * limit + 1}–{Math.min(page * limit, total)} of {total}</span>
+            <div style={{ display: "flex", gap: 8 }}>
               {page > 1 && (
-                <a href={`/inventory?page=${page - 1}`} className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+                <a href={`/inventory?page=${page - 1}`} style={{
+                  padding: "5px 12px", borderRadius: 8, border: "1px solid var(--border)",
+                  color: "var(--text-2)", fontSize: 12, textDecoration: "none",
+                  background: "var(--bg-input)", transition: "all 0.15s",
+                }}>
                   Prev
                 </a>
               )}
               {page < totalPages && (
-                <a href={`/inventory?page=${page + 1}`} className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+                <a href={`/inventory?page=${page + 1}`} style={{
+                  padding: "5px 12px", borderRadius: 8, border: "1px solid var(--border)",
+                  color: "var(--text-2)", fontSize: 12, textDecoration: "none",
+                  background: "var(--bg-input)", transition: "all 0.15s",
+                }}>
                   Next
                 </a>
               )}
@@ -201,5 +224,43 @@ export function InventoryTable({ products, total, page, limit, userRole, search 
         )}
       </div>
     </div>
+  );
+}
+
+function ActionBtn({
+  children, onClick, href, disabled, color, hoverBg, title,
+}: {
+  children: React.ReactNode;
+  onClick?: () => void;
+  href?: string;
+  disabled?: boolean;
+  color: string;
+  hoverBg: string;
+  title?: string;
+}) {
+  const style: React.CSSProperties = {
+    display: "inline-flex", alignItems: "center", justifyContent: "center",
+    width: 28, height: 28, borderRadius: 7, border: "none", background: "transparent",
+    color, cursor: disabled ? "not-allowed" : "pointer", opacity: disabled ? 0.5 : 1,
+    transition: "background 0.15s",
+    textDecoration: "none",
+  };
+  if (href) {
+    return (
+      <a href={href} style={style} title={title}
+        onMouseEnter={(e) => (e.currentTarget.style.background = hoverBg)}
+        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+      >
+        {children}
+      </a>
+    );
+  }
+  return (
+    <button onClick={onClick} disabled={disabled} style={style} title={title}
+      onMouseEnter={(e) => { if (!disabled) (e.currentTarget as HTMLButtonElement).style.background = hoverBg; }}
+      onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "transparent"; }}
+    >
+      {children}
+    </button>
   );
 }

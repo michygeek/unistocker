@@ -61,44 +61,74 @@ export default async function ReportsPage() {
     qty: Number(t._sum.quantity ?? 0),
   }));
 
+  const rankColors = ["#0D9488", "#60a5fa", "#c084fc", "#fbbf24", "#fb923c"];
+
   return (
-    <div className="flex flex-col flex-1">
+    <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
       <Header title="Reports & Analytics" />
-      <div className="flex-1 p-4 sm:p-6 space-y-4 sm:space-y-6 animate-in">
-        <div className="flex items-center justify-between flex-wrap gap-3">
+      <div className="animate-in" style={{ flex: 1, padding: "24px", display: "flex", flexDirection: "column", gap: 24 }}>
+
+        {/* Page header */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Analytics Overview</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Last 30 days and all-time stats</p>
+            <h2 style={{ fontSize: 16, fontWeight: 700, color: "var(--text)", margin: 0 }}>Analytics Overview</h2>
+            <p style={{ fontSize: 13, color: "var(--text-2)", marginTop: 2 }}>Last 30 days and all-time stats</p>
           </div>
           <ExportReportsButton />
         </div>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatsCard title="All-Time Revenue" value={`₦${Number(allTimeRevenue._sum.total ?? 0).toFixed(2)}`} icon={DollarSign} color="green" />
-          <StatsCard title="All-Time Profit" value={`₦${Number(allTimeRevenue._sum.profit ?? 0).toFixed(2)}`} icon={TrendingUp} color="blue" />
-          <StatsCard title="Total Transactions" value={allTimeRevenue._count.id} icon={ShoppingCart} color="purple" />
-          <StatsCard title="This Month Revenue" value={`₦${Number(monthRevenue._sum.total ?? 0).toFixed(2)}`} icon={BarChart3} color="indigo" />
+
+        {/* Stats grid */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 16 }}>
+          <StatsCard title="All-Time Revenue"    value={`₦${Number(allTimeRevenue._sum.total ?? 0).toLocaleString()}`} icon={DollarSign}   color="green"  />
+          <StatsCard title="All-Time Profit"     value={`₦${Number(allTimeRevenue._sum.profit ?? 0).toLocaleString()}`} icon={TrendingUp}  color="blue"   />
+          <StatsCard title="Total Transactions"  value={allTimeRevenue._count.id}                                         icon={ShoppingCart} color="purple" />
+          <StatsCard title="This Month Revenue"  value={`₦${Number(monthRevenue._sum.total ?? 0).toLocaleString()}`}     icon={BarChart3}   color="indigo" />
         </div>
 
+        {/* Chart */}
         <SalesChart data={chartData} />
 
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800">
-            <h2 className="font-semibold text-gray-900 dark:text-white">Top Selling Products</h2>
+        {/* Top products */}
+        <div className="uni-card" style={{ overflow: "hidden" }}>
+          <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", gap: 8 }}>
+            <Package size={16} style={{ color: "var(--accent)" }} />
+            <h2 style={{ fontSize: 15, fontWeight: 700, color: "var(--text)", margin: 0 }}>Top Selling Products</h2>
           </div>
-          <div className="divide-y divide-gray-50 dark:divide-gray-800">
-            {topWithNames.map((item, i) => (
-              <div key={item.productId} className="px-6 py-4 flex items-center gap-4">
-                <span className="w-7 h-7 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 text-sm font-bold flex items-center justify-center shrink-0">
-                  {i + 1}
-                </span>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">{item.product?.name ?? "—"}</p>
-                  <p className="text-xs text-gray-400">{item.product?.sku} · {item.qty} units sold</p>
+          {topWithNames.length === 0 ? (
+            <div style={{ padding: "40px 20px", textAlign: "center", color: "var(--text-3)", fontSize: 13 }}>
+              No sales data yet
+            </div>
+          ) : (
+            <div>
+              {topWithNames.map((item, i) => (
+                <div key={item.productId} style={{
+                  display: "flex", alignItems: "center", gap: 14,
+                  padding: "14px 20px",
+                  borderBottom: i < topWithNames.length - 1 ? "1px solid var(--border)" : "none",
+                }}>
+                  <span style={{
+                    width: 28, height: 28, borderRadius: "50%", flexShrink: 0,
+                    background: `${rankColors[i]}20`, color: rankColors[i],
+                    fontSize: 12, fontWeight: 800,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                  }}>
+                    {i + 1}
+                  </span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {item.product?.name ?? "—"}
+                    </p>
+                    <p style={{ fontSize: 11, color: "var(--text-3)", marginTop: 2 }}>
+                      {item.product?.sku} · {item.qty} units sold
+                    </p>
+                  </div>
+                  <span style={{ fontWeight: 700, fontSize: 14, color: "var(--text)", flexShrink: 0 }}>
+                    ₦{item.total.toLocaleString()}
+                  </span>
                 </div>
-                <span className="font-semibold text-gray-900 dark:text-white">₦{item.total.toFixed(2)}</span>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

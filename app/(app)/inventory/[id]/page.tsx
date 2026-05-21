@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { Header } from "@/components/layout/header";
 import { format } from "date-fns";
-import { Package, Tag, Barcode, ArrowLeft, Plus, Minus, TrendingDown, TrendingUp, RefreshCw } from "lucide-react";
+import { Package, Tag, Barcode, ArrowLeft, Plus, Minus, RefreshCw, TrendingDown, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import type { Metadata } from "next";
 
@@ -16,19 +16,19 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 }
 
 const TX_ICON: Record<string, React.ReactNode> = {
-  STOCK_IN:     <Plus size={13} />,
-  STOCK_OUT:    <Minus size={13} />,
-  ADJUSTMENT:   <RefreshCw size={13} />,
-  RETURN:       <TrendingUp size={13} />,
-  SALE:         <TrendingDown size={13} />,
+  STOCK_IN:   <Plus size={13} />,
+  STOCK_OUT:  <Minus size={13} />,
+  ADJUSTMENT: <RefreshCw size={13} />,
+  RETURN:     <TrendingUp size={13} />,
+  SALE:       <TrendingDown size={13} />,
 };
 
-const TX_COLOR: Record<string, string> = {
-  STOCK_IN:   "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400",
-  STOCK_OUT:  "bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-400",
-  ADJUSTMENT: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400",
-  RETURN:     "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-400",
-  SALE:       "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400",
+const TX_STYLE: Record<string, { bg: string; color: string }> = {
+  STOCK_IN:   { bg: "var(--accent-sub)",       color: "var(--accent)" },
+  STOCK_OUT:  { bg: "rgba(251,146,60,0.10)",  color: "#fb923c"       },
+  ADJUSTMENT: { bg: "rgba(59,130,246,0.10)",  color: "var(--info)"   },
+  RETURN:     { bg: "rgba(168,85,247,0.10)",  color: "#c084fc"       },
+  SALE:       { bg: "rgba(239,68,68,0.10)",   color: "var(--danger)" },
 };
 
 export default async function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -61,72 +61,73 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   const sellingPrice = Number(product.sellingPrice);
   const margin = sellingPrice > 0 ? ((sellingPrice - costPrice) / sellingPrice) * 100 : 0;
   const isLowStock = product.quantity <= product.lowStockAlert;
-
   const canEdit = session.user.role === "BOSS" || session.user.role === "MANAGER";
 
   return (
-    <div className="flex flex-col flex-1">
+    <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
       <Header title="Product Details" unreadCount={unreadCount} />
-      <div className="flex-1 p-4 sm:p-6 max-w-5xl mx-auto w-full space-y-4 sm:space-y-6 animate-in">
+      <div className="animate-in" style={{ flex: 1, padding: "24px", maxWidth: 900, margin: "0 auto", width: "100%", display: "flex", flexDirection: "column", gap: 20 }}>
 
         {/* Back + actions */}
-        <div className="flex items-center justify-between gap-3 flex-wrap">
-          <Link href="/inventory" className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 dark:hover:text-white transition">
-            <ArrowLeft size={16} /> Back to Inventory
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
+          <Link href="/inventory" style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "var(--text-2)", textDecoration: "none" }}>
+            <ArrowLeft size={14} /> Back to Inventory
           </Link>
           {canEdit && (
-            <Link
-              href={`/inventory/${id}/edit`}
-              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-xl transition"
-            >
+            <Link href={`/inventory/${id}/edit`} className="uni-btn uni-btn-primary">
               Edit Product
             </Link>
           )}
         </div>
 
         {/* Main card */}
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
-          <div className="flex flex-col sm:flex-row gap-6 p-6">
+        <div className="uni-card" style={{ overflow: "hidden" }}>
+          {/* Product info */}
+          <div style={{ display: "flex", gap: 20, padding: 20, flexWrap: "wrap" }}>
             {/* Image */}
-            <div className="shrink-0">
+            <div style={{ flexShrink: 0 }}>
               {product.imageUrl ? (
-                <img src={product.imageUrl} alt={product.name} className="w-32 h-32 rounded-2xl object-cover border border-gray-100 dark:border-gray-800" />
+                <img src={product.imageUrl} alt={product.name} style={{ width: 120, height: 120, borderRadius: 16, objectFit: "cover", border: "1px solid var(--border)" }} />
               ) : (
-                <div className="w-32 h-32 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                  <Package size={40} className="text-gray-300 dark:text-gray-600" />
+                <div style={{ width: 120, height: 120, borderRadius: 16, background: "var(--bg-input)", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid var(--border)" }}>
+                  <Package size={36} style={{ color: "var(--text-3)" }} />
                 </div>
               )}
             </div>
 
-            {/* Info */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-start justify-between gap-4 flex-wrap">
+            {/* Details */}
+            <div style={{ flex: 1, minWidth: 200 }}>
+              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 8, marginBottom: 8 }}>
                 <div>
-                  <h1 className="text-xl font-bold text-gray-900 dark:text-white">{product.name}</h1>
-                  <p className="text-sm text-gray-500 font-mono mt-0.5">SKU: {product.sku}</p>
+                  <h1 style={{ fontSize: 20, fontWeight: 800, color: "var(--text)", margin: 0 }}>{product.name}</h1>
+                  <p style={{ fontSize: 12, fontFamily: "monospace", color: "var(--text-3)", marginTop: 4 }}>SKU: {product.sku}</p>
                 </div>
-                <span className={`text-xs font-semibold px-3 py-1.5 rounded-xl ${product.isActive ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400" : "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400"}`}>
+                <span style={{
+                  fontSize: 11, fontWeight: 700, padding: "4px 10px", borderRadius: 8,
+                  background: product.isActive ? "var(--accent-sub)" : "var(--bg-input)",
+                  color: product.isActive ? "var(--accent)" : "var(--text-3)",
+                }}>
                   {product.isActive ? "Active" : "Inactive"}
                 </span>
               </div>
 
               {product.description && (
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">{product.description}</p>
+                <p style={{ fontSize: 13, color: "var(--text-2)", marginBottom: 12 }}>{product.description}</p>
               )}
 
-              <div className="flex flex-wrap gap-2 mt-3">
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                 {product.category && (
-                  <span className="flex items-center gap-1 text-xs bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 px-2.5 py-1 rounded-lg">
+                  <span style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, fontWeight: 600, padding: "4px 10px", borderRadius: 8, background: "var(--accent-sub)", color: "var(--accent)" }}>
                     <Tag size={11} /> {product.category.name}
                   </span>
                 )}
                 {product.barcode && (
-                  <span className="flex items-center gap-1 text-xs bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 px-2.5 py-1 rounded-lg font-mono">
+                  <span style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, fontFamily: "monospace", padding: "4px 10px", borderRadius: 8, background: "var(--bg-input)", color: "var(--text-2)", border: "1px solid var(--border)" }}>
                     <Barcode size={11} /> {product.barcode}
                   </span>
                 )}
                 {product.branch && (
-                  <span className="text-xs bg-purple-50 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 px-2.5 py-1 rounded-lg">
+                  <span style={{ fontSize: 11, fontWeight: 600, padding: "4px 10px", borderRadius: 8, background: "rgba(168,85,247,0.10)", color: "#c084fc" }}>
                     {product.branch.name}
                   </span>
                 )}
@@ -135,74 +136,81 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
           </div>
 
           {/* Stats row */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-gray-100 dark:divide-gray-800 border-t border-gray-100 dark:border-gray-800">
-            <div className="p-5">
-              <p className="text-xs text-gray-400 mb-1">Cost Price</p>
-              <p className="text-lg font-bold text-gray-900 dark:text-white">₦{costPrice.toFixed(2)}</p>
-            </div>
-            <div className="p-5">
-              <p className="text-xs text-gray-400 mb-1">Selling Price</p>
-              <p className="text-lg font-bold text-indigo-600 dark:text-indigo-400">₦{sellingPrice.toFixed(2)}</p>
-            </div>
-            <div className="p-5">
-              <p className="text-xs text-gray-400 mb-1">Margin</p>
-              <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400">{margin.toFixed(1)}%</p>
-            </div>
-            <div className="p-5">
-              <p className="text-xs text-gray-400 mb-1">In Stock</p>
-              <p className={`text-lg font-bold ${isLowStock ? "text-red-600 dark:text-red-400" : "text-gray-900 dark:text-white"}`}>
-                {product.quantity} units
-                {isLowStock && <span className="text-xs ml-1 font-normal">(low)</span>}
-              </p>
-            </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", borderTop: "1px solid var(--border)" }}>
+            {[
+              { label: "Cost Price",    value: `₦${costPrice.toFixed(2)}`,   color: "var(--text)" },
+              { label: "Selling Price", value: `₦${sellingPrice.toFixed(2)}`, color: "var(--accent)" },
+              { label: "Margin",        value: `${margin.toFixed(1)}%`,       color: "#34d399" },
+              { label: "In Stock",      value: `${product.quantity} units`,   color: isLowStock ? "var(--danger)" : "var(--text)" },
+            ].map((stat, i) => (
+              <div key={stat.label} style={{ padding: "16px 20px", borderRight: i < 3 ? "1px solid var(--border)" : "none" }}>
+                <p style={{ fontSize: 11, color: "var(--text-3)", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.05em", fontWeight: 600 }}>{stat.label}</p>
+                <p style={{ fontSize: 18, fontWeight: 800, color: stat.color }}>{stat.value}</p>
+                {stat.label === "In Stock" && isLowStock && (
+                  <p style={{ fontSize: 11, color: "var(--warning)", marginTop: 2 }}>Below threshold</p>
+                )}
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* Meta */}
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-5">
-          <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Details</h2>
-          <dl className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
+        {/* Meta details */}
+        <div className="uni-card" style={{ padding: 20 }}>
+          <h2 style={{ fontSize: 13, fontWeight: 700, color: "var(--text)", marginBottom: 14, textTransform: "uppercase", letterSpacing: "0.05em" }}>Details</h2>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 12 }}>
             {[
               { label: "Low Stock Alert", value: `${product.lowStockAlert} units` },
               { label: "Created By", value: product.createdBy.name ?? product.createdBy.email },
               { label: "Created", value: format(new Date(product.createdAt), "MMM d, yyyy") },
               { label: "Last Updated", value: format(new Date(product.updatedAt), "MMM d, yyyy") },
             ].map(({ label, value }) => (
-              <div key={label}>
-                <dt className="text-xs text-gray-400">{label}</dt>
-                <dd className="font-medium text-gray-900 dark:text-white mt-0.5">{value}</dd>
+              <div key={label} style={{ padding: "10px 14px", background: "var(--bg-input)", borderRadius: 10, border: "1px solid var(--border)" }}>
+                <p style={{ fontSize: 11, color: "var(--text-3)", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.05em", fontWeight: 600 }}>{label}</p>
+                <p style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{value}</p>
               </div>
             ))}
-          </dl>
+          </div>
         </div>
 
         {/* Stock history */}
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800">
-            <h2 className="font-semibold text-gray-900 dark:text-white">Stock History</h2>
+        <div className="uni-card" style={{ overflow: "hidden" }}>
+          <div style={{ padding: "14px 20px", borderBottom: "1px solid var(--border)" }}>
+            <h2 style={{ fontSize: 15, fontWeight: 700, color: "var(--text)", margin: 0 }}>Stock History</h2>
           </div>
           {transactions.length === 0 ? (
-            <p className="px-6 py-10 text-center text-sm text-gray-400">No transactions recorded yet.</p>
+            <p style={{ padding: "40px 20px", textAlign: "center", color: "var(--text-3)", fontSize: 13 }}>No transactions recorded yet.</p>
           ) : (
-            <div className="divide-y divide-gray-50 dark:divide-gray-800">
-              {transactions.map((tx) => (
-                <div key={tx.id} className="px-4 sm:px-6 py-3.5 flex items-center gap-3 sm:gap-4">
-                  <span className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${TX_COLOR[tx.type] ?? "bg-gray-100 text-gray-600"}`}>
-                    {TX_ICON[tx.type] ?? <RefreshCw size={13} />}
-                  </span>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-800 dark:text-gray-200">{tx.type.replace("_", " ")}</p>
-                    {tx.notes && <p className="text-xs text-gray-400 truncate">{tx.notes}</p>}
+            <div>
+              {transactions.map((tx, i) => {
+                const ts = TX_STYLE[tx.type] ?? { bg: "var(--bg-input)", color: "var(--text-2)" };
+                const isPositive = ["STOCK_IN", "RETURN"].includes(tx.type);
+                return (
+                  <div key={tx.id} style={{
+                    display: "flex", alignItems: "center", gap: 12,
+                    padding: "12px 20px",
+                    borderBottom: i < transactions.length - 1 ? "1px solid var(--border)" : "none",
+                  }}>
+                    <span style={{
+                      width: 30, height: 30, borderRadius: 8, flexShrink: 0,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      background: ts.bg, color: ts.color,
+                    }}>
+                      {TX_ICON[tx.type] ?? <RefreshCw size={13} />}
+                    </span>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{tx.type.replace("_", " ")}</p>
+                      {tx.notes && <p style={{ fontSize: 11, color: "var(--text-3)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{tx.notes}</p>}
+                    </div>
+                    <div style={{ textAlign: "right", flexShrink: 0 }}>
+                      <p style={{ fontSize: 13, fontWeight: 800, color: isPositive ? "var(--accent)" : "var(--danger)" }}>
+                        {isPositive ? "+" : "-"}{tx.quantity}
+                      </p>
+                      <p style={{ fontSize: 11, color: "var(--text-3)" }}>{tx.user.name ?? tx.user.email}</p>
+                      <p style={{ fontSize: 11, color: "var(--text-3)" }}>{format(new Date(tx.createdAt), "MMM d, h:mm a")}</p>
+                    </div>
                   </div>
-                  <div className="text-right shrink-0">
-                    <p className={`text-sm font-bold ${["STOCK_IN", "RETURN"].includes(tx.type) ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
-                      {["STOCK_IN", "RETURN"].includes(tx.type) ? "+" : "-"}{tx.quantity}
-                    </p>
-                    <p className="text-xs text-gray-400">{tx.user.name ?? tx.user.email}</p>
-                    <p className="text-xs text-gray-300 dark:text-gray-600">{format(new Date(tx.createdAt), "MMM d, h:mm a")}</p>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

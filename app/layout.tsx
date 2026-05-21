@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#1B3D4F",
+  themeColor: "#09090B",
   width: "device-width",
   initialScale: 1,
   minimumScale: 1,
@@ -28,7 +28,11 @@ import { PWARegister } from "@/components/pwa-register";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full`}>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full`} suppressHydrationWarning>
+      <head>
+        {/* Prevents flash of wrong theme on load */}
+        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('uni-theme');if(t==='dark'){document.documentElement.classList.add('dark')}else{document.documentElement.classList.remove('dark')}}catch(e){}})()` }} />
+      </head>
       <body className="min-h-full antialiased" suppressHydrationWarning>
         <PWARegister />
         {children}

@@ -13,29 +13,51 @@ export function LowStockAlert({ products }: { products: LowStockProduct[] }) {
   if (products.length === 0) return null;
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-amber-200 dark:border-amber-900 overflow-hidden">
-      <div className="px-6 py-4 bg-amber-50 dark:bg-amber-950/50 border-b border-amber-200 dark:border-amber-900 flex items-center gap-2">
-        <AlertTriangle size={16} className="text-amber-600 dark:text-amber-400" />
-        <h2 className="font-semibold text-amber-800 dark:text-amber-300">
-          Low Stock Alerts ({products.length})
+    <div className="uni-card" style={{ overflow: "hidden", borderColor: "rgba(245,158,11,0.25)" }}>
+      {/* Header */}
+      <div style={{
+        padding: "14px 20px",
+        borderBottom: "1px solid rgba(245,158,11,0.20)",
+        display: "flex", alignItems: "center", gap: 8,
+        background: "rgba(245,158,11,0.06)",
+      }}>
+        <AlertTriangle size={15} style={{ color: "var(--warning)", flexShrink: 0 }} />
+        <h2 style={{ fontSize: 14, fontWeight: 700, color: "var(--warning)", margin: 0 }}>
+          Low Stock Alerts
         </h2>
+        <span style={{
+          marginLeft: "auto", fontSize: 11, fontWeight: 700,
+          padding: "2px 8px", borderRadius: 99,
+          background: "rgba(245,158,11,0.15)", color: "var(--warning)",
+        }}>
+          {products.length}
+        </span>
       </div>
-      <div className="divide-y divide-gray-50 dark:divide-gray-800">
-        {products.map((p) => (
+
+      <div>
+        {products.map((p, i) => (
           <Link
             key={p.id}
             href={`/inventory/${p.id}`}
-            className="px-6 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800/50 transition group"
+            style={{
+              display: "flex", alignItems: "center", justifyContent: "space-between",
+              padding: "12px 20px",
+              borderBottom: i < products.length - 1 ? "1px solid var(--border)" : "none",
+              textDecoration: "none",
+              transition: "background 0.15s",
+            }}
+            className="low-stock-row"
           >
-            <div>
-              <p className="text-sm font-medium text-gray-800 dark:text-gray-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">
+            <style>{`.low-stock-row:hover { background: var(--bg-card-2); }`}</style>
+            <div style={{ minWidth: 0 }}>
+              <p style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                 {p.name}
               </p>
-              <p className="text-xs text-gray-400">{p.sku}</p>
+              <p style={{ fontSize: 11, color: "var(--text-3)", marginTop: 2 }}>{p.sku}</p>
             </div>
-            <div className="text-right">
-              <span className="text-sm font-bold text-red-600 dark:text-red-400">{p.quantity}</span>
-              <p className="text-xs text-gray-400">/ {p.lowStockAlert} min</p>
+            <div style={{ textAlign: "right", flexShrink: 0, marginLeft: 12 }}>
+              <span style={{ fontSize: 15, fontWeight: 800, color: "var(--danger)" }}>{p.quantity}</span>
+              <p style={{ fontSize: 11, color: "var(--text-3)", marginTop: 1 }}>/ {p.lowStockAlert} min</p>
             </div>
           </Link>
         ))}

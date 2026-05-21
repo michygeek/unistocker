@@ -29,8 +29,8 @@ export async function sendPasswordResetEmail(
 
       <!-- Header -->
       <tr><td style="background:linear-gradient(135deg,#0F2030,#1B3D4F);border-radius:12px 12px 0 0;padding:32px 40px;text-align:center;">
-        <div style="display:inline-block;background:#2EBD78;border-radius:12px;padding:10px 16px;margin-bottom:16px;">
-          <span style="color:#fff;font-size:18px;font-weight:800;letter-spacing:-0.02em;">${APP_NAME}</span>
+        <div style="display:inline-block;background:#0D9488;border-radius:12px;padding:10px 16px;margin-bottom:16px;">
+          <span style="color:#FFFFFF;font-size:18px;font-weight:800;letter-spacing:-0.02em;">${APP_NAME}</span>
         </div>
         <p style="color:#7EB8A8;font-size:13px;margin:0;">Inventory Management</p>
       </td></tr>
@@ -50,9 +50,9 @@ export async function sendPasswordResetEmail(
         <table width="100%" cellpadding="0" cellspacing="0">
           <tr><td align="center" style="padding-bottom:28px;">
             <a href="${resetUrl}"
-               style="display:inline-block;background:#2EBD78;color:#ffffff;font-size:15px;font-weight:700;
+               style="display:inline-block;background:#0D9488;color:#FFFFFF;font-size:15px;font-weight:700;
                       text-decoration:none;padding:14px 36px;border-radius:10px;
-                      box-shadow:0 4px 14px rgba(46,189,120,0.35);">
+                      box-shadow:0 4px 14px rgba(13,148,136,0.30);">
               Reset Password
             </a>
           </td></tr>
@@ -61,7 +61,7 @@ export async function sendPasswordResetEmail(
         <!-- Fallback URL -->
         <p style="font-size:12px;color:#9ca3af;line-height:1.6;margin:0 0 24px;">
           If the button doesn't work, copy and paste this link into your browser:<br />
-          <a href="${resetUrl}" style="color:#2EBD78;word-break:break-all;">${resetUrl}</a>
+          <a href="${resetUrl}" style="color:#0D9488;word-break:break-all;">${resetUrl}</a>
         </p>
 
         <hr style="border:none;border-top:1px solid #f3f4f6;margin:0 0 20px;" />

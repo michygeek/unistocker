@@ -12,7 +12,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   });
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex">
+    <div style={{ minHeight: "100vh", background: "var(--bg)", display: "flex" }}>
       <Sidebar
         userRole={session.user.role}
         userName={session.user.name}

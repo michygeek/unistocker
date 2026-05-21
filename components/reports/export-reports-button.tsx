@@ -33,7 +33,7 @@ export function ExportReportsButton() {
     <button
       onClick={handleExport}
       disabled={loading}
-      className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition disabled:opacity-60"
+      className="uni-btn uni-btn-ghost"
     >
       {loading ? <Loader2 size={15} className="animate-spin" /> : <Download size={15} />}
       Export CSV

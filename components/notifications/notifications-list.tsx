@@ -14,67 +14,85 @@ interface Notification {
   createdAt: Date;
 }
 
-const TYPE_ICONS: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
+const TYPE_ICONS: Record<string, React.ComponentType<{ size?: number }>> = {
   PRODUCT_CREATED: Package,
   PRODUCT_DELETED: Package,
-  STOCK_IN: TrendingDown,
-  STOCK_OUT: TrendingDown,
-  PRICE_CHANGE: DollarSign,
-  SALE_RECORDED: ShoppingCart,
-  LOW_STOCK: AlertTriangle,
+  STOCK_IN:        TrendingDown,
+  STOCK_OUT:       TrendingDown,
+  PRICE_CHANGE:    DollarSign,
+  SALE_RECORDED:   ShoppingCart,
+  LOW_STOCK:       AlertTriangle,
 };
 
-const TYPE_COLORS: Record<string, string> = {
-  PRODUCT_CREATED: "bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400",
-  PRODUCT_DELETED: "bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400",
-  STOCK_IN: "bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400",
-  STOCK_OUT: "bg-orange-100 dark:bg-orange-900/50 text-orange-600 dark:text-orange-400",
-  PRICE_CHANGE: "bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400",
-  SALE_RECORDED: "bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400",
-  LOW_STOCK: "bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-400",
+const TYPE_STYLE: Record<string, { bg: string; color: string }> = {
+  PRODUCT_CREATED: { bg: "var(--accent-sub)",   color: "var(--accent)" },
+  PRODUCT_DELETED: { bg: "rgba(239,68,68,0.10)",   color: "var(--danger)" },
+  STOCK_IN:        { bg: "var(--accent-sub)",   color: "var(--accent)" },
+  STOCK_OUT:       { bg: "rgba(251,146,60,0.10)",  color: "#fb923c"  },
+  PRICE_CHANGE:    { bg: "rgba(59,130,246,0.10)",  color: "var(--info)" },
+  SALE_RECORDED:   { bg: "rgba(168,85,247,0.10)",  color: "#c084fc"  },
+  LOW_STOCK:       { bg: "rgba(245,158,11,0.10)",  color: "var(--warning)" },
 };
 
 export function NotificationsList({ notifications }: { notifications: Notification[] }) {
   if (notifications.length === 0) {
     return (
-      <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-12 text-center">
-        <Bell size={40} className="mx-auto text-gray-300 dark:text-gray-700 mb-3" />
-        <p className="text-gray-400">No notifications yet</p>
+      <div className="uni-card" style={{ padding: "48px 24px", textAlign: "center" }}>
+        <Bell size={40} style={{ margin: "0 auto 12px", color: "var(--text-3)", opacity: 0.5 }} />
+        <p style={{ color: "var(--text-3)", fontSize: 14 }}>No notifications yet</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
-      <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800">
-        <h2 className="font-semibold text-gray-900 dark:text-white">
-          All Notifications ({notifications.length})
+    <div className="uni-card" style={{ overflow: "hidden" }}>
+      <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <h2 style={{ fontSize: 15, fontWeight: 700, color: "var(--text)", margin: 0 }}>
+          All Notifications
         </h2>
+        <span style={{ fontSize: 12, color: "var(--text-3)" }}>{notifications.length} total</span>
       </div>
-      <div className="divide-y divide-gray-50 dark:divide-gray-800">
-        {notifications.map((n) => {
+
+      <div>
+        {notifications.map((n, i) => {
           const Icon = TYPE_ICONS[n.type] ?? Bell;
-          const color = TYPE_COLORS[n.type] ?? "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400";
+          const ts = TYPE_STYLE[n.type] ?? { bg: "var(--bg-input)", color: "var(--text-2)" };
+          const isUnread = !n.readAt;
 
           return (
             <div
               key={n.id}
-              className={`flex items-start gap-4 px-6 py-4 transition ${!n.readAt ? "bg-indigo-50/50 dark:bg-indigo-950/20" : "hover:bg-gray-50 dark:hover:bg-gray-800/50"}`}
+              style={{
+                display: "flex", alignItems: "flex-start", gap: 14,
+                padding: "14px 20px",
+                background: isUnread ? "var(--accent-sub)" : "transparent",
+                borderBottom: i < notifications.length - 1 ? "1px solid var(--border)" : "none",
+                transition: "background 0.15s",
+              }}
             >
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${color}`}>
-                <Icon size={18} />
+              {/* Icon */}
+              <div style={{
+                width: 38, height: 38, borderRadius: 10, flexShrink: 0,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                background: ts.bg, color: ts.color,
+              }}>
+                <Icon size={17} />
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-start justify-between gap-2">
-                  <p className={`text-sm font-medium ${!n.readAt ? "text-gray-900 dark:text-white" : "text-gray-700 dark:text-gray-300"}`}>
+
+              {/* Content */}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
+                  <p style={{ fontSize: 13, fontWeight: isUnread ? 700 : 600, color: "var(--text)", display: "flex", alignItems: "center", gap: 6 }}>
                     {n.title}
-                    {!n.readAt && <span className="ml-2 inline-block w-2 h-2 bg-indigo-500 rounded-full align-middle" />}
+                    {isUnread && (
+                      <span style={{ display: "inline-block", width: 6, height: 6, borderRadius: "50%", background: "var(--accent)", flexShrink: 0 }} />
+                    )}
                   </p>
-                  <span className="text-xs text-gray-400 flex-shrink-0">
+                  <span style={{ fontSize: 11, color: "var(--text-3)", flexShrink: 0 }}>
                     {formatDistanceToNow(new Date(n.createdAt), { addSuffix: true })}
                   </span>
                 </div>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{n.body}</p>
+                <p style={{ fontSize: 13, color: "var(--text-2)", marginTop: 3 }}>{n.body}</p>
               </div>
             </div>
           );

@@ -16,18 +16,14 @@ interface StaffMember {
   branch: { name: string } | null;
 }
 
-const ROLE_COLORS: Record<UserRole, string> = {
-  BOSS:    "bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300",
-  MANAGER: "bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300",
-  STAFF:   "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
+const ROLE_STYLE: Record<UserRole, { bg: string; color: string }> = {
+  BOSS:    { bg: "rgba(168,85,247,0.10)",  color: "#c084fc" },
+  MANAGER: { bg: "rgba(59,130,246,0.10)",  color: "var(--info)" },
+  STAFF:   { bg: "rgba(100,116,139,0.10)", color: "var(--text-2)" },
 };
 
-const INPUT = "w-full px-3 py-2 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#2EBD78] placeholder-gray-400 dark:placeholder-gray-500";
-
 export function StaffManagement({
-  staff,
-  currentUserId,
-  currentUserRole,
+  staff, currentUserId, currentUserRole,
 }: {
   staff: StaffMember[];
   currentUserId: string;
@@ -41,8 +37,7 @@ export function StaffManagement({
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading("create");
-    setError("");
+    setLoading("create"); setError("");
     const fd = new FormData();
     Object.entries(formData).forEach(([k, v]) => fd.append(k, v));
     const result = await createStaffMember(fd);
@@ -64,154 +59,171 @@ export function StaffManagement({
   };
 
   const canToggle = (member: StaffMember) => {
-    if (member.id === currentUserId) return false;          // can't toggle yourself
-    if (currentUserRole === "MANAGER" && member.role === "BOSS") return false; // manager can't touch boss
+    if (member.id === currentUserId) return false;
+    if (currentUserRole === "MANAGER" && member.role === "BOSS") return false;
     return true;
   };
 
   return (
-    <div className="space-y-6 max-w-4xl">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+    <div style={{ display: "flex", flexDirection: "column", gap: 20, maxWidth: 900 }}>
+      {/* Header row */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Team Members</h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400">{staff.length} accounts</p>
+          <h2 style={{ fontSize: 16, fontWeight: 700, color: "var(--text)", margin: 0 }}>Team Members</h2>
+          <p style={{ fontSize: 13, color: "var(--text-2)", marginTop: 2 }}>{staff.length} accounts</p>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="flex items-center gap-2 text-white px-4 py-2.5 rounded-xl font-medium text-sm transition"
-          style={{ background: "#2EBD78" }}
-          onMouseEnter={(e) => ((e.currentTarget as HTMLButtonElement).style.background = "#22A865")}
-          onMouseLeave={(e) => ((e.currentTarget as HTMLButtonElement).style.background = "#2EBD78")}
+          className="uni-btn uni-btn-primary"
         >
-          <UserPlus size={16} /> Add Staff
+          <UserPlus size={15} /> Add Staff
         </button>
       </div>
 
+      {/* Create form */}
       {showForm && (
-        <form onSubmit={handleCreate} className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-6 space-y-4">
-          <h3 className="font-semibold text-gray-900 dark:text-white">Create New Staff Account</h3>
-          {error && <p className="text-red-500 text-sm bg-red-50 dark:bg-red-950 px-3 py-2 rounded-lg">{error}</p>}
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {([
-              { key: "name",     label: "Full Name", type: "text",     placeholder: "e.g. John Doe" },
-              { key: "email",    label: "Email",     type: "email",    placeholder: "staff@company.com" },
-              { key: "password", label: "Password",  type: "password", placeholder: "Min. 8 characters" },
-            ] as const).map((f) => (
-              <div key={f.key}>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{f.label}</label>
-                <input
-                  type={f.type}
-                  placeholder={f.placeholder}
-                  value={formData[f.key]}
-                  onChange={(e) => setFormData((p) => ({ ...p, [f.key]: e.target.value }))}
-                  required
-                  className={INPUT}
-                />
+        <div className="uni-card" style={{ padding: 20 }}>
+          <h3 style={{ fontSize: 14, fontWeight: 700, color: "var(--text)", marginBottom: 16 }}>
+            Create New Staff Account
+          </h3>
+          {error && (
+            <p style={{ fontSize: 13, color: "var(--danger)", padding: "10px 14px", background: "rgba(239,68,68,0.08)", borderRadius: 8, marginBottom: 16 }}>
+              {error}
+            </p>
+          )}
+          <form onSubmit={handleCreate} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              {([
+                { key: "name",     label: "Full Name", type: "text",     placeholder: "e.g. John Doe" },
+                { key: "email",    label: "Email",     type: "email",    placeholder: "staff@company.com" },
+                { key: "password", label: "Password",  type: "password", placeholder: "Min. 8 characters" },
+              ] as const).map((f) => (
+                <div key={f.key}>
+                  <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--text-2)", marginBottom: 6 }}>{f.label}</label>
+                  <input
+                    type={f.type}
+                    placeholder={f.placeholder}
+                    value={formData[f.key]}
+                    onChange={(e) => setFormData((p) => ({ ...p, [f.key]: e.target.value }))}
+                    required
+                    className="uni-input"
+                  />
+                </div>
+              ))}
+              <div>
+                <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--text-2)", marginBottom: 6 }}>Role</label>
+                <select
+                  value={formData.role}
+                  onChange={(e) => setFormData((p) => ({ ...p, role: e.target.value }))}
+                  className="uni-input"
+                >
+                  <option value="STAFF">Staff</option>
+                  <option value="MANAGER">Manager</option>
+                  {currentUserRole === "BOSS" && <option value="BOSS">Boss</option>}
+                </select>
               </div>
-            ))}
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Role</label>
-              <select
-                value={formData.role}
-                onChange={(e) => setFormData((p) => ({ ...p, role: e.target.value }))}
-                className={INPUT}
-              >
-                <option value="STAFF">Staff</option>
-                <option value="MANAGER">Manager</option>
-                {/* Only a BOSS can create another BOSS */}
-                {currentUserRole === "BOSS" && <option value="BOSS">Boss</option>}
-              </select>
             </div>
-          </div>
-
-          <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={() => { setShowForm(false); setError(""); }}
-              className="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading === "create"}
-              className="px-4 py-2 text-white rounded-xl text-sm font-medium transition flex items-center gap-2 disabled:opacity-70"
-              style={{ background: "#2EBD78" }}
-            >
-              {loading === "create"
-                ? <><Loader2 size={14} className="animate-spin" /> Creating…</>
-                : "Create Account"}
-            </button>
-          </div>
-        </form>
+            <div style={{ display: "flex", gap: 10 }}>
+              <button
+                type="button"
+                onClick={() => { setShowForm(false); setError(""); }}
+                className="uni-btn uni-btn-ghost"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={loading === "create"}
+                className="uni-btn uni-btn-primary"
+              >
+                {loading === "create"
+                  ? <><Loader2 size={14} className="animate-spin" /> Creating…</>
+                  : "Create Account"}
+              </button>
+            </div>
+          </form>
+        </div>
       )}
 
-      <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+      {/* Staff table */}
+      <div className="uni-card" style={{ overflow: "hidden" }}>
+        <div style={{ overflowX: "auto" }}>
+          <table className="uni-table">
             <thead>
-              <tr className="bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400">
-                <th className="text-left px-4 sm:px-6 py-3 font-medium">Name</th>
-                <th className="text-left px-4 py-3 font-medium hidden sm:table-cell">Email</th>
-                <th className="text-left px-4 py-3 font-medium">Role</th>
-                <th className="text-left px-4 py-3 font-medium hidden sm:table-cell">Status</th>
-                <th className="text-right px-4 sm:px-6 py-3 font-medium">Actions</th>
+              <tr>
+                <th style={{ paddingLeft: 20 }}>Name</th>
+                <th className="hidden sm:table-cell">Email</th>
+                <th>Role</th>
+                <th className="hidden sm:table-cell">Status</th>
+                <th style={{ textAlign: "right", paddingRight: 20 }}>Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
-              {staff.map((member) => (
-                <tr key={member.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition">
-                  <td className="px-4 sm:px-6 py-3 sm:py-4">
-                    <div className="flex items-center gap-2 sm:gap-3">
-                      <div
-                        className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
-                        style={{ background: "linear-gradient(135deg, #2EBD78, #1B3D4F)" }}
-                      >
-                        <span className="text-white text-xs font-bold">
-                          {(member.name ?? member.email).charAt(0).toUpperCase()}
-                        </span>
+            <tbody>
+              {staff.map((member) => {
+                const rs = ROLE_STYLE[member.role];
+                return (
+                  <tr key={member.id}>
+                    <td style={{ paddingLeft: 20 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <div style={{
+                          width: 34, height: 34, borderRadius: "50%", flexShrink: 0,
+                          background: "linear-gradient(135deg, #0D9488, #042F2E)",
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                        }}>
+                          <span style={{ color: "#FFFFFF", fontSize: 12, fontWeight: 700 }}>
+                            {(member.name ?? member.email).charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                        <div style={{ minWidth: 0 }}>
+                          <p style={{ fontWeight: 600, fontSize: 13, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                            {member.name ?? "—"}
+                          </p>
+                          <p className="sm:hidden" style={{ fontSize: 11, color: "var(--text-3)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                            {member.email}
+                          </p>
+                        </div>
                       </div>
-                      <div className="min-w-0">
-                        <span className="font-medium text-gray-900 dark:text-white block truncate">{member.name ?? "—"}</span>
-                        <span className="text-xs text-gray-400 truncate block sm:hidden">{member.email}</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-4 py-4 text-gray-500 dark:text-gray-400 text-sm hidden sm:table-cell">{member.email}</td>
-                  <td className="px-4 py-3 sm:py-4">
-                    <span className={`text-xs font-semibold px-2 py-1 rounded-lg ${ROLE_COLORS[member.role]}`}>
-                      {member.role}
-                    </span>
-                  </td>
-                  <td className="px-4 py-4 hidden sm:table-cell">
-                    <span className={`flex items-center gap-1.5 text-xs font-medium ${member.isActive ? "text-green-600" : "text-gray-400"}`}>
-                      {member.isActive ? <CheckCircle size={14} /> : <XCircle size={14} />}
-                      {member.isActive ? "Active" : "Inactive"}
-                    </span>
-                  </td>
-                  <td className="px-4 sm:px-6 py-3 sm:py-4 text-right">
-                    {canToggle(member) ? (
-                      <button
-                        onClick={() => handleToggle(member.id, member.isActive)}
-                        disabled={loading === member.id}
-                        className={`text-xs px-2.5 sm:px-3 py-1.5 rounded-lg font-medium transition disabled:opacity-50 ${
-                          member.isActive
-                            ? "bg-red-50 dark:bg-red-900/30 text-red-600 hover:bg-red-100"
-                            : "bg-green-50 dark:bg-green-900/30 text-green-600 hover:bg-green-100"
-                        }`}
-                      >
-                        {loading === member.id ? "…" : member.isActive ? "Deactivate" : "Activate"}
-                      </button>
-                    ) : member.role === "BOSS" && currentUserRole === "MANAGER" ? (
-                      <span className="inline-flex items-center gap-1 text-xs text-gray-400 dark:text-gray-600">
-                        <ShieldOff size={12} /> <span className="hidden sm:inline">Protected</span>
+                    </td>
+                    <td className="hidden sm:table-cell" style={{ color: "var(--text-2)", fontSize: 13 }}>{member.email}</td>
+                    <td>
+                      <span style={{
+                        fontSize: 11, fontWeight: 700, padding: "3px 9px", borderRadius: 6,
+                        background: rs.bg, color: rs.color, letterSpacing: "0.03em",
+                      }}>
+                        {member.role}
                       </span>
-                    ) : null}
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td className="hidden sm:table-cell">
+                      <span style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, fontWeight: 600, color: member.isActive ? "var(--accent)" : "var(--text-3)" }}>
+                        {member.isActive ? <CheckCircle size={13} /> : <XCircle size={13} />}
+                        {member.isActive ? "Active" : "Inactive"}
+                      </span>
+                    </td>
+                    <td style={{ textAlign: "right", paddingRight: 20 }}>
+                      {canToggle(member) ? (
+                        <button
+                          onClick={() => handleToggle(member.id, member.isActive)}
+                          disabled={loading === member.id}
+                          style={{
+                            fontSize: 12, fontWeight: 600, padding: "5px 12px", borderRadius: 8,
+                            border: "none", cursor: loading === member.id ? "not-allowed" : "pointer",
+                            opacity: loading === member.id ? 0.5 : 1, transition: "all 0.15s",
+                            background: member.isActive ? "rgba(239,68,68,0.10)" : "var(--accent-sub)",
+                            color: member.isActive ? "var(--danger)" : "var(--accent)",
+                          }}
+                        >
+                          {loading === member.id ? "…" : member.isActive ? "Deactivate" : "Activate"}
+                        </button>
+                      ) : member.role === "BOSS" && currentUserRole === "MANAGER" ? (
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 12, color: "var(--text-3)" }}>
+                          <ShieldOff size={12} />
+                          <span className="hidden sm:inline">Protected</span>
+                        </span>
+                      ) : null}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

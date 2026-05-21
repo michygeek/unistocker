@@ -1,8 +1,8 @@
 "use client";
 
-import { Bell, Search, Sun, Moon } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Bell, Search } from "lucide-react";
 import Link from "next/link";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 interface HeaderProps {
   title: string;
@@ -10,42 +10,99 @@ interface HeaderProps {
 }
 
 export function Header({ title, unreadCount = 0 }: HeaderProps) {
-  const [dark, setDark] = useState(false);
-
-  useEffect(() => {
-    const isDark = document.documentElement.classList.contains("dark");
-    setDark(isDark);
-  }, []);
-
-  const toggleDark = () => {
-    document.documentElement.classList.toggle("dark");
-    setDark(!dark);
-  };
-
   return (
-    <header className="sticky top-0 z-20 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 px-6 py-4 flex items-center justify-between">
-      <h1 className="text-xl font-semibold text-gray-900 dark:text-white ml-12 lg:ml-0">{title}</h1>
+    <header
+      style={{
+        position: "sticky", top: 0, zIndex: 20,
+        background: "rgba(var(--bg-card-rgb, 255,255,255), 0.82)",
+        backdropFilter: "blur(16px)",
+        borderBottom: "1px solid var(--border)",
+        padding: "0 24px",
+        height: 64,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: 16,
+      }}
+    >
+      {/* Title */}
+      <h1
+        style={{
+          fontSize: 18,
+          fontWeight: 700,
+          color: "var(--text)",
+          letterSpacing: "-0.02em",
+          marginLeft: 48,
+          whiteSpace: "nowrap",
+        }}
+        className="lg:ml-0"
+      >
+        {title}
+      </h1>
 
-      <div className="flex items-center gap-3">
-        <div className="hidden md:flex items-center gap-2 bg-gray-100 dark:bg-gray-800 rounded-xl px-3 py-2 text-sm text-gray-500 dark:text-gray-400 w-56">
-          <Search size={16} />
-          <span>Search...</span>
+      {/* Right controls */}
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        {/* Search */}
+        <div
+          className="hidden md:flex"
+          style={{
+            alignItems: "center",
+            gap: 8,
+            background: "var(--bg-input)",
+            border: "1px solid var(--border)",
+            borderRadius: 10,
+            padding: "7px 14px",
+            fontSize: 13,
+            color: "var(--text-3)",
+            width: 200,
+            cursor: "text",
+          }}
+        >
+          <Search size={14} style={{ color: "var(--text-3)", flexShrink: 0 }} />
+          <span>Search…</span>
         </div>
 
-        <button
-          onClick={toggleDark}
-          className="p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
-        >
-          {dark ? <Sun size={18} /> : <Moon size={18} />}
-        </button>
+        {/* Theme toggle */}
+        <ThemeToggle />
 
+        {/* Notifications */}
         <Link
           href="/notifications"
-          className="relative p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+          style={{
+            position: "relative",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 38,
+            height: 38,
+            borderRadius: 10,
+            background: "var(--bg-input)",
+            border: "1px solid var(--border)",
+            color: "var(--text-2)",
+            textDecoration: "none",
+            transition: "all 0.15s",
+          }}
         >
-          <Bell size={18} />
+          <Bell size={17} />
           {unreadCount > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+            <span
+              style={{
+                position: "absolute",
+                top: -3,
+                right: -3,
+                width: 17,
+                height: 17,
+                background: "#ef4444",
+                color: "#fff",
+                fontSize: 10,
+                fontWeight: 700,
+                borderRadius: 99,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                border: "2px solid var(--bg)",
+              }}
+            >
               {unreadCount > 9 ? "9+" : unreadCount}
             </span>
           )}

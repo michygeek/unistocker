@@ -19,9 +19,9 @@ export default async function StaffPage() {
   });
 
   return (
-    <div className="flex flex-col flex-1">
+    <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
       <Header title="Staff Management" />
-      <div className="flex-1 p-4 sm:p-6 animate-in">
+      <div className="animate-in" style={{ flex: 1, padding: "24px" }}>
         <StaffManagement staff={staff} currentUserId={session.user.id} currentUserRole={session.user.role} />
       </div>
     </div>

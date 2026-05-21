@@ -40,11 +40,11 @@ export function ForgotPasswordForm() {
       <div style={{ textAlign: "center", padding: "8px 0" }}>
         <div style={{
           width: 56, height: 56, borderRadius: "50%",
-          background: "rgba(46,189,120,0.12)", border: "2px solid rgba(46,189,120,0.3)",
+          background: "rgba(13,148,136,0.10)", border: "2px solid rgba(13,148,136,0.30)",
           display: "flex", alignItems: "center", justifyContent: "center",
           margin: "0 auto 20px",
         }}>
-          <CheckCircle size={26} color="#2EBD78" />
+          <CheckCircle size={26} color="#0D9488" />
         </div>
         <h3 style={{ fontSize: 18, fontWeight: 700, color: "#0F2030", margin: "0 0 8px" }}>
           Check your email

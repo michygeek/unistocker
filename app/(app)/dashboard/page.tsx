@@ -70,17 +70,17 @@ export default async function DashboardPage() {
   const totalProfit = Number(revenueData._sum.profit ?? 0);
 
   return (
-    <div className="flex flex-col flex-1">
+    <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
       <Header title="Dashboard" unreadCount={unreadCount} />
-      <div className="flex-1 p-4 sm:p-6 space-y-4 sm:space-y-6 animate-in">
+      <div className="animate-in" style={{ flex: 1, padding: "24px", display: "flex", flexDirection: "column", gap: 24 }}>
         <div>
-          <h2 className="text-gray-500 dark:text-gray-400 text-sm mb-1">
-            Welcome back, <span className="text-gray-900 dark:text-white font-semibold">{session.user.name ?? session.user.email}</span>
-          </h2>
-          <p className="text-xs text-gray-400">Here&apos;s what&apos;s happening in your store today.</p>
+          <p style={{ fontSize: 13, color: "var(--text-2)", marginBottom: 2 }}>
+            Welcome back, <span style={{ color: "var(--text)", fontWeight: 700 }}>{session.user.name ?? session.user.email}</span>
+          </p>
+          <p style={{ fontSize: 12, color: "var(--text-3)" }}>Here&apos;s what&apos;s happening in your store today.</p>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: 16 }}>
           <StatsCard title="Total Products" value={totalProducts} icon={Package} color="indigo" change="Active items" changeType="neutral" />
           <StatsCard title="Total Sales" value={totalSalesCount} icon={ShoppingCart} color="purple" change="All time" changeType="neutral" />
           <StatsCard title="7-Day Revenue" value={`₦${totalRevenue.toFixed(2)}`} icon={DollarSign} color="green" change="Last 7 days" changeType="up" />
@@ -89,8 +89,8 @@ export default async function DashboardPage() {
           <StatsCard title="Staff" value={totalStaff} icon={Users} color="red" change="Active accounts" changeType="neutral" />
         </div>
 
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-          <div className="xl:col-span-2">
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
+          <div style={{ gridColumn: "span 2" }}>
             <SalesChart data={chartData} />
           </div>
           <div>
