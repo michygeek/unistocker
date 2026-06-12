@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import {
   LayoutDashboard, Package, ShoppingCart, BarChart3,
-  Users, Settings, Bell, LogOut, Menu, X,
+  Users, Settings, Bell, LogOut, Menu, X, TrendingUp, AlertTriangle, Lightbulb,
 } from "lucide-react";
 import { useState } from "react";
 import type { UserRole } from "@prisma/client";
@@ -19,6 +19,12 @@ const NAV = [
   { href: "/notifications",  label: "Notifications", icon: Bell },
   { href: "/settings/staff", label: "Staff",         icon: Users,      roles: ["BOSS","MANAGER"] },
   { href: "/settings",       label: "My Account",    icon: Settings },
+] as const;
+
+const AI_NAV = [
+  { href: "/dashboard/ai/forecasting",  label: "Demand Forecasting", icon: TrendingUp },
+  { href: "/dashboard/ai/stock-alerts", label: "Smart Stock Alerts", icon: AlertTriangle },
+  { href: "/dashboard/ai/insights",     label: "Business Insights",  icon: Lightbulb },
 ] as const;
 
 interface Props {
@@ -108,6 +114,25 @@ export function Sidebar({ userRole, userName, userEmail, organizationName, unrea
               Icon={item.icon}
               active={active}
               badge={item.href === "/notifications" ? unreadCount : undefined}
+            />
+          );
+        })}
+
+        {/* AI Features section */}
+        <div style={{ marginTop: 12, marginBottom: 4 }}>
+          <p style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.25)", textTransform: "uppercase", letterSpacing: "0.08em", padding: "4px 12px" }}>
+            AI Features
+          </p>
+        </div>
+        {AI_NAV.map((item) => {
+          const active = pathname === item.href || pathname.startsWith(item.href + "/");
+          return (
+            <NavLink
+              key={item.href}
+              href={item.href}
+              label={item.label}
+              Icon={item.icon}
+              active={active}
             />
           );
         })}

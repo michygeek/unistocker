@@ -9,6 +9,7 @@ import { createProduct } from "@/lib/actions/products";
 import { useRouter } from "next/navigation";
 import type { UserRole } from "@prisma/client";
 import { BarcodeScanner } from "@/components/inventory/barcode-scanner";
+import { PhotoEntryButton } from "@/components/ai/photo-entry-button";
 
 const schema = z.object({
   name: z.string().min(2),
@@ -27,6 +28,8 @@ export function AddProductButton({ categories, userRole }: { categories: { id: s
   const [preview, setPreview] = useState<string | null>(null);
   const [imageError, setImageError] = useState("");
   const [scannerOpen, setScannerOpen] = useState(false);
+  const [aiFilledFields, setAiFilledFields] = useState<Set<string>>(new Set());
+  const [aiConfidence, setAiConfidence] = useState<number | null>(null);
 
   const MAX_IMAGE_BYTES = 2 * 1024 * 1024;
   const router = useRouter();
@@ -34,6 +37,22 @@ export function AddProductButton({ categories, userRole }: { categories: { id: s
   const { register, handleSubmit, reset, setValue, formState: { errors, isSubmitting } } = useForm({ resolver: zodResolver(schema) });
 
   if (userRole === "STAFF") return null;
+
+  const onPhotoResult = (result: {
+    name?: string; description?: string; category?: string;
+    suggestedSellingPrice?: number; suggestedCostPrice?: number;
+    barcode?: string | null; confidence?: number;
+  }, _imageUrl: string) => {
+    const filled = new Set<string>();
+    if (result.name) { setValue("name" as never, result.name as never); filled.add("name"); }
+    if (result.description) { setValue("description" as never, result.description as never); filled.add("description"); }
+    if (result.suggestedSellingPrice) { setValue("sellingPrice" as never, result.suggestedSellingPrice as never); filled.add("sellingPrice"); }
+    if (result.suggestedCostPrice) { setValue("costPrice" as never, result.suggestedCostPrice as never); filled.add("costPrice"); }
+    if (result.barcode) { setValue("barcode" as never, result.barcode as never); filled.add("barcode"); }
+    setAiFilledFields(filled);
+    setAiConfidence(result.confidence ?? null);
+    setOpen(true);
+  };
 
   const onSubmit = async (data: z.infer<typeof schema>) => {
     const fd = new FormData();
@@ -66,6 +85,7 @@ export function AddProductButton({ categories, userRole }: { categories: { id: s
 
   return (
     <>
+      <PhotoEntryButton onResult={onPhotoResult} />
       <button
         onClick={() => setOpen(true)}
         className="uni-btn uni-btn-primary"
@@ -103,6 +123,13 @@ export function AddProductButton({ categories, userRole }: { categories: { id: s
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} style={{ padding: 20, display: "flex", flexDirection: "column", gap: 20 }}>
+              {aiConfidence !== null && aiFilledFields.size > 0 && (
+                <div style={{ padding: "8px 14px", background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.25)", borderRadius: 10, display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ fontSize: 12, color: "var(--warning)", fontWeight: 600 }}>
+                    {Math.round(aiConfidence * 100)}% confidence — please review highlighted fields
+                  </span>
+                </div>
+              )}
               {/* Image upload */}
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
                 <label htmlFor="product-image" style={{ cursor: "pointer" }}>

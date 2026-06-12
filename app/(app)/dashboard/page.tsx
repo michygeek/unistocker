@@ -5,7 +5,11 @@ import { StatsCard } from "@/components/dashboard/stats-card";
 import { RecentActivity } from "@/components/dashboard/recent-activity";
 import { SalesChart } from "@/components/dashboard/sales-chart";
 import { LowStockAlert } from "@/components/dashboard/low-stock-alert";
+import { SmartAlertBanner } from "@/components/ai/smart-alert-banner";
+import { WeeklyInsightCard } from "@/components/ai/weekly-insight-card";
+import { AIAssistant } from "@/components/ai/ai-assistant";
 import { Package, ShoppingCart, TrendingUp, AlertTriangle, DollarSign, Users } from "lucide-react";
+import Link from "next/link";
 import { format, subDays, startOfDay } from "date-fns";
 import type { Metadata } from "next";
 
@@ -27,6 +31,9 @@ export default async function DashboardPage() {
     recentLogs,
     totalStaff,
     unreadCount,
+    criticalStockCount,
+    needReorderCount,
+    latestWeeklyInsight,
   ] = await Promise.all([
     db.product.count({ where: { isActive: true } }),
     db.sale.count(),
@@ -48,6 +55,14 @@ export default async function DashboardPage() {
     }),
     db.user.count({ where: { isActive: true } }),
     db.notification.count({ where: { userId: session.user.id, readAt: null, status: "SENT" } }),
+    db.stockPrediction.count({ where: { urgencyLevel: "CRITICAL", product: { isActive: true } } }),
+    db.demandForecast.count({
+      where: {
+        reorderByDate: { lte: new Date(Date.now() + 7 * 86400000) },
+        createdAt: { gte: subDays(new Date(), 4) },
+      },
+    }),
+    db.weeklyInsight.findFirst({ orderBy: { createdAt: "desc" } }),
   ]);
 
   const chartData = await Promise.all(
@@ -80,6 +95,54 @@ export default async function DashboardPage() {
           <p style={{ fontSize: 12, color: "var(--text-3)" }}>Here&apos;s what&apos;s happening in your store today.</p>
         </div>
 
+        {/* AI Overview */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <SmartAlertBanner criticalCount={criticalStockCount} />
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            <WeeklyInsightCard insight={latestWeeklyInsight ? {
+              id: latestWeeklyInsight.id,
+              weekOf: latestWeeklyInsight.weekOf.toISOString(),
+              summary: latestWeeklyInsight.summary,
+              topProducts: latestWeeklyInsight.topProducts as never,
+              alerts: latestWeeklyInsight.alerts as never,
+              highlights: latestWeeklyInsight.highlights as never,
+              createdAt: latestWeeklyInsight.createdAt.toISOString(),
+            } : null} />
+
+            <div className="uni-card" style={{ padding: 20 }}>
+              <p style={{ fontSize: 12, fontWeight: 700, color: "var(--text-2)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 12 }}>AI Overview</p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                <Link href="/dashboard/ai/forecasting" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", borderRadius: 10, background: "var(--bg-input)", border: "1px solid var(--border)", textDecoration: "none", transition: "all 0.15s" }} className="ai-overview-link">
+                  <span style={{ fontSize: 13, color: "var(--text)", fontWeight: 600 }}>Demand Forecasting</span>
+                  {needReorderCount > 0 ? (
+                    <span style={{ fontSize: 12, fontWeight: 700, padding: "3px 8px", borderRadius: 8, background: "rgba(239,68,68,0.10)", color: "var(--danger)" }}>
+                      {needReorderCount} need reorder
+                    </span>
+                  ) : (
+                    <span style={{ fontSize: 12, color: "var(--accent)", fontWeight: 600 }}>All healthy</span>
+                  )}
+                </Link>
+                <Link href="/dashboard/ai/stock-alerts" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", borderRadius: 10, background: "var(--bg-input)", border: "1px solid var(--border)", textDecoration: "none" }} className="ai-overview-link">
+                  <span style={{ fontSize: 13, color: "var(--text)", fontWeight: 600 }}>Smart Stock Alerts</span>
+                  {criticalStockCount > 0 ? (
+                    <span style={{ fontSize: 12, fontWeight: 700, padding: "3px 8px", borderRadius: 8, background: "rgba(239,68,68,0.10)", color: "var(--danger)" }}>
+                      {criticalStockCount} critical
+                    </span>
+                  ) : (
+                    <span style={{ fontSize: 12, color: "var(--accent)", fontWeight: 600 }}>All healthy</span>
+                  )}
+                </Link>
+                <Link href="/dashboard/ai/insights" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", borderRadius: 10, background: "var(--bg-input)", border: "1px solid var(--border)", textDecoration: "none" }} className="ai-overview-link">
+                  <span style={{ fontSize: 13, color: "var(--text)", fontWeight: 600 }}>Business Insights</span>
+                  <span style={{ fontSize: 12, color: "var(--accent)", fontWeight: 600 }}>Ask anything →</span>
+                </Link>
+              </div>
+              <style>{`.ai-overview-link:hover{border-color:var(--border-2)!important;background:var(--bg-card-2)!important}`}</style>
+            </div>
+          </div>
+        </div>
+
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: 16 }}>
           <StatsCard title="Total Products" value={totalProducts} icon={Package} color="indigo" change="Active items" changeType="neutral" />
           <StatsCard title="Total Sales" value={totalSalesCount} icon={ShoppingCart} color="purple" change="All time" changeType="neutral" />
@@ -107,6 +170,7 @@ export default async function DashboardPage() {
           user: { name: l.user.name, email: l.user.email },
         }))} />
       </div>
+      <AIAssistant />
     </div>
   );
 }

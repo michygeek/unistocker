@@ -2,8 +2,9 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { Header } from "@/components/layout/header";
+import { ForecastCard } from "@/components/ai/forecast-card";
 import { format } from "date-fns";
-import { Package, Tag, Barcode, ArrowLeft, Plus, Minus, RefreshCw, TrendingDown, TrendingUp } from "lucide-react";
+import { Package, Tag, Barcode, ArrowLeft, Plus, Minus, RefreshCw, TrendingDown, TrendingUp, Clock } from "lucide-react";
 import Link from "next/link";
 import type { Metadata } from "next";
 
@@ -37,7 +38,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
 
   const { id } = await params;
 
-  const [product, transactions, unreadCount] = await Promise.all([
+  const [product, transactions, unreadCount, stockPrediction, latestForecast] = await Promise.all([
     db.product.findUnique({
       where: { id },
       include: {
@@ -53,6 +54,8 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
       take: 50,
     }),
     db.notification.count({ where: { userId: session.user.id, readAt: null, status: "SENT" } }),
+    db.stockPrediction.findUnique({ where: { productId: id } }),
+    db.demandForecast.findFirst({ where: { productId: id }, orderBy: { createdAt: "desc" } }),
   ]);
 
   if (!product) notFound();
@@ -62,6 +65,18 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   const margin = sellingPrice > 0 ? ((sellingPrice - costPrice) / sellingPrice) * 100 : 0;
   const isLowStock = product.quantity <= product.lowStockAlert;
   const canEdit = session.user.role === "BOSS" || session.user.role === "MANAGER";
+
+  const serialisedForecast = latestForecast ? {
+    id: latestForecast.id,
+    next7Days: latestForecast.next7Days,
+    next14Days: latestForecast.next14Days,
+    next30Days: latestForecast.next30Days,
+    reorderQty: latestForecast.reorderQty,
+    reorderByDate: latestForecast.reorderByDate.toISOString(),
+    confidence: latestForecast.confidence,
+    reasoning: latestForecast.reasoning,
+    createdAt: latestForecast.createdAt.toISOString(),
+  } : null;
 
   return (
     <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
@@ -141,16 +156,28 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
               { label: "Cost Price",    value: `₦${costPrice.toFixed(2)}`,   color: "var(--text)" },
               { label: "Selling Price", value: `₦${sellingPrice.toFixed(2)}`, color: "var(--accent)" },
               { label: "Margin",        value: `${margin.toFixed(1)}%`,       color: "#34d399" },
-              { label: "In Stock",      value: `${product.quantity} units`,   color: isLowStock ? "var(--danger)" : "var(--text)" },
             ].map((stat, i) => (
-              <div key={stat.label} style={{ padding: "16px 20px", borderRight: i < 3 ? "1px solid var(--border)" : "none" }}>
+              <div key={stat.label} style={{ padding: "16px 20px", borderRight: "1px solid var(--border)" }}>
                 <p style={{ fontSize: 11, color: "var(--text-3)", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.05em", fontWeight: 600 }}>{stat.label}</p>
                 <p style={{ fontSize: 18, fontWeight: 800, color: stat.color }}>{stat.value}</p>
-                {stat.label === "In Stock" && isLowStock && (
-                  <p style={{ fontSize: 11, color: "var(--warning)", marginTop: 2 }}>Below threshold</p>
-                )}
               </div>
             ))}
+            {/* Dynamic stock status */}
+            <div style={{ padding: "16px 20px" }}>
+              <p style={{ fontSize: 11, color: "var(--text-3)", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.05em", fontWeight: 600 }}>In Stock</p>
+              <p style={{ fontSize: 18, fontWeight: 800, color: isLowStock ? "var(--danger)" : "var(--text)" }}>{product.quantity} units</p>
+              {stockPrediction ? (
+                <p style={{ fontSize: 11, marginTop: 2, fontWeight: 600, color:
+                  stockPrediction.urgencyLevel === "CRITICAL" ? "var(--danger)" :
+                  stockPrediction.urgencyLevel === "WARNING" ? "var(--warning)" :
+                  stockPrediction.urgencyLevel === "WATCH" ? "var(--info)" : "var(--accent)" }}>
+                  <Clock style={{ display: "inline", width: 10, height: 10, marginRight: 3 }} />
+                  Runs out in {Math.round(stockPrediction.daysUntilStockout)} days
+                </p>
+              ) : isLowStock ? (
+                <p style={{ fontSize: 11, color: "var(--warning)", marginTop: 2 }}>Below threshold</p>
+              ) : null}
+            </div>
           </div>
         </div>
 
@@ -171,6 +198,9 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
             ))}
           </div>
         </div>
+
+        {/* AI Forecast */}
+        <ForecastCard productId={id} initialForecast={serialisedForecast} />
 
         {/* Stock history */}
         <div className="uni-card" style={{ overflow: "hidden" }}>

@@ -4,6 +4,7 @@ import {
   Package, BarChart3, Bell, Users, ShieldCheck,
   ArrowRight, CheckCircle,
   ShoppingCart, Globe, Smartphone, Star,
+  TrendingUp, AlertTriangle, MessageSquare, Camera, Bot, Zap,
 } from "lucide-react";
 
 /* ─── Design tokens ─────────────────────────────────────────────────────── */
@@ -541,6 +542,106 @@ const CSS = `
   .lp-footer-link:hover { color: ${C.text}; }
 
   /* ══════════════════════════════════════════════
+     HERO — AI CHIPS
+  ══════════════════════════════════════════════ */
+  .lp-hero-ai-chips {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px;
+  }
+  .lp-hero-ai-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 600; color: ${C.dText2};
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.10);
+    padding: 5px 12px; border-radius: 99px; transition: all 0.18s;
+  }
+  .lp-hero-ai-chip svg { color: ${C.accentBright}; }
+  .lp-hero-ai-chip:hover { background: rgba(45,212,191,0.10); border-color: rgba(45,212,191,0.25); color: ${C.dText}; }
+
+  /* ══════════════════════════════════════════════
+     AI FEATURES SECTION  (dark — full-width)
+  ══════════════════════════════════════════════ */
+  .lp-ai-section {
+    background: ${C.dark2};
+    padding: 100px 36px;
+    border-top: 1px solid rgba(255,255,255,0.04);
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    position: relative; overflow: hidden;
+  }
+  /* subtle radial glow behind header */
+  .lp-ai-section::before {
+    content: ''; position: absolute;
+    top: -180px; left: 50%; transform: translateX(-50%);
+    width: 700px; height: 400px; border-radius: 50%;
+    background: radial-gradient(ellipse at center, rgba(13,148,136,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .lp-ai-hd { text-align: center; margin-bottom: 64px; position: relative; z-index: 1; }
+  .lp-ai-badge {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase;
+    color: ${C.accentBright};
+    background: rgba(45,212,191,0.08); border: 1px solid rgba(45,212,191,0.22);
+    padding: 5px 16px; border-radius: 99px; margin-bottom: 20px;
+  }
+  .lp-ai-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 16px; max-width: 1000px; margin: 0 auto;
+    position: relative; z-index: 1;
+  }
+  .lp-ai-card {
+    border-radius: 18px; padding: 32px 28px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    display: flex; flex-direction: column; gap: 16px;
+    transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+    position: relative; overflow: hidden;
+  }
+  .lp-ai-card::after {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, ${C.accentBright}, transparent);
+    opacity: 0; transition: opacity 0.25s;
+  }
+  .lp-ai-card:hover::after { opacity: 1; }
+  .lp-ai-card:hover {
+    border-color: rgba(45,212,191,0.20);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.30), 0 0 0 1px rgba(45,212,191,0.10);
+  }
+  .lp-ai-card-icon {
+    width: 52px; height: 52px; border-radius: 14px;
+    background: rgba(13,148,136,0.12); border: 1px solid rgba(13,148,136,0.22);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .lp-ai-card-row { display: flex; align-items: flex-start; gap: 18px; }
+  .lp-ai-card-title { font-size: 17px; font-weight: 800; color: ${C.dText}; margin-bottom: 6px; letter-spacing: -0.02em; }
+  .lp-ai-card-desc  { font-size: 14px; color: ${C.dText2}; line-height: 1.72; }
+  .lp-ai-card-bullets { display: flex; flex-direction: column; gap: 7px; padding-top: 4px; }
+  .lp-ai-bullet {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12.5px; color: ${C.dText3};
+  }
+  .lp-ai-bullet::before {
+    content: ''; width: 5px; height: 5px; border-radius: 50%;
+    background: ${C.accentBright}; flex-shrink: 0; opacity: 0.70;
+  }
+  /* Demo pill inside card */
+  .lp-ai-demo-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(13,148,136,0.12); border: 1px solid rgba(13,148,136,0.22);
+    border-radius: 8px; padding: 6px 12px;
+    font-size: 12px; font-weight: 700; color: ${C.accentBright};
+    width: fit-content;
+  }
+  /* Bottom CTA row */
+  .lp-ai-cta-row {
+    display: flex; align-items: center; justify-content: center; gap: 16px;
+    margin-top: 56px; flex-wrap: wrap; position: relative; z-index: 1;
+  }
+  .lp-ai-cta-label {
+    font-size: 15px; color: ${C.dText2};
+  }
+  .lp-ai-cta-label strong { color: ${C.dText}; }
+
+  /* ══════════════════════════════════════════════
      UTILS
   ══════════════════════════════════════════════ */
   .lp-inner    { max-width: 1200px; margin: 0 auto; }
@@ -564,12 +665,13 @@ const CSS = `
     .lp-cta-right { align-items: flex-start; }
     .lp-cta-ring { display: none; }
     .lp-btn-pri { animation: none; box-shadow: 0 4px 20px rgba(13,148,136,0.32); }
+    .lp-ai-grid { grid-template-columns: 1fr; }
   }
   @media (max-width: 640px) {
     .lp-nav-links, .lp-signin { display: none; }
     .lp-hero { padding: 112px 20px 72px; }
     .lp-features-section, .lp-hiw-section, .lp-testi-section,
-    .lp-pricing-section, .lp-cta-section { padding: 72px 20px; }
+    .lp-pricing-section, .lp-cta-section, .lp-ai-section { padding: 72px 20px; }
     .lp-logos-strip, .lp-footer { padding: 24px 20px; }
     .lp-feat-grid { grid-template-columns: 1fr; }
     .lp-steps-grid { grid-template-columns: 1fr; }
@@ -578,6 +680,8 @@ const CSS = `
     .lp-btn-pri, .lp-btn-sec, .lp-btn-accent { font-size: 14px; padding: 13px 22px; }
     .lp-hero-proof { gap: 20px; }
     .lp-features-count { display: none; }
+    .lp-ai-card-row { flex-direction: column; gap: 12px; }
+    .lp-hero-ai-chips { display: none; }
   }
 `;
 
@@ -589,6 +693,7 @@ export default function LandingPage() {
       <Nav />
       <Hero />
       <Logos />
+      <AIFeatures />
       <Features />
       <HowItWorks />
       <Testimonials />
@@ -611,6 +716,7 @@ function Nav() {
           <span className="lp-logo-text">UniStocker</span>
         </Link>
         <nav className="lp-nav-links">
+          <a href="#ai-features"  className="lp-nav-link">AI Features</a>
           <a href="#features"     className="lp-nav-link">Features</a>
           <a href="#how-it-works" className="lp-nav-link">How it works</a>
           <a href="#pricing"      className="lp-nav-link">Pricing</a>
@@ -633,20 +739,28 @@ function Hero() {
         {/* Left */}
         <div className="lp-hero-left">
           <div className="lp-hero-eyebrow anim-0">
-            Inventory Management Platform
+            <Bot size={12} />
+            AI-Powered Inventory Platform
           </div>
           <h1 className="lp-h1 anim-1">
-            Run your stock<br />like a <em>pro.</em>
+            Your stock,<br />now <em>thinks</em> for itself.
           </h1>
           <p className="lp-hero-sub anim-2">
-            Track stock, record sales, manage your team, and get real-time
-            alerts — all from one clean dashboard. No spreadsheets needed.
+            Track stock, record sales, and manage your team — plus get AI
+            demand forecasts, smart stockout warnings, and a business
+            assistant that answers any question in plain English.
           </p>
           <div className="lp-hero-btns anim-3">
             <Link href="/auth/register" className="lp-btn-pri">
               Start for free <ArrowRight size={16} />
             </Link>
-            <Link href="/auth/login" className="lp-btn-sec">Sign in</Link>
+            <a href="#ai-features" className="lp-btn-sec">See AI features</a>
+          </div>
+          <div className="lp-hero-ai-chips anim-3">
+            <span className="lp-hero-ai-chip"><TrendingUp size={11} /> Demand Forecasting</span>
+            <span className="lp-hero-ai-chip"><AlertTriangle size={11} /> Smart Stock Alerts</span>
+            <span className="lp-hero-ai-chip"><MessageSquare size={11} /> Business Chat</span>
+            <span className="lp-hero-ai-chip"><Camera size={11} /> Photo Product Entry</span>
           </div>
           <div className="lp-hero-proof anim-4">
             <div className="lp-proof-stat">
@@ -711,9 +825,9 @@ function Hero() {
                     </div>
                     <div className="lp-mock-rows">
                       {[
-                        { pill: "STOCK IN", txt: "50 units — Wireless Mouse Pro",   time: "2m",  bg: "rgba(13,148,136,0.12)",  fg: "#0D9488" },
-                        { pill: "SALE",     txt: "Receipt #4821 · ₦18,900",          time: "14m", bg: "rgba(96,165,250,0.12)",  fg: "#3b82f6" },
-                        { pill: "ALERT",    txt: "USB-C Hub below minimum stock",    time: "1h",  bg: "rgba(251,191,36,0.12)",  fg: "#d97706" },
+                        { pill: "AI FORECAST", txt: "Order 45 units of USB-C Hub by Jun 3", time: "AI",  bg: "rgba(45,212,191,0.12)",  fg: "#2DD4BF" },
+                        { pill: "SALE",        txt: "Receipt #4821 · ₦18,900",              time: "14m", bg: "rgba(96,165,250,0.12)",  fg: "#3b82f6" },
+                        { pill: "⚠ CRITICAL",  txt: "Wireless Mouse runs out in 2 days",    time: "AI",  bg: "rgba(239,68,68,0.12)",   fg: "#ef4444" },
                       ].map((r, i) => (
                         <div key={i} className="lp-mock-row">
                           <span className="lp-mock-pill" style={{ background: r.bg, color: r.fg }}>{r.pill}</span>
@@ -745,6 +859,115 @@ function Logos() {
         </div>
       </div>
     </div>
+  );
+}
+
+/* ─── AI Features ───────────────────────────────────────────────────────── */
+function AIFeatures() {
+  const cards = [
+    {
+      icon: TrendingUp,
+      title: "Demand Forecasting",
+      desc: "AI analyses 90 days of sales patterns — weekday/weekend trends, spikes, and burn rate — then predicts exactly how much stock you'll need over the next 7, 14, and 30 days.",
+      bullets: [
+        "Exact reorder quantity and date per product",
+        "Confidence score so you know when to trust it",
+        "Plain English reasoning from Claude",
+        "Batch-run across all products at once",
+      ],
+      demo: "Order 45 units by Jun 3 · 87% confidence",
+      demoColor: "#2DD4BF",
+    },
+    {
+      icon: AlertTriangle,
+      title: "Smart Stock Alerts",
+      desc: "Goes beyond simple reorder levels. AI monitors live sales velocity — and warns you before you hit the threshold, not after. Even catches when your reorder level is set wrong.",
+      bullets: [
+        "CRITICAL / WARNING / WATCH / HEALTHY status",
+        "\"Runs out in X days\" on every product page",
+        "Suggests corrected reorder levels with one-click update",
+        "Auto-refreshes every 6 hours via cron job",
+      ],
+      demo: "USB-C Hub · runs out in 2 days · CRITICAL",
+      demoColor: "#ef4444",
+    },
+    {
+      icon: Bot,
+      title: "AI Business Assistant",
+      desc: "A floating chat panel available on every dashboard page. Ask anything in plain English — or Pidgin. Get direct, data-backed answers with real numbers from your live business data.",
+      bullets: [
+        "Streaming word-by-word responses via Claude",
+        "Live revenue, profit, staff, and stock context injected",
+        "Quick-question chips for common queries",
+        "Automated weekly narrative report every Monday",
+      ],
+      demo: "\"What were my top products this week?\"",
+      demoColor: "#a855f7",
+    },
+    {
+      icon: Camera,
+      title: "Photo Product Entry",
+      desc: "Take or upload a photo of any product — its label, packaging, or barcode. Claude Vision reads the image and pre-fills the entire Add Product form. Review, tweak, save.",
+      bullets: [
+        "Detects name, category, brand, and barcode",
+        "Suggests realistic Nigerian market prices",
+        "Amber highlights show which fields AI filled",
+        "Batch import up to 20 products at once",
+      ],
+      demo: "Identified: Indomie Noodles 70g · 94% confidence",
+      demoColor: "#f59e0b",
+    },
+  ];
+
+  return (
+    <section id="ai-features" className="lp-ai-section">
+      <div className="lp-ai-hd">
+        <div className="lp-ai-badge">
+          <Zap size={11} /> Powered by Claude AI
+        </div>
+        <h2 className="lp-section-title lp-title-d" style={{ marginBottom: 14 }}>
+          Your inventory, now<br />with a brain.
+        </h2>
+        <p className="lp-section-sub-c lp-sub-d">
+          Four AI features built into UniStocker — no extra tools, no setup, no guesswork.
+          Just smarter decisions, automatically.
+        </p>
+      </div>
+
+      <div className="lp-ai-grid">
+        {cards.map((card) => (
+          <div key={card.title} className="lp-ai-card">
+            <div className="lp-ai-card-row">
+              <div className="lp-ai-card-icon">
+                <card.icon size={22} color={C.accentBright} />
+              </div>
+              <div style={{ flex: 1 }}>
+                <div className="lp-ai-card-title">{card.title}</div>
+                <div className="lp-ai-card-desc">{card.desc}</div>
+              </div>
+            </div>
+            <div className="lp-ai-card-bullets">
+              {card.bullets.map((b) => (
+                <div key={b} className="lp-ai-bullet">{b}</div>
+              ))}
+            </div>
+            <div className="lp-ai-demo-pill">
+              <span style={{ color: card.demoColor, fontSize: 13 }}>▶</span>
+              <span>{card.demo}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="lp-ai-cta-row">
+        <p className="lp-ai-cta-label">
+          All AI features use <strong>Claude Sonnet 4.6</strong> — responses are cached for 4 hours to keep costs low.
+        </p>
+        <Link href="/auth/register" className="lp-btn-accent" style={{ fontSize: 14, padding: "12px 28px" }}>
+          Try it free <ArrowRight size={15} />
+        </Link>
+      </div>
+    </section>
   );
 }
 
