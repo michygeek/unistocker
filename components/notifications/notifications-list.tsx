@@ -47,10 +47,10 @@ export function NotificationsList({ notifications }: { notifications: Notificati
   return (
     <div className="uni-card" style={{ overflow: "hidden" }}>
       <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <h2 style={{ fontSize: 15, fontWeight: 700, color: "var(--text)", margin: 0 }}>
+        <h2 style={{ fontSize: 17, fontWeight: 700, color: "var(--text)", margin: 0 }}>
           All Notifications
         </h2>
-        <span style={{ fontSize: 12, color: "var(--text-3)" }}>{notifications.length} total</span>
+        <span style={{ fontSize: 13, color: "var(--text-3)" }}>{notifications.length} total</span>
       </div>
 
       <div>
@@ -82,13 +82,13 @@ export function NotificationsList({ notifications }: { notifications: Notificati
               {/* Content */}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
-                  <p style={{ fontSize: 13, fontWeight: isUnread ? 700 : 600, color: "var(--text)", display: "flex", alignItems: "center", gap: 6 }}>
+                  <p style={{ fontSize: 14, fontWeight: isUnread ? 700 : 600, color: "var(--text)", display: "flex", alignItems: "center", gap: 6 }}>
                     {n.title}
                     {isUnread && (
                       <span style={{ display: "inline-block", width: 6, height: 6, borderRadius: "50%", background: "var(--accent)", flexShrink: 0 }} />
                     )}
                   </p>
-                  <span style={{ fontSize: 11, color: "var(--text-3)", flexShrink: 0 }}>
+                  <span style={{ fontSize: 12, color: "var(--text-3)", flexShrink: 0 }}>
                     {formatDistanceToNow(new Date(n.createdAt), { addSuffix: true })}
                   </span>
                 </div>

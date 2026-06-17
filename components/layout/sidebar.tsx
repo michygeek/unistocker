@@ -39,15 +39,15 @@ const S = {
   sidebar:     { background: "var(--sidebar)", width: 256, height: "100%", display: "flex", flexDirection: "column" as const },
   brand:       { padding: "20px 16px 16px", borderBottom: "1px solid rgba(255,255,255,0.05)", display: "flex", alignItems: "center", gap: 10 },
   logoBox:     { width: 36, height: 36, borderRadius: 10, background: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 },
-  orgName:     { fontWeight: 700, color: "#fff", fontSize: 14, margin: 0, lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const },
-  poweredBy:   { fontSize: 10, color: "rgba(255,255,255,0.28)", margin: "3px 0 0", letterSpacing: "0.02em" },
+  orgName:     { fontWeight: 700, color: "#fff", fontSize: 15, margin: 0, lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const },
+  poweredBy:   { fontSize: 11, color: "rgba(255,255,255,0.28)", margin: "3px 0 0", letterSpacing: "0.02em" },
   nav:         { flex: 1, padding: "10px 10px", display: "flex", flexDirection: "column" as const, gap: 1, overflowY: "auto" as const },
   footer:      { padding: "10px 10px 14px", borderTop: "1px solid rgba(255,255,255,0.05)" },
   userRow:     { display: "flex", alignItems: "center", gap: 10, padding: "9px 10px", marginBottom: 2 },
   avatar:      { width: 34, height: 34, borderRadius: "50%", background: "linear-gradient(135deg, #0D9488, #042F2E)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 },
-  avatarText:  { color: "#FFFFFF", fontSize: 13, fontWeight: 700 },
-  userName:    { color: "#fff", fontSize: 13, fontWeight: 600, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const },
-  userEmail:   { color: "rgba(255,255,255,0.30)", fontSize: 11, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const },
+  avatarText:  { color: "#FFFFFF", fontSize: 14, fontWeight: 700 },
+  userName:    { color: "#fff", fontSize: 14, fontWeight: 600, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const },
+  userEmail:   { color: "rgba(255,255,255,0.30)", fontSize: 12, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const },
 };
 
 function NavLink({ href, label, Icon, active, badge }: { href: string; label: string; Icon: React.ComponentType<{size?: number}>; active: boolean; badge?: number }) {
@@ -57,7 +57,7 @@ function NavLink({ href, label, Icon, active, badge }: { href: string; label: st
       style={{
         display: "flex", alignItems: "center", gap: 10,
         padding: "9px 12px", borderRadius: 10, textDecoration: "none",
-        fontSize: 13.5, fontWeight: 500, transition: "all 0.15s",
+        fontSize: 14.5, fontWeight: 500, transition: "all 0.15s",
         background: active ? "var(--accent)" : "transparent",
         color: active ? "var(--accent-fg)" : "var(--sidebar-text)",
         boxShadow: active ? "var(--shadow-accent)" : "none",
@@ -156,7 +156,7 @@ export function Sidebar({ userRole, userName, userEmail, organizationName, unrea
             width: "100%", display: "flex", alignItems: "center", gap: 10,
             padding: "9px 12px", borderRadius: 10, border: "none", cursor: "pointer",
             background: "transparent", color: "rgba(255,255,255,0.38)",
-            fontSize: 13.5, fontWeight: 500, transition: "all 0.15s", textAlign: "left",
+            fontSize: 14.5, fontWeight: 500, transition: "all 0.15s", textAlign: "left",
           }}
         >
           <style>{`.signout-btn:hover{background:rgba(239,68,68,0.12)!important;color:#f87171!important}`}</style>

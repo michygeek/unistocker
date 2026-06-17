@@ -3,8 +3,8 @@ import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { Header } from "@/components/layout/header";
 import { ForecastCard } from "@/components/ai/forecast-card";
-import { format } from "date-fns";
-import { Package, Tag, Barcode, ArrowLeft, Plus, Minus, RefreshCw, TrendingDown, TrendingUp, Clock } from "lucide-react";
+import { format, differenceInDays } from "date-fns";
+import { Package, Tag, Barcode, ArrowLeft, Plus, Minus, RefreshCw, TrendingDown, TrendingUp, Clock, AlertTriangle, CalendarClock } from "lucide-react";
 import Link from "next/link";
 import type { Metadata } from "next";
 
@@ -65,6 +65,16 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   const margin = sellingPrice > 0 ? ((sellingPrice - costPrice) / sellingPrice) * 100 : 0;
   const isLowStock = product.quantity <= product.lowStockAlert;
   const canEdit = session.user.role === "BOSS" || session.user.role === "MANAGER";
+
+  const ppc = product.piecesPerCarton;
+  const cartons = ppc && ppc > 0 ? Math.floor(product.quantity / ppc) : null;
+  const loosePieces = ppc && ppc > 0 ? product.quantity % ppc : null;
+  const qtyDisplay = ppc && ppc > 0
+    ? (cartons === 0 ? `${loosePieces} pcs` : loosePieces === 0 ? `${cartons} ctn` : `${cartons} ctn + ${loosePieces} pcs`)
+    : `${product.quantity} units`;
+
+  const expiryDays = product.expirationDate ? differenceInDays(new Date(product.expirationDate), new Date()) : null;
+  const expiryColor = expiryDays === null ? null : expiryDays <= 0 ? "var(--danger)" : expiryDays <= 30 ? "var(--danger)" : expiryDays <= 60 ? "var(--warning)" : "var(--accent)";
 
   const serialisedForecast = latestForecast ? {
     id: latestForecast.id,
@@ -156,18 +166,21 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
               { label: "Cost Price",    value: `₦${costPrice.toFixed(2)}`,   color: "var(--text)" },
               { label: "Selling Price", value: `₦${sellingPrice.toFixed(2)}`, color: "var(--accent)" },
               { label: "Margin",        value: `${margin.toFixed(1)}%`,       color: "#34d399" },
-            ].map((stat, i) => (
+            ].map((stat) => (
               <div key={stat.label} style={{ padding: "16px 20px", borderRight: "1px solid var(--border)" }}>
-                <p style={{ fontSize: 11, color: "var(--text-3)", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.05em", fontWeight: 600 }}>{stat.label}</p>
+                <p style={{ fontSize: 12, color: "var(--text-3)", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.05em", fontWeight: 600 }}>{stat.label}</p>
                 <p style={{ fontSize: 18, fontWeight: 800, color: stat.color }}>{stat.value}</p>
               </div>
             ))}
             {/* Dynamic stock status */}
             <div style={{ padding: "16px 20px" }}>
-              <p style={{ fontSize: 11, color: "var(--text-3)", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.05em", fontWeight: 600 }}>In Stock</p>
-              <p style={{ fontSize: 18, fontWeight: 800, color: isLowStock ? "var(--danger)" : "var(--text)" }}>{product.quantity} units</p>
+              <p style={{ fontSize: 12, color: "var(--text-3)", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.05em", fontWeight: 600 }}>In Stock</p>
+              <p style={{ fontSize: 18, fontWeight: 800, color: isLowStock ? "var(--danger)" : "var(--text)" }}>{qtyDisplay}</p>
+              {ppc && ppc > 0 && (
+                <p style={{ fontSize: 12, color: "var(--text-3)", marginTop: 2 }}>{product.quantity} pieces total</p>
+              )}
               {stockPrediction ? (
-                <p style={{ fontSize: 11, marginTop: 2, fontWeight: 600, color:
+                <p style={{ fontSize: 12, marginTop: 2, fontWeight: 600, color:
                   stockPrediction.urgencyLevel === "CRITICAL" ? "var(--danger)" :
                   stockPrediction.urgencyLevel === "WARNING" ? "var(--warning)" :
                   stockPrediction.urgencyLevel === "WATCH" ? "var(--info)" : "var(--accent)" }}>
@@ -175,25 +188,54 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
                   Runs out in {Math.round(stockPrediction.daysUntilStockout)} days
                 </p>
               ) : isLowStock ? (
-                <p style={{ fontSize: 11, color: "var(--warning)", marginTop: 2 }}>Below threshold</p>
+                <p style={{ fontSize: 12, color: "var(--warning)", marginTop: 2 }}>Below threshold</p>
               ) : null}
             </div>
           </div>
         </div>
 
+        {/* Expiry alert banner */}
+        {expiryDays !== null && expiryDays <= 60 && (
+          <div style={{
+            display: "flex", alignItems: "center", gap: 12, padding: "14px 18px",
+            borderRadius: 12, border: `1px solid ${expiryColor}`,
+            background: expiryDays <= 30 ? "rgba(239,68,68,0.07)" : "rgba(245,158,11,0.07)",
+          }}>
+            <AlertTriangle size={20} style={{ color: expiryColor!, flexShrink: 0 }} />
+            <div>
+              <p style={{ fontSize: 14, fontWeight: 700, color: expiryColor!, margin: 0 }}>
+                {expiryDays <= 0 ? "This product has expired!" : expiryDays <= 30 ? `Expires in ${expiryDays} day${expiryDays !== 1 ? "s" : ""}` : `Expires in ${expiryDays} days`}
+              </p>
+              <p style={{ fontSize: 13, color: "var(--text-2)", marginTop: 2 }}>
+                Expiration date: {format(new Date(product.expirationDate!), "MMMM d, yyyy")}
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Meta details */}
         <div className="uni-card" style={{ padding: 20 }}>
-          <h2 style={{ fontSize: 13, fontWeight: 700, color: "var(--text)", marginBottom: 14, textTransform: "uppercase", letterSpacing: "0.05em" }}>Details</h2>
+          <h2 style={{ fontSize: 14, fontWeight: 700, color: "var(--text)", marginBottom: 14, textTransform: "uppercase", letterSpacing: "0.05em" }}>Details</h2>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 12 }}>
             {[
               { label: "Low Stock Alert", value: `${product.lowStockAlert} units` },
+              ...(ppc ? [{ label: "Pieces per Carton", value: `${ppc} pieces` }] : []),
+              ...(product.expirationDate ? [{
+                label: "Expiration Date",
+                value: format(new Date(product.expirationDate), "MMM d, yyyy"),
+                highlight: expiryDays !== null && expiryDays <= 60,
+                color: expiryColor ?? undefined,
+              }] : []),
               { label: "Created By", value: product.createdBy.name ?? product.createdBy.email },
               { label: "Created", value: format(new Date(product.createdAt), "MMM d, yyyy") },
               { label: "Last Updated", value: format(new Date(product.updatedAt), "MMM d, yyyy") },
-            ].map(({ label, value }) => (
-              <div key={label} style={{ padding: "10px 14px", background: "var(--bg-input)", borderRadius: 10, border: "1px solid var(--border)" }}>
-                <p style={{ fontSize: 11, color: "var(--text-3)", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.05em", fontWeight: 600 }}>{label}</p>
-                <p style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{value}</p>
+            ].map(({ label, value, highlight, color }) => (
+              <div key={label} style={{ padding: "10px 14px", background: highlight ? `${color}10` : "var(--bg-input)", borderRadius: 10, border: `1px solid ${highlight ? color : "var(--border)"}` }}>
+                <p style={{ fontSize: 12, color: "var(--text-3)", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.05em", fontWeight: 600 }}>{label}</p>
+                <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                  {highlight && <CalendarClock size={13} style={{ color }} />}
+                  <p style={{ fontSize: 14, fontWeight: 600, color: highlight ? color : "var(--text)" }}>{value}</p>
+                </div>
               </div>
             ))}
           </div>

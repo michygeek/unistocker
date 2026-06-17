@@ -56,8 +56,8 @@ export default async function InventoryPage({ searchParams }: { searchParams: Pr
       <div className="animate-in" style={{ flex: 1, padding: "24px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12, marginBottom: 20 }}>
           <div>
-            <h2 style={{ fontSize: 16, fontWeight: 700, color: "var(--text)", margin: 0 }}>Products</h2>
-            <p style={{ fontSize: 13, color: "var(--text-2)", marginTop: 2 }}>{total} items total</p>
+            <h2 style={{ fontSize: 18, fontWeight: 700, color: "var(--text)", margin: 0 }}>Products</h2>
+            <p style={{ fontSize: 14, color: "var(--text-2)", marginTop: 2 }}>{total} items total</p>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <ExportInventoryButton />

@@ -45,6 +45,8 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
             sellingPrice: Number(product.sellingPrice),
             quantity: product.quantity,
             lowStockAlert: product.lowStockAlert,
+            piecesPerCarton: product.piecesPerCarton ?? null,
+            expirationDate: product.expirationDate ?? null,
             barcode: product.barcode ?? "",
             categoryId: product.categoryId ?? "",
             imageUrl: product.imageUrl ?? null,

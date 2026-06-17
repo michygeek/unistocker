@@ -7,6 +7,7 @@ interface StatsCardProps {
   changeType?: "up" | "down" | "neutral";
   icon: LucideIcon;
   color: "indigo" | "green" | "yellow" | "red" | "blue" | "purple";
+  badge?: string;
 }
 
 const colorMap = {
@@ -18,7 +19,7 @@ const colorMap = {
   purple: { bg: "rgba(168,85,247,0.12)",  fg: "#c084fc" },
 };
 
-export function StatsCard({ title, value, change, changeType = "neutral", icon: Icon, color }: StatsCardProps) {
+export function StatsCard({ title, value, change, changeType = "neutral", icon: Icon, color, badge }: StatsCardProps) {
   const { bg, fg } = colorMap[color];
 
   return (
@@ -46,7 +47,7 @@ export function StatsCard({ title, value, change, changeType = "neutral", icon: 
         {/* Trend badge */}
         {change && (
           <span style={{
-            fontSize: 11, fontWeight: 700,
+            fontSize: 12, fontWeight: 700,
             padding: "4px 8px", borderRadius: 7,
             background: changeType === "up"
               ? "var(--accent-sub)"
@@ -80,8 +81,17 @@ export function StatsCard({ title, value, change, changeType = "neutral", icon: 
       </p>
 
       {/* Label */}
-      <p style={{ fontSize: 12, fontWeight: 500, color: "var(--text-2)" }}>
+      <p style={{ fontSize: 13, fontWeight: 500, color: "var(--text-2)" }}>
         {title}
+        {badge && (
+          <span style={{
+            marginLeft: 6, fontSize: 10, fontWeight: 700, textTransform: "uppercase",
+            letterSpacing: "0.05em", padding: "1px 5px", borderRadius: 4,
+            background: "var(--bg-input)", color: "var(--text-3)",
+          }}>
+            {badge}
+          </span>
+        )}
       </p>
     </div>
   );

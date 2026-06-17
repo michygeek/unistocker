@@ -23,6 +23,8 @@ const ProductSchema = z.object({
   sellingPrice: z.coerce.number().positive(),
   quantity: z.coerce.number().int().min(0),
   lowStockAlert: z.coerce.number().int().min(0).default(10),
+  piecesPerCarton: z.coerce.number().int().min(1).optional().nullable(),
+  expirationDate: z.string().optional().transform((v) => (v ? new Date(v) : undefined)),
   barcode: z.string().optional(),
   categoryId: z.string().optional(),
 });

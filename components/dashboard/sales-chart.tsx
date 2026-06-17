@@ -8,7 +8,7 @@ import {
 
 interface SalesData { date: string; revenue: number; profit: number; }
 
-export function SalesChart({ data }: { data: SalesData[] }) {
+export function SalesChart({ data, rangeLabel }: { data: SalesData[]; rangeLabel?: string }) {
   const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
@@ -29,7 +29,7 @@ export function SalesChart({ data }: { data: SalesData[] }) {
           <h2 style={{ fontSize: 15, fontWeight: 700, color: "var(--text)", margin: 0, letterSpacing: "-0.01em" }}>
             Revenue &amp; Profit
           </h2>
-          <p style={{ fontSize: 12, color: "var(--text-2)", marginTop: 3 }}>Last 7 days</p>
+          <p style={{ fontSize: 12, color: "var(--text-2)", marginTop: 3 }}>{rangeLabel ?? "Last 30 days"}</p>
         </div>
         <div style={{ display: "flex", gap: 16 }}>
           {[

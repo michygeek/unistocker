@@ -28,7 +28,7 @@ export function Header({ title, unreadCount = 0 }: HeaderProps) {
       {/* Title */}
       <h1
         style={{
-          fontSize: 18,
+          fontSize: 20,
           fontWeight: 700,
           color: "var(--text)",
           letterSpacing: "-0.02em",
@@ -52,7 +52,7 @@ export function Header({ title, unreadCount = 0 }: HeaderProps) {
             border: "1px solid var(--border)",
             borderRadius: 10,
             padding: "7px 14px",
-            fontSize: 13,
+            fontSize: 14,
             color: "var(--text-3)",
             width: 200,
             cursor: "text",

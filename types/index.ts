@@ -40,6 +40,8 @@ export interface ProductWithCategory {
   sellingPrice: number;
   quantity: number;
   lowStockAlert: number;
+  piecesPerCarton: number | null;
+  expirationDate: Date | null;
   imageUrl: string | null;
   barcode: string | null;
   isActive: boolean;

@@ -37,7 +37,7 @@ export default async function SalesPage({ searchParams }: { searchParams: Promis
     db.sale.count({ where }),
     db.product.findMany({
       where: { isActive: true, quantity: { gt: 0 } },
-      select: { id: true, name: true, sku: true, barcode: true, sellingPrice: true, quantity: true },
+      select: { id: true, name: true, sku: true, barcode: true, sellingPrice: true, quantity: true, piecesPerCarton: true },
       orderBy: { name: "asc" },
     }),
     db.notification.count({ where: { userId: session.user.id, readAt: null, status: "SENT" } }),
@@ -49,13 +49,18 @@ export default async function SalesPage({ searchParams }: { searchParams: Promis
       <div className="animate-in" style={{ flex: 1, padding: "24px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12, marginBottom: 20 }}>
           <div>
-            <h2 style={{ fontSize: 16, fontWeight: 700, color: "var(--text)", margin: 0 }}>Sales Records</h2>
-            <p style={{ fontSize: 13, color: "var(--text-2)", marginTop: 2 }}>{total} total transactions</p>
+            <h2 style={{ fontSize: 18, fontWeight: 700, color: "var(--text)", margin: 0 }}>Sales Records</h2>
+            <p style={{ fontSize: 14, color: "var(--text-2)", marginTop: 2 }}>{total} total transactions</p>
           </div>
-          <NewSaleButton products={products.map((p) => ({ ...p, sellingPrice: Number(p.sellingPrice) }))} />
+          <NewSaleButton
+            products={products.map((p) => ({ ...p, sellingPrice: Number(p.sellingPrice), piecesPerCarton: p.piecesPerCarton ?? null }))}
+            userName={session.user.name ?? session.user.email ?? "Cashier"}
+            organizationName={session.user.organizationName ?? ""}
+          />
         </div>
 
         <SalesTable
+          organizationName={session.user.organizationName ?? ""}
           sales={sales.map((s) => ({
             ...s,
             subtotal: Number(s.subtotal),
