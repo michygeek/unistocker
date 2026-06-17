@@ -23,7 +23,7 @@ export function SalesChart({ data, rangeLabel }: { data: SalesData[]; rangeLabel
   const profitColor  = isDark ? "#60a5fa" : "#3b82f6";
 
   return (
-    <div className="uni-card" style={{ padding: "24px" }}>
+    <div className="uni-card" style={{ padding: "24px", minWidth: 0, width: "100%" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
         <div>
           <h2 style={{ fontSize: 15, fontWeight: 700, color: "var(--text)", margin: 0, letterSpacing: "-0.01em" }}>

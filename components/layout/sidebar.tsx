@@ -8,6 +8,7 @@ import {
   LayoutDashboard, Package, ShoppingCart, BarChart3,
   Users, Settings, Bell, LogOut, Menu, X, TrendingUp, AlertTriangle, Lightbulb,
 } from "lucide-react";
+import { PWAInstallButton } from "@/components/pwa/install-button";
 import { useState } from "react";
 import type { UserRole } from "@prisma/client";
 
@@ -152,6 +153,7 @@ export function Sidebar({ userRole, userName, userEmail, organizationName, unrea
             <p style={S.userEmail}>{userEmail}</p>
           </div>
         </div>
+        <PWAInstallButton />
         <button
           onClick={() => signOut({ callbackUrl: "/auth/login" })}
           className="signout-btn"

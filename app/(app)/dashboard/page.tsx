@@ -99,7 +99,15 @@ export default async function DashboardPage() {
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           <SmartAlertBanner criticalCount={criticalStockCount} />
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+          <style>{`
+            @media (max-width: 767px) {
+              .dash-ai-grid   { grid-template-columns: 1fr !important; }
+              .dash-chart-grid { grid-template-columns: 1fr !important; }
+              .dash-chart-main { grid-column: span 1 !important; }
+            }
+          `}</style>
+
+          <div className="dash-ai-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
             <WeeklyInsightCard insight={latestWeeklyInsight ? {
               id: latestWeeklyInsight.id,
               weekOf: latestWeeklyInsight.weekOf.toISOString(),
@@ -152,8 +160,8 @@ export default async function DashboardPage() {
           <StatsCard title="Staff" value={totalStaff} icon={Users} color="red" change="Active accounts" changeType="neutral" />
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
-          <div style={{ gridColumn: "span 2" }}>
+        <div className="dash-chart-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
+          <div className="dash-chart-main" style={{ gridColumn: "span 2" }}>
             <SalesChart data={chartData} />
           </div>
           <div>

@@ -3,6 +3,7 @@
 import { Bell, Search } from "lucide-react";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { PWAInstallButton } from "@/components/pwa/install-button";
 
 interface HeaderProps {
   title: string;
@@ -41,7 +42,7 @@ export function Header({ title, unreadCount = 0 }: HeaderProps) {
       </h1>
 
       {/* Right controls */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         {/* Search */}
         <div
           className="hidden md:flex"
@@ -60,6 +61,11 @@ export function Header({ title, unreadCount = 0 }: HeaderProps) {
         >
           <Search size={14} style={{ color: "var(--text-3)", flexShrink: 0 }} />
           <span>Search…</span>
+        </div>
+
+        {/* Install button — only shown on mobile where sidebar is hidden */}
+        <div className="lg:hidden">
+          <PWAInstallButton variant="header" />
         </div>
 
         {/* Theme toggle */}
