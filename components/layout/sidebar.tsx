@@ -50,10 +50,11 @@ const S = {
   userEmail:   { color: "rgba(255,255,255,0.30)", fontSize: 12, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const },
 };
 
-function NavLink({ href, label, Icon, active, badge }: { href: string; label: string; Icon: React.ComponentType<{size?: number}>; active: boolean; badge?: number }) {
+function NavLink({ href, label, Icon, active, badge, onClick }: { href: string; label: string; Icon: React.ComponentType<{size?: number}>; active: boolean; badge?: number; onClick?: () => void }) {
   return (
     <Link
       href={href}
+      onClick={onClick}
       style={{
         display: "flex", alignItems: "center", gap: 10,
         padding: "9px 12px", borderRadius: 10, textDecoration: "none",
@@ -85,7 +86,7 @@ export function Sidebar({ userRole, userName, userEmail, organizationName, unrea
 
   const visible = NAV.filter((i) => !("roles" in i) || (i.roles as readonly string[]).includes(userRole));
 
-  const Content = () => (
+  const Content = ({ onLinkClick }: { onLinkClick?: () => void }) => (
     <div style={S.sidebar}>
       {/* Brand */}
       <div style={S.brand}>
@@ -114,6 +115,7 @@ export function Sidebar({ userRole, userName, userEmail, organizationName, unrea
               Icon={item.icon}
               active={active}
               badge={item.href === "/notifications" ? unreadCount : undefined}
+              onClick={onLinkClick}
             />
           );
         })}
@@ -133,6 +135,7 @@ export function Sidebar({ userRole, userName, userEmail, organizationName, unrea
               label={item.label}
               Icon={item.icon}
               active={active}
+              onClick={onLinkClick}
             />
           );
         })}
@@ -197,7 +200,7 @@ export function Sidebar({ userRole, userName, userEmail, organizationName, unrea
             >
               <X size={18} />
             </button>
-            <Content />
+            <Content onLinkClick={() => setMobileOpen(false)} />
           </aside>
         </div>
       )}
@@ -206,6 +209,7 @@ export function Sidebar({ userRole, userName, userEmail, organizationName, unrea
       <aside className="hidden lg:block" style={{ width: 256, position: "fixed", top: 0, bottom: 0, left: 0, zIndex: 30 }}>
         <Content />
       </aside>
+
     </>
   );
 }
