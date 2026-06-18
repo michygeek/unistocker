@@ -54,6 +54,11 @@ export function PWARegister() {
       .then(async (reg) => {
         console.log("[PWA] Service worker registered:", reg.scope);
 
+        // Register background sync so the browser can replay ops even when app is closed
+        if ("sync" in reg) {
+          try { await (reg.sync as { register(tag: string): Promise<void> }).register("sync-pending"); } catch {}
+        }
+
         if (!("Notification" in window)) return;
 
         if (Notification.permission === "default") {

@@ -11,6 +11,7 @@ import { AIAssistant } from "@/components/ai/ai-assistant";
 import { Package, ShoppingCart, TrendingUp, AlertTriangle, DollarSign, Users } from "lucide-react";
 import Link from "next/link";
 import { format, subDays, startOfDay } from "date-fns";
+import { getActiveBranchId, getProductBranchConditions, getSaleBranchConditions } from "@/lib/branch-filter";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Dashboard" };
@@ -22,6 +23,10 @@ export default async function DashboardPage() {
 
   const now = new Date();
   const sevenDaysAgo = subDays(now, 7);
+
+  const activeBranchId = await getActiveBranchId(session.user);
+  const productBranchConds = getProductBranchConditions(activeBranchId);
+  const saleBranchConds = getSaleBranchConditions(activeBranchId);
 
   const [
     totalProducts,
@@ -35,25 +40,23 @@ export default async function DashboardPage() {
     needReorderCount,
     latestWeeklyInsight,
   ] = await Promise.all([
-    db.product.count({ where: { isActive: true } }),
-    db.sale.count(),
+    db.product.count({ where: { AND: [{ isActive: true }, ...productBranchConds] } }),
+    db.sale.count({ where: { AND: saleBranchConds } }),
     db.sale.aggregate({
       _sum: { total: true, profit: true },
-      where: { createdAt: { gte: sevenDaysAgo } },
+      where: { AND: [{ createdAt: { gte: sevenDaysAgo } }, ...saleBranchConds] },
     }),
-    db.$queryRaw<{ id: string; name: string; sku: string; quantity: number; lowStockAlert: number }[]>`
-      SELECT id, name, sku, quantity, "lowStockAlert"
-      FROM "Product"
-      WHERE "isActive" = true AND quantity <= "lowStockAlert"
-      ORDER BY quantity ASC
-      LIMIT 5
-    `,
+    db.product.findMany({
+      where: { AND: [{ isActive: true }, ...productBranchConds] },
+      select: { id: true, name: true, sku: true, quantity: true, lowStockAlert: true },
+      orderBy: { quantity: "asc" },
+    }).then((rows) => rows.filter((p) => p.quantity <= p.lowStockAlert).slice(0, 5)),
     db.activityLog.findMany({
       orderBy: { createdAt: "desc" },
       take: 10,
       include: { user: { select: { name: true, email: true } } },
     }),
-    db.user.count({ where: { isActive: true } }),
+    db.user.count({ where: { isActive: true, isSuperAdmin: false, organizationId: session.user.organizationId ?? "none", ...(activeBranchId ? { branchId: activeBranchId } : {}) } }),
     db.notification.count({ where: { userId: session.user.id, readAt: null, status: "SENT" } }),
     db.stockPrediction.count({ where: { urgencyLevel: "CRITICAL", product: { isActive: true } } }),
     db.demandForecast.count({
@@ -72,7 +75,7 @@ export default async function DashboardPage() {
       const end = new Date(start.getTime() + 86400000);
       return db.sale.aggregate({
         _sum: { total: true, profit: true },
-        where: { createdAt: { gte: start, lt: end } },
+        where: { AND: [{ createdAt: { gte: start, lt: end } }, ...saleBranchConds] },
       }).then((r) => ({
         date: format(day, "MMM d"),
         revenue: Number(r._sum.total ?? 0),

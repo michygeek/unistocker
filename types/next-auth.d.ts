@@ -6,6 +6,7 @@ declare module "next-auth" {
     user: {
       id: string;
       role: UserRole;
+      isSuperAdmin?: boolean;
       branchId?: string | null;
       organizationId?: string | null;
       organizationName?: string | null;
@@ -14,6 +15,7 @@ declare module "next-auth" {
 
   interface User {
     role: UserRole;
+    isSuperAdmin?: boolean;
     branchId?: string | null;
     organizationId?: string | null;
     organizationName?: string | null;
@@ -24,6 +26,7 @@ declare module "next-auth/jwt" {
   interface JWT {
     id: string;
     role: UserRole;
+    isSuperAdmin?: boolean;
     branchId?: string | null;
     organizationId?: string | null;
     organizationName?: string | null;

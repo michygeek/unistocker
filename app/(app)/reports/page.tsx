@@ -8,6 +8,7 @@ import { ExportReportsButton } from "@/components/reports/export-reports-button"
 import { DateRangePicker } from "@/components/reports/date-range-picker";
 import { Package, TrendingUp, ShoppingCart, DollarSign, BarChart3 } from "lucide-react";
 import { format, startOfDay, endOfDay } from "date-fns";
+import { getActiveBranchId, getSaleBranchConditions } from "@/lib/branch-filter";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Reports" };
@@ -37,29 +38,33 @@ export default async function ReportsPage({
   const fromStr = toInputDate(fromDate);
   const toStr = toInputDate(toDate);
 
-  const [allTimeStats, rangeStats, rangeSales, topProducts] = await Promise.all([
-    // All-time totals (never filtered)
-    db.sale.aggregate({ _sum: { total: true, profit: true }, _count: { id: true } }),
+  const activeBranchId = await getActiveBranchId(session.user);
+  const saleConds = getSaleBranchConditions(activeBranchId);
+  const branchWhere = saleConds.length > 0 ? { AND: saleConds } : {};
 
-    // Stats for selected range
+  const [allTimeStats, rangeStats, rangeSales, topProducts] = await Promise.all([
     db.sale.aggregate({
       _sum: { total: true, profit: true },
       _count: { id: true },
-      where: { createdAt: { gte: fromDate, lte: toDate } },
+      where: branchWhere,
     }),
 
-    // Individual sales in range for chart (single query, grouped in JS)
+    db.sale.aggregate({
+      _sum: { total: true, profit: true },
+      _count: { id: true },
+      where: { ...branchWhere, createdAt: { gte: fromDate, lte: toDate } },
+    }),
+
     db.sale.findMany({
-      where: { createdAt: { gte: fromDate, lte: toDate } },
+      where: { ...branchWhere, createdAt: { gte: fromDate, lte: toDate } },
       select: { createdAt: true, total: true, profit: true },
       orderBy: { createdAt: "asc" },
     }),
 
-    // Top products in range
     db.saleItem.groupBy({
       by: ["productId"],
       _sum: { quantity: true, total: true },
-      where: { sale: { createdAt: { gte: fromDate, lte: toDate } } },
+      where: { sale: { ...branchWhere, createdAt: { gte: fromDate, lte: toDate } } },
       orderBy: { _sum: { total: "desc" } },
       take: 5,
     }),

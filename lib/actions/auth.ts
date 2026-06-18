@@ -8,7 +8,8 @@ import { auth, signIn } from "@/lib/auth";
 import { hasPermission } from "@/lib/auth/permissions";
 import { addActivityLogJob } from "@/lib/queue";
 import { revalidatePath } from "next/cache";
-import { sendPasswordResetEmail } from "@/lib/email";
+import { sendPasswordResetEmail, sendWelcomeEmail, sendStaffInviteEmail } from "@/lib/email";
+import { checkStaffLimit } from "@/lib/subscription";
 import type { UserRole } from "@prisma/client";
 
 const RegisterSchema = z.object({
@@ -50,6 +51,10 @@ export async function registerUser(formData: FormData) {
     data: { name: organizationName, slug },
   });
 
+  await db.subscription.create({
+    data: { organizationId: org.id, plan: "FREE", status: "ACTIVE" },
+  });
+
   await db.user.create({
     data: {
       name,
@@ -59,6 +64,11 @@ export async function registerUser(formData: FormData) {
       organizationId: org.id,
     },
   });
+
+  // Fire-and-forget — don't let email failure block registration
+  sendWelcomeEmail(email, name, organizationName).catch((err) =>
+    console.error("Welcome email failed:", err)
+  );
 
   return { success: true };
 }
@@ -162,6 +172,13 @@ export async function createStaffMember(formData: FormData) {
   if (!session?.user) throw new Error("Unauthorized");
   if (!hasPermission(session.user.role, "staff:write")) throw new Error("Forbidden");
 
+  if (session.user.organizationId) {
+    const limit = await checkStaffLimit(session.user.organizationId);
+    if (!limit.allowed) {
+      return { error: { _limit: [`Staff limit reached (${limit.current}/${limit.max} on ${limit.plan} plan). Upgrade to add more staff.`] } };
+    }
+  }
+
   const raw = Object.fromEntries(formData.entries());
   const schema = z.object({
     name: z.string().min(2).max(50),
@@ -190,6 +207,22 @@ export async function createStaffMember(formData: FormData) {
       organizationId: session.user.organizationId ?? undefined,
     },
   });
+
+  // Fetch org name for the invite email
+  const org = session.user.organizationId
+    ? await db.organization.findUnique({
+        where: { id: session.user.organizationId },
+        select: { name: true },
+      })
+    : null;
+
+  sendStaffInviteEmail(
+    email,
+    name,
+    org?.name ?? "your organization",
+    session.user.name ?? session.user.email ?? "Your manager",
+    password
+  ).catch((err) => console.error("Staff invite email failed:", err));
 
   await addActivityLogJob({
     userId: session.user.id,

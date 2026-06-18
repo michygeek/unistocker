@@ -5,7 +5,9 @@ import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { hasPermission } from "@/lib/auth/permissions";
+import { getActiveBranchId } from "@/lib/branch-filter";
 import { addNotificationJob, addActivityLogJob, addStockCheckJob } from "@/lib/queue";
+import { checkProductLimit } from "@/lib/subscription";
 import { notifyAllBossUsers } from "@/lib/notifications";
 import { v2 as cloudinary } from "cloudinary";
 
@@ -34,6 +36,13 @@ export async function createProduct(formData: FormData) {
   if (!session?.user) throw new Error("Unauthorized");
   if (!hasPermission(session.user.role, "products:write")) throw new Error("Forbidden");
 
+  if (session.user.organizationId) {
+    const limit = await checkProductLimit(session.user.organizationId);
+    if (!limit.allowed) {
+      return { error: { _limit: [`Product limit reached (${limit.current}/${limit.max} on ${limit.plan} plan). Upgrade to add more products.`] } };
+    }
+  }
+
   const raw = Object.fromEntries(formData.entries());
   const parsed = ProductSchema.safeParse(raw);
   if (!parsed.success) return { error: parsed.error.flatten().fieldErrors };
@@ -61,13 +70,15 @@ export async function createProduct(formData: FormData) {
   // DB unique constraint on sku handles duplicates — no pre-check needed
   let product;
   try {
+    const branchId = (await getActiveBranchId(session.user)) ?? undefined;
     product = await db.product.create({
       data: {
         ...data,
         imageUrl,
         imagePublicId,
         createdById: session.user.id,
-        branchId: session.user.branchId ?? undefined,
+        branchId,
+        organizationId: session.user.organizationId ?? undefined,
       },
     });
   } catch (e: unknown) {

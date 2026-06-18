@@ -31,6 +31,19 @@ enum NotificationStatus {
   FAILED
 }
 
+enum Plan {
+  FREE
+  PRO
+  BUSINESS
+}
+
+enum SubscriptionStatus {
+  TRIAL
+  ACTIVE
+  EXPIRED
+  CANCELLED
+}
+
 model Organization {
   id        String   @id @default(cuid())
   name      String
@@ -40,10 +53,27 @@ model Organization {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  users    User[]
-  branches Branch[]
-  products Product[]
-  sales    Sale[]
+  users        User[]
+  branches     Branch[]
+  products     Product[]
+  sales        Sale[]
+  subscription Subscription?
+}
+
+model Subscription {
+  id                       String             @id @default(cuid())
+  organizationId           String             @unique
+  plan                     Plan               @default(FREE)
+  status                   SubscriptionStatus @default(ACTIVE)
+  trialEndsAt              DateTime?
+  currentPeriodEnd         DateTime?
+  paystackCustomerCode     String?
+  paystackSubscriptionCode String?
+  paystackPlanCode         String?
+  createdAt                DateTime           @default(now())
+  updatedAt                DateTime           @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id])
 }
 
 model Account {
@@ -89,6 +119,7 @@ model User {
   image          String?
   password       String?
   role           UserRole  @default(STAFF)
+  isSuperAdmin   Boolean   @default(false)
   isActive       Boolean   @default(true)
   pushToken      String?
   branchId       String?

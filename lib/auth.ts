@@ -37,6 +37,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           name: user.name,
           email: user.email,
           role: user.role,
+          isSuperAdmin: user.isSuperAdmin,
           image: user.image,
           branchId: user.branchId,
           organizationId: user.organization?.id ?? null,
@@ -50,6 +51,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (user) {
         token.role = (user as { role: UserRole }).role;
         token.id = user.id as string;
+        token.isSuperAdmin = (user as { isSuperAdmin?: boolean }).isSuperAdmin ?? false;
         token.branchId = (user as { branchId?: string | null }).branchId;
         token.organizationId = (user as { organizationId?: string | null }).organizationId;
         token.organizationName = (user as { organizationName?: string | null }).organizationName;
@@ -60,6 +62,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (token) {
         session.user.id = token.id as string;
         session.user.role = token.role as UserRole;
+        session.user.isSuperAdmin = token.isSuperAdmin as boolean | undefined;
         session.user.branchId = token.branchId as string | null | undefined;
         session.user.organizationId = token.organizationId as string | null | undefined;
         session.user.organizationName = token.organizationName as string | null | undefined;

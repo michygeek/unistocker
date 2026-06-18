@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Search, Edit, Trash2, Plus, Minus, Eye, Package, AlertTriangle, CalendarClock } from "lucide-react";
 import { deleteProduct, adjustStock } from "@/lib/actions/products";
+import { addOp } from "@/lib/offline-queue";
 import type { UserRole } from "@prisma/client";
 import type { ProductWithCategory } from "@/types";
 import { differenceInDays, format } from "date-fns";
@@ -67,6 +68,17 @@ function StockAdjustModal({ product, type, onClose, onDone }: StockAdjustModalPr
   const handleSubmit = async () => {
     if (totalPieces <= 0) { setError("Enter a quantity greater than 0"); return; }
     setLoading(true); setError("");
+
+    // ── Offline path ──────────────────────────────────────────────────────
+    if (!navigator.onLine) {
+      await addOp({ type, payload: { productId: product.id, quantity: totalPieces, type } });
+      window.dispatchEvent(new CustomEvent("offline-queue-updated"));
+      setLoading(false);
+      onDone(); onClose();
+      return;
+    }
+
+    // ── Online path ───────────────────────────────────────────────────────
     const result = await adjustStock(product.id, totalPieces, type);
     setLoading(false);
     if ("error" in result) { setError(typeof result.error === "string" ? result.error : "Failed"); }

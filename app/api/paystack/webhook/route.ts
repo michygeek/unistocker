@@ -1,0 +1,131 @@
+import { createHmac } from "crypto";
+import { NextRequest, NextResponse } from "next/server";
+import { db } from "@/lib/db";
+import type { PlanType } from "@/lib/plans";
+
+function verifySignature(body: string, signature: string): boolean {
+  const secret = process.env.PAYSTACK_SECRET_KEY;
+  if (!secret) return false;
+  const expected = createHmac("sha512", secret).update(body).digest("hex");
+  return expected === signature;
+}
+
+function planFromCode(planCode: string | undefined): PlanType | null {
+  if (!planCode) return null;
+  if (planCode === process.env.PAYSTACK_PRO_PLAN_CODE) return "PRO";
+  if (planCode === process.env.PAYSTACK_BUSINESS_PLAN_CODE) return "BUSINESS";
+  return null;
+}
+
+export async function POST(req: NextRequest) {
+  const rawBody = await req.text();
+  const signature = req.headers.get("x-paystack-signature") ?? "";
+
+  if (!verifySignature(rawBody, signature)) {
+    return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
+  }
+
+  const event = JSON.parse(rawBody) as {
+    event: string;
+    data: Record<string, unknown>;
+  };
+
+  const data = event.data as Record<string, unknown>;
+
+  switch (event.event) {
+    case "charge.success": {
+      const metadata = data.metadata as Record<string, string> | undefined;
+      const organizationId = metadata?.organizationId;
+      const plan = (metadata?.plan ?? null) as PlanType | null;
+
+      if (!organizationId || !plan || plan === "FREE") break;
+
+      const currentPeriodEnd = new Date(Date.now() + 30 * 86400000);
+      const customer = data.customer as { customer_code: string } | undefined;
+      const subscription = data.subscription as { subscription_code?: string; plan_code?: string } | undefined;
+
+      await db.subscription.upsert({
+        where: { organizationId },
+        create: {
+          organizationId,
+          plan,
+          status: "ACTIVE",
+          currentPeriodEnd,
+          paystackCustomerCode: customer?.customer_code ?? null,
+          paystackSubscriptionCode: subscription?.subscription_code ?? null,
+          paystackPlanCode: subscription?.plan_code ?? null,
+        },
+        update: {
+          plan,
+          status: "ACTIVE",
+          currentPeriodEnd,
+          trialEndsAt: null,
+          paystackCustomerCode: customer?.customer_code ?? null,
+          paystackSubscriptionCode: subscription?.subscription_code ?? null,
+          paystackPlanCode: subscription?.plan_code ?? null,
+        },
+      });
+      break;
+    }
+
+    case "subscription.create": {
+      const sub = data as {
+        customer?: { customer_code?: string };
+        plan?: { plan_code?: string };
+        subscription_code?: string;
+        metadata?: Record<string, string>;
+      };
+      const organizationId = sub.metadata?.organizationId;
+      if (!organizationId) break;
+
+      await db.subscription.updateMany({
+        where: { organizationId },
+        data: {
+          paystackSubscriptionCode: sub.subscription_code ?? null,
+          paystackCustomerCode: sub.customer?.customer_code ?? null,
+          paystackPlanCode: sub.plan?.plan_code ?? null,
+        },
+      });
+      break;
+    }
+
+    case "invoice.payment_success": {
+      const subscription = data.subscription as { subscription_code?: string } | undefined;
+      const subscriptionCode = subscription?.subscription_code;
+      if (!subscriptionCode) break;
+
+      const existing = await db.subscription.findFirst({
+        where: { paystackSubscriptionCode: subscriptionCode },
+      });
+      if (!existing) break;
+
+      // Extend period by 30 days from the later of now vs current end
+      const base = existing.currentPeriodEnd
+        ? Math.max(existing.currentPeriodEnd.getTime(), Date.now())
+        : Date.now();
+      const newEnd = new Date(base + 30 * 86400000);
+
+      await db.subscription.update({
+        where: { id: existing.id },
+        data: { status: "ACTIVE", currentPeriodEnd: newEnd, trialEndsAt: null },
+      });
+      break;
+    }
+
+    case "subscription.disable": {
+      const sub = data as { subscription_code?: string };
+      if (!sub.subscription_code) break;
+
+      await db.subscription.updateMany({
+        where: { paystackSubscriptionCode: sub.subscription_code },
+        data: { plan: "FREE", status: "CANCELLED", currentPeriodEnd: null },
+      });
+      break;
+    }
+
+    default:
+      break;
+  }
+
+  return NextResponse.json({ received: true });
+}

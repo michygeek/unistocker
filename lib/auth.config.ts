@@ -16,12 +16,17 @@ export const authConfig: NextAuthConfig = {
       const publicPaths = ["/auth/login", "/auth/register", "/auth/error"];
       if (publicPaths.some((p) => pathname.startsWith(p))) return true;
       if (pathname.startsWith("/api/auth")) return true;
+      if (pathname === "/" || pathname.startsWith("/_next") || pathname.startsWith("/api/paystack")) return true;
+      if (pathname.startsWith("/admin")) {
+        return !!(auth?.user as { isSuperAdmin?: boolean } | undefined)?.isSuperAdmin;
+      }
       return !!auth?.user;
     },
     async jwt({ token, user }) {
       if (user) {
         token.role = (user as { role: UserRole }).role;
         token.id = user.id as string;
+        token.isSuperAdmin = (user as { isSuperAdmin?: boolean }).isSuperAdmin ?? false;
         token.branchId = (user as { branchId?: string | null }).branchId;
       }
       return token;
@@ -30,6 +35,7 @@ export const authConfig: NextAuthConfig = {
       if (token) {
         session.user.id = token.id as string;
         session.user.role = token.role as UserRole;
+        session.user.isSuperAdmin = token.isSuperAdmin as boolean | undefined;
         session.user.branchId = token.branchId as string | null | undefined;
       }
       return session;

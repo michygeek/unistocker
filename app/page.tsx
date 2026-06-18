@@ -872,7 +872,7 @@ function AIFeatures() {
       bullets: [
         "Exact reorder quantity and date per product",
         "Confidence score so you know when to trust it",
-        "Plain English reasoning from Claude",
+        "Plain English reasoning for every prediction",
         "Batch-run across all products at once",
       ],
       demo: "Order 45 units by Jun 3 · 87% confidence",
@@ -881,12 +881,12 @@ function AIFeatures() {
     {
       icon: AlertTriangle,
       title: "Smart Stock Alerts",
-      desc: "Goes beyond simple reorder levels. AI monitors live sales velocity — and warns you before you hit the threshold, not after. Even catches when your reorder level is set wrong.",
+      desc: "Goes beyond simple reorder levels. AI monitors live sales velocity — and warns you before you hit the threshold, not after. Even catches when your reorder level is set too low.",
       bullets: [
         "CRITICAL / WARNING / WATCH / HEALTHY status",
-        "\"Runs out in X days\" on every product page",
+        "\"Runs out in X days\" on every product",
         "Suggests corrected reorder levels with one-click update",
-        "Auto-refreshes every 6 hours via cron job",
+        "Auto-refreshes every 6 hours in the background",
       ],
       demo: "USB-C Hub · runs out in 2 days · CRITICAL",
       demoColor: "#ef4444",
@@ -894,10 +894,10 @@ function AIFeatures() {
     {
       icon: Bot,
       title: "AI Business Assistant",
-      desc: "A floating chat panel available on every dashboard page. Ask anything in plain English — or Pidgin. Get direct, data-backed answers with real numbers from your live business data.",
+      desc: "A chat panel built into your dashboard. Ask anything in plain English — or Pidgin. Get direct, data-backed answers with real numbers from your live business data.",
       bullets: [
-        "Streaming word-by-word responses via Claude",
-        "Live revenue, profit, staff, and stock context injected",
+        "Answers questions about revenue, profit, and stock",
+        "Live business context injected automatically",
         "Quick-question chips for common queries",
         "Automated weekly narrative report every Monday",
       ],
@@ -907,11 +907,11 @@ function AIFeatures() {
     {
       icon: Camera,
       title: "Photo Product Entry",
-      desc: "Take or upload a photo of any product — its label, packaging, or barcode. Claude Vision reads the image and pre-fills the entire Add Product form. Review, tweak, save.",
+      desc: "Take or upload a photo of any product — its label, packaging, or barcode. AI reads the image and pre-fills the entire Add Product form. Review, tweak, save.",
       bullets: [
         "Detects name, category, brand, and barcode",
         "Suggests realistic Nigerian market prices",
-        "Amber highlights show which fields AI filled",
+        "Highlights which fields were filled by AI",
         "Batch import up to 20 products at once",
       ],
       demo: "Identified: Indomie Noodles 70g · 94% confidence",
@@ -923,7 +923,7 @@ function AIFeatures() {
     <section id="ai-features" className="lp-ai-section">
       <div className="lp-ai-hd">
         <div className="lp-ai-badge">
-          <Zap size={11} /> Powered by Claude AI
+          <Zap size={11} /> AI-Powered
         </div>
         <h2 className="lp-section-title lp-title-d" style={{ marginBottom: 14 }}>
           Your inventory, now<br />with a brain.
@@ -961,7 +961,7 @@ function AIFeatures() {
 
       <div className="lp-ai-cta-row">
         <p className="lp-ai-cta-label">
-          All AI features use <strong>Claude Sonnet 4.6</strong> — responses are cached for 4 hours to keep costs low.
+          All AI features are built in — <strong>no setup, no extra tools</strong>, no guesswork.
         </p>
         <Link href="/auth/register" className="lp-btn-accent" style={{ fontSize: 14, padding: "12px 28px" }}>
           Try it free <ArrowRight size={15} />
@@ -1083,22 +1083,55 @@ function Testimonials() {
 function Pricing() {
   const plans = [
     {
-      name: "Starter", price: "Free", period: "", highlight: false,
-      desc: "Perfect for a single-location business just getting started.",
-      features: ["Up to 100 products", "2 staff accounts", "Sales tracking", "Basic reports", "Email notifications"],
+      name: "Free Forever", price: "₦0", period: "", highlight: false,
+      desc: "Everything you need to get started — no card, no expiry.",
+      features: [
+        "Up to 10 products",
+        "1 staff account (owner only)",
+        "1 branch location",
+        "Basic inventory management",
+        "Sales recording & receipts",
+        "7-day dashboard overview",
+        "Low stock alerts",
+        "Works offline (PWA)",
+      ],
       cta: "Get started free", href: "/auth/register",
     },
     {
-      name: "Business", price: "$19", period: "/mo", highlight: true,
-      desc: "For growing businesses that need more power and features.",
-      features: ["Unlimited products", "10 staff accounts", "Multi-branch support", "Advanced profit reports", "Push + email notifications", "Activity audit logs"],
-      cta: "Start free trial", href: "/auth/register",
+      name: "Pro", price: "₦2,999", period: "/month", highlight: true,
+      desc: "For growing businesses with a team. Includes AI and a 30-day free trial.",
+      features: [
+        "Up to 500 products",
+        "5 staff accounts",
+        "Up to 5 branch locations",
+        "Everything in Free",
+        "AI demand forecasting",
+        "AI smart stock alerts",
+        "AI business assistant",
+        "Date-range sales & inventory reports",
+        "Export reports to CSV / Excel",
+        "Product photo import via AI",
+        "Push & email notifications",
+        "30-day free trial — no card required",
+      ],
+      cta: "Start 30-day free trial", href: "/auth/register",
     },
     {
-      name: "Enterprise", price: "Custom", period: "", highlight: false,
-      desc: "For large operations with custom requirements.",
-      features: ["Everything in Business", "Unlimited branches & staff", "WhatsApp alerts", "API access", "Dedicated support"],
-      cta: "Contact us", href: "mailto:hello@unistocker.app",
+      name: "Business", price: "₦6,999", period: "/month", highlight: false,
+      desc: "For large operations across multiple locations.",
+      features: [
+        "Unlimited products",
+        "Up to 50 staff accounts",
+        "Up to 50 branch locations",
+        "Everything in Pro",
+        "Multi-location analytics",
+        "Cross-branch inventory view",
+        "Full activity & audit logs",
+        "Per-branch performance reports",
+        "Priority support",
+        "30-day free trial — no card required",
+      ],
+      cta: "Start 30-day free trial", href: "/auth/register",
     },
   ];
   return (
@@ -1106,7 +1139,7 @@ function Pricing() {
       <div className="lp-pricing-hd">
         <span className="lp-eyebrow">Pricing</span>
         <h2 className="lp-section-title">Simple, honest pricing</h2>
-        <p className="lp-section-sub-c">No hidden fees. Start free. Cancel anytime.</p>
+        <p className="lp-section-sub-c">No hidden fees. Paid plans start with a 30-day free trial — no card required.</p>
       </div>
       <div className="lp-pricing-grid">
         {plans.map((plan) => (

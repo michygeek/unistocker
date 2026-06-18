@@ -6,6 +6,7 @@ import { recordSale } from "@/lib/actions/sales";
 import { useRouter } from "next/navigation";
 import { BarcodeScanner } from "@/components/inventory/barcode-scanner";
 import { SaleReceipt, type ReceiptData } from "@/components/sales/sale-receipt";
+import { addOp } from "@/lib/offline-queue";
 
 interface Product {
   id: string;
@@ -137,10 +138,42 @@ export function NewSaleButton({ products, userName, organizationName }: Props) {
     if (!validItems.length) { setError("All cart items have 0 quantity"); return; }
     setLoading(true); setError("");
 
-    const result = await recordSale({
+    const salePayload = {
       items: validItems.map((i) => ({ productId: i.id, quantity: totalPieces(i), unitPrice: i.sellingPrice })),
       discount, tax, notes,
-    });
+    };
+
+    // ── Offline path ──────────────────────────────────────────────────────
+    if (!navigator.onLine) {
+      await addOp({ type: "SALE", payload: salePayload });
+      window.dispatchEvent(new CustomEvent("offline-queue-updated"));
+      setLoading(false);
+
+      const tempNumber = `PENDING-${Date.now().toString().slice(-6)}`;
+      const receiptData: ReceiptData = {
+        receiptNumber: tempNumber,
+        createdAt: new Date(),
+        cashierName: userName,
+        organizationName,
+        items: validItems.map((i) => ({
+          name: i.name,
+          quantity: totalPieces(i),
+          unitPrice: i.sellingPrice,
+          total: i.sellingPrice * totalPieces(i),
+        })),
+        subtotal,
+        discount,
+        taxAmount: taxAmt,
+        total,
+        notes: notes ? `${notes} [PENDING SYNC]` : "[PENDING SYNC — will confirm when online]",
+      };
+      setReceipt(receiptData);
+      setCart([]); setDiscount(0); setTax(0); setNotes(""); setBarcodeInput(""); setProductFilter("");
+      return;
+    }
+
+    // ── Online path ───────────────────────────────────────────────────────
+    const result = await recordSale(salePayload);
     setLoading(false);
 
     if ("error" in result) {
@@ -148,7 +181,6 @@ export function NewSaleButton({ products, userName, organizationName }: Props) {
       return;
     }
 
-    // Build receipt from local cart state + server receipt number
     const receiptData: ReceiptData = {
       receiptNumber: result.sale.receiptNumber,
       createdAt: new Date(),
@@ -168,7 +200,6 @@ export function NewSaleButton({ products, userName, organizationName }: Props) {
     };
 
     setReceipt(receiptData);
-    // Reset cart but keep modal open — receipt modal takes over
     setCart([]); setDiscount(0); setTax(0); setNotes(""); setBarcodeInput(""); setProductFilter("");
     router.refresh();
   };

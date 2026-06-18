@@ -4,20 +4,29 @@ import { authConfig } from "@/lib/auth.config";
 const { auth } = NextAuth(authConfig);
 
 export default auth(function proxy(request) {
-  const { nextUrl, auth: session } = request as typeof request & { auth: { user?: unknown } | null };
+  const { nextUrl, auth: session } = request as typeof request & {
+    auth: { user?: { isSuperAdmin?: boolean } } | null;
+  };
   const { pathname } = nextUrl;
 
-  // Auth pages: redirect logged-in users to dashboard, let others through
+  const isSuperAdmin = !!(session?.user as { isSuperAdmin?: boolean } | undefined)?.isSuperAdmin;
+
+  // Auth pages: redirect logged-in users to the right home
   const authPaths = ["/auth/login", "/auth/register", "/auth/error", "/auth/forgot-password", "/auth/reset-password"];
   if (authPaths.some((p) => pathname.startsWith(p))) {
-    if (session?.user) return Response.redirect(new URL("/dashboard", request.url));
+    if (session?.user) {
+      return Response.redirect(new URL(isSuperAdmin ? "/admin" : "/dashboard", request.url));
+    }
     return;
   }
 
   // API auth routes: always allow
   if (pathname.startsWith("/api/auth")) return;
 
-  // Landing page: publicly accessible to everyone
+  // Paystack webhook: public
+  if (pathname.startsWith("/api/paystack")) return;
+
+  // Landing page: publicly accessible
   if (pathname === "/") return;
 
   // All other routes: require authentication
@@ -25,6 +34,17 @@ export default auth(function proxy(request) {
     const loginUrl = new URL("/auth/login", request.url);
     loginUrl.searchParams.set("callbackUrl", pathname);
     return Response.redirect(loginUrl);
+  }
+
+  // Admin routes: require super admin
+  if (pathname.startsWith("/admin")) {
+    if (!isSuperAdmin) return Response.redirect(new URL("/dashboard", request.url));
+    return;
+  }
+
+  // App routes: super admins should stay in /admin
+  if (isSuperAdmin && !pathname.startsWith("/admin") && !pathname.startsWith("/api")) {
+    return Response.redirect(new URL("/admin", request.url));
   }
 });
 

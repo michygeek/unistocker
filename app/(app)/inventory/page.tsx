@@ -5,6 +5,7 @@ import { InventoryTable } from "@/components/inventory/inventory-table";
 import { AddProductButton } from "@/components/inventory/add-product-button";
 import { ExportInventoryButton } from "@/components/inventory/export-inventory-button";
 import { ImportProductsModal } from "@/components/inventory/import-products-modal";
+import { getActiveBranchId, getProductBranchConditions } from "@/lib/branch-filter";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Inventory" };
@@ -23,14 +24,20 @@ export default async function InventoryPage({ searchParams }: { searchParams: Pr
   const categoryId = params.category;
   const showInactive = params.status === "inactive";
 
+  const activeBranchId = await getActiveBranchId(session.user);
+  const branchConds = getProductBranchConditions(activeBranchId);
+
   const productWhere = {
-    isActive: showInactive ? false : true,
-    ...(search && { OR: [
-      { name: { contains: search, mode: "insensitive" as const } },
-      { sku: { contains: search, mode: "insensitive" as const } },
-      { barcode: { contains: search, mode: "insensitive" as const } },
-    ]}),
-    ...(categoryId && { categoryId }),
+    AND: [
+      { isActive: showInactive ? false : true },
+      ...branchConds,
+      ...(search ? [{ OR: [
+        { name: { contains: search, mode: "insensitive" as const } },
+        { sku: { contains: search, mode: "insensitive" as const } },
+        { barcode: { contains: search, mode: "insensitive" as const } },
+      ]}] : []),
+      ...(categoryId ? [{ categoryId }] : []),
+    ],
   };
 
   const [products, total, categories, unreadCount] = await Promise.all([

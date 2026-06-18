@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { Header } from "@/components/layout/header";
 import { SalesTable } from "@/components/sales/sales-table";
 import { NewSaleButton } from "@/components/sales/new-sale-button";
+import { getActiveBranchId, getSaleBranchConditions, getProductBranchConditions } from "@/lib/branch-filter";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Sales" };
@@ -16,9 +17,11 @@ export default async function SalesPage({ searchParams }: { searchParams: Promis
   const page = Number(params.page ?? 1);
   const limit = 20;
 
-  const where = session.user.role === "STAFF"
-    ? { userId: session.user.id }
-    : {};
+  const activeBranchId = await getActiveBranchId(session.user);
+  const saleConds = getSaleBranchConditions(activeBranchId);
+  const productConds = getProductBranchConditions(activeBranchId);
+
+  const where = { AND: saleConds };
 
   const [sales, total, products, unreadCount] = await Promise.all([
     db.sale.findMany({
@@ -36,7 +39,7 @@ export default async function SalesPage({ searchParams }: { searchParams: Promis
     }),
     db.sale.count({ where }),
     db.product.findMany({
-      where: { isActive: true, quantity: { gt: 0 } },
+      where: { AND: [{ isActive: true, quantity: { gt: 0 } }, ...productConds] },
       select: { id: true, name: true, sku: true, barcode: true, sellingPrice: true, quantity: true, piecesPerCarton: true },
       orderBy: { name: "asc" },
     }),

@@ -6,9 +6,11 @@ import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import {
   LayoutDashboard, Package, ShoppingCart, BarChart3,
-  Users, Settings, Bell, LogOut, Menu, X, TrendingUp, AlertTriangle, Lightbulb,
+  Users, Settings, Bell, LogOut, Menu, X, TrendingUp, AlertTriangle, Lightbulb, Building2, CreditCard,
 } from "lucide-react";
 import { PWAInstallButton } from "@/components/pwa/install-button";
+import { BranchPicker } from "@/components/branches/branch-picker";
+import { PLAN_BADGE, type PlanType } from "@/lib/plans";
 import { useState } from "react";
 import type { UserRole } from "@prisma/client";
 
@@ -18,8 +20,10 @@ const NAV = [
   { href: "/sales",          label: "Sales",         icon: ShoppingCart },
   { href: "/reports",        label: "Reports",       icon: BarChart3,  roles: ["BOSS","MANAGER"] },
   { href: "/notifications",  label: "Notifications", icon: Bell },
-  { href: "/settings/staff", label: "Staff",         icon: Users,      roles: ["BOSS","MANAGER"] },
-  { href: "/settings",       label: "My Account",    icon: Settings },
+  { href: "/settings/staff",     label: "Staff",     icon: Users,     roles: ["BOSS","MANAGER"] },
+  { href: "/settings/branches", label: "Branches",  icon: Building2, roles: ["BOSS"] },
+  { href: "/billing",            label: "Billing",    icon: CreditCard, roles: ["BOSS"] },
+  { href: "/settings",          label: "My Account", icon: Settings },
 ] as const;
 
 const AI_NAV = [
@@ -34,6 +38,9 @@ interface Props {
   userEmail?: string;
   organizationName?: string | null;
   unreadCount?: number;
+  branches?: { id: string; name: string; isActive: boolean }[];
+  activeBranchId?: string | null;
+  plan?: PlanType;
 }
 
 const S = {
@@ -81,7 +88,7 @@ function NavLink({ href, label, Icon, active, badge, onClick }: { href: string; 
   );
 }
 
-export function Sidebar({ userRole, userName, userEmail, organizationName, unreadCount = 0 }: Props) {
+export function Sidebar({ userRole, userName, userEmail, organizationName, unreadCount = 0, branches = [], activeBranchId = null, plan = "FREE" }: Props) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -96,9 +103,24 @@ export function Sidebar({ userRole, userName, userEmail, organizationName, unrea
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <p style={S.orgName}>{organizationName ?? "UniStocker"}</p>
-          <p style={S.poweredBy}>UniStocker · Inventory Platform</p>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 2 }}>
+            <p style={{ ...S.poweredBy, margin: 0 }}>UniStocker</p>
+            {(() => {
+              const b = PLAN_BADGE[plan];
+              return (
+                <span style={{ fontSize: 9, fontWeight: 800, padding: "1px 6px", borderRadius: 99, background: b.bg, color: b.color, letterSpacing: "0.04em" }}>
+                  {b.label}
+                </span>
+              );
+            })()}
+          </div>
         </div>
       </div>
+
+      {/* Branch picker — BOSS only */}
+      {userRole === "BOSS" && branches.length > 0 && (
+        <BranchPicker branches={branches} activeBranchId={activeBranchId} />
+      )}
 
       {/* Nav */}
       <nav style={S.nav}>

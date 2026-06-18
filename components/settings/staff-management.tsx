@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { UserPlus, CheckCircle, XCircle, Loader2, ShieldOff } from "lucide-react";
 import { createStaffMember, updateStaffStatus } from "@/lib/actions/auth";
+import { assignUserToBranch } from "@/lib/actions/branches";
 import type { UserRole } from "@prisma/client";
 
 interface StaffMember {
@@ -13,7 +14,14 @@ interface StaffMember {
   role: UserRole;
   isActive: boolean;
   createdAt: Date;
+  branchId: string | null;
   branch: { name: string } | null;
+}
+
+interface BranchOption {
+  id: string;
+  name: string;
+  isActive: boolean;
 }
 
 const ROLE_STYLE: Record<UserRole, { bg: string; color: string }> = {
@@ -23,17 +31,25 @@ const ROLE_STYLE: Record<UserRole, { bg: string; color: string }> = {
 };
 
 export function StaffManagement({
-  staff, currentUserId, currentUserRole,
+  staff, currentUserId, currentUserRole, branches = [],
 }: {
   staff: StaffMember[];
   currentUserId: string;
   currentUserRole: UserRole;
+  branches?: BranchOption[];
 }) {
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState<string | null>(null);
   const [formData, setFormData] = useState({ name: "", email: "", password: "", role: "STAFF" });
   const [error, setError] = useState("");
   const router = useRouter();
+
+  const handleBranchAssign = async (userId: string, branchId: string | null) => {
+    setLoading(`branch-${userId}`);
+    await assignUserToBranch(userId, branchId);
+    setLoading(null);
+    router.refresh();
+  };
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -154,6 +170,7 @@ export function StaffManagement({
                 <th style={{ paddingLeft: 20 }}>Name</th>
                 <th className="hidden sm:table-cell">Email</th>
                 <th>Role</th>
+                {branches.length > 0 && <th className="hidden md:table-cell">Branch</th>}
                 <th className="hidden sm:table-cell">Status</th>
                 <th style={{ textAlign: "right", paddingRight: 20 }}>Actions</th>
               </tr>
@@ -193,6 +210,22 @@ export function StaffManagement({
                         {member.role}
                       </span>
                     </td>
+                    {branches.length > 0 && (
+                      <td className="hidden md:table-cell">
+                        <select
+                          value={member.branchId ?? ""}
+                          disabled={loading === `branch-${member.id}`}
+                          onChange={(e) => handleBranchAssign(member.id, e.target.value || null)}
+                          className="uni-input"
+                          style={{ fontSize: 12, padding: "4px 8px", minWidth: 140, opacity: loading === `branch-${member.id}` ? 0.5 : 1 }}
+                        >
+                          <option value="">No branch</option>
+                          {branches.filter((b) => b.isActive).map((b) => (
+                            <option key={b.id} value={b.id}>{b.name}</option>
+                          ))}
+                        </select>
+                      </td>
+                    )}
                     <td className="hidden sm:table-cell">
                       <span style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, fontWeight: 600, color: member.isActive ? "var(--accent)" : "var(--text-3)" }}>
                         {member.isActive ? <CheckCircle size={13} /> : <XCircle size={13} />}

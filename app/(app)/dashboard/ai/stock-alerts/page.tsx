@@ -2,6 +2,9 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { Header } from "@/components/layout/header";
 import { StockAlertsView } from "@/components/ai/stock-alerts-view";
+import { PlanGate } from "@/components/billing/plan-gate";
+import { getOrgSubscription } from "@/lib/subscription";
+import { PLAN_FEATURES } from "@/lib/plans";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Smart Stock Alerts" };
@@ -11,9 +14,19 @@ export default async function StockAlertsPage() {
   const session = await auth();
   if (!session?.user) return null;
 
-  const unreadCount = await db.notification.count({
-    where: { userId: session.user.id, readAt: null, status: "SENT" },
-  });
+  const [unreadCount, subscription] = await Promise.all([
+    db.notification.count({ where: { userId: session.user.id, readAt: null, status: "SENT" } }),
+    session.user.organizationId ? getOrgSubscription(session.user.organizationId) : null,
+  ]);
+
+  if (!subscription || !PLAN_FEATURES[subscription.plan].ai) {
+    return (
+      <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
+        <Header title="Smart Stock Alerts" unreadCount={unreadCount} />
+        <PlanGate requiredPlan="PRO" feature="Smart Stock Alerts" />
+      </div>
+    );
+  }
 
   const predictions = await db.stockPrediction.findMany({
     include: {
