@@ -8,7 +8,7 @@ import { auth, signIn } from "@/lib/auth";
 import { hasPermission } from "@/lib/auth/permissions";
 import { addActivityLogJob } from "@/lib/queue";
 import { revalidatePath } from "next/cache";
-import { sendPasswordResetEmail, sendWelcomeEmail, sendStaffInviteEmail } from "@/lib/email";
+import { sendPasswordResetEmail, sendWelcomeEmail, sendStaffInviteEmail, sendVerificationEmail } from "@/lib/email";
 import { checkStaffLimit } from "@/lib/subscription";
 import type { UserRole } from "@prisma/client";
 
@@ -62,14 +62,56 @@ export async function registerUser(formData: FormData) {
       password: hash,
       role: "BOSS",
       organizationId: org.id,
+      // emailVerified stays null until they click the verification link
     },
   });
 
-  // Fire-and-forget — don't let email failure block registration
-  sendWelcomeEmail(email, name, organizationName).catch((err) =>
-    console.error("Welcome email failed:", err)
+  // Create verification token (24 h)
+  await db.verificationToken.deleteMany({ where: { identifier: email } });
+  const verifyToken = randomBytes(32).toString("hex");
+  await db.verificationToken.create({
+    data: {
+      identifier: email,
+      token: verifyToken,
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+    },
+  });
+
+  const baseUrl = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
+  const verifyUrl = `${baseUrl}/api/auth/verify-email?token=${verifyToken}&email=${encodeURIComponent(email)}`;
+
+  sendVerificationEmail(email, name, verifyUrl).catch((err) =>
+    console.error("Verification email failed:", err)
   );
 
+  return { success: true };
+}
+
+/* ── Email verification helpers ───────────────────────────────────────────── */
+
+export async function checkEmailVerification(email: string): Promise<{ verified: boolean }> {
+  const user = await db.user.findUnique({ where: { email }, select: { emailVerified: true } });
+  if (!user) return { verified: true }; // No account — let signIn fail normally
+  return { verified: !!user.emailVerified };
+}
+
+export async function resendVerificationEmail(email: string): Promise<{ success: boolean }> {
+  const user = await db.user.findUnique({
+    where: { email },
+    select: { name: true, emailVerified: true },
+  });
+  if (!user || user.emailVerified) return { success: true }; // Silent — no info leakage
+
+  await db.verificationToken.deleteMany({ where: { identifier: email } });
+  const token = randomBytes(32).toString("hex");
+  await db.verificationToken.create({
+    data: { identifier: email, token, expires: new Date(Date.now() + 24 * 60 * 60 * 1000) },
+  });
+
+  const baseUrl = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
+  const verifyUrl = `${baseUrl}/api/auth/verify-email?token=${token}&email=${encodeURIComponent(email)}`;
+
+  sendVerificationEmail(email, user.name ?? "there", verifyUrl).catch(console.error);
   return { success: true };
 }
 
@@ -205,6 +247,7 @@ export async function createStaffMember(formData: FormData) {
       role: role as UserRole,
       branchId: session.user.branchId ?? undefined,
       organizationId: session.user.organizationId ?? undefined,
+      emailVerified: new Date(), // Admin-created accounts are pre-verified
     },
   });
 

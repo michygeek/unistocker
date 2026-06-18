@@ -59,7 +59,36 @@ function ctaButton(href: string, label: string) {
   </table>`;
 }
 
-// ── Welcome email (sent to new org owner on register) ─────────────────────────
+// ── Verification email (sent on register) ─────────────────────────────────────
+
+export async function sendVerificationEmail(to: string, name: string, verifyUrl: string) {
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: `Verify your ${APP_NAME} email address`,
+    html: emailWrapper(`
+      <p style="font-size:16px;color:#374151;margin:0 0 8px;">Hi ${name},</p>
+      <h1 style="font-size:22px;font-weight:800;color:#0F2030;margin:0 0 16px;letter-spacing:-0.02em;">
+        Verify your email address
+      </h1>
+      <p style="font-size:14px;color:#6b7280;line-height:1.65;margin:0 0 28px;">
+        Thanks for signing up for ${APP_NAME}. Click the button below to verify your
+        email and activate your account. This link expires in <strong>24 hours</strong>.
+      </p>
+      ${ctaButton(verifyUrl, "Verify Email Address")}
+      <p style="font-size:12px;color:#9ca3af;line-height:1.6;margin:0 0 24px;">
+        If the button doesn't work, copy and paste this link into your browser:<br />
+        <a href="${verifyUrl}" style="color:#0D9488;word-break:break-all;">${verifyUrl}</a>
+      </p>
+      <hr style="border:none;border-top:1px solid #f3f4f6;margin:0 0 20px;" />
+      <p style="font-size:12px;color:#9ca3af;margin:0;line-height:1.6;">
+        If you didn't create an account on ${APP_NAME}, you can safely ignore this email.
+      </p>
+    `),
+  });
+}
+
+// ── Welcome email (sent to new org owner after email verification) ─────────────
 
 export async function sendWelcomeEmail(to: string, name: string, orgName: string) {
   const greeting = `Hi ${name},`;

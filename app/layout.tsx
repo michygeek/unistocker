@@ -32,6 +32,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         {/* Prevents flash of wrong theme on load */}
         <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('uni-theme');if(t==='dark'){document.documentElement.classList.add('dark')}else{document.documentElement.classList.remove('dark')}}catch(e){}})()` }} />
+        {/* Capture beforeinstallprompt before React hydrates — avoids race condition */}
+        <script dangerouslySetInnerHTML={{ __html: `window.__pwaInstallPrompt=null;window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__pwaInstallPrompt=e;});` }} />
       </head>
       <body className="min-h-full antialiased" suppressHydrationWarning>
         <PWARegister />

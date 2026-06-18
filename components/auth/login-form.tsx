@@ -6,8 +6,9 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Loader2, Eye, EyeOff } from "lucide-react";
+import { Loader2, Eye, EyeOff, MailCheck } from "lucide-react";
 import Link from "next/link";
+import { checkEmailVerification } from "@/lib/actions/auth";
 
 const schema = z.object({
   email: z.string().email("Invalid email"),
@@ -15,20 +16,35 @@ const schema = z.object({
 });
 type FormData = z.infer<typeof schema>;
 
-export function LoginForm({ showRegisteredBanner }: { showRegisteredBanner?: boolean }) {
+interface LoginFormProps {
+  showRegisteredBanner?: boolean;
+  showVerifiedBanner?: boolean;
+}
+
+export function LoginForm({ showRegisteredBanner, showVerifiedBanner }: LoginFormProps) {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-  const [serverError, setServerError] = useState("");
+  const [serverError, setServerError] = useState<"invalid" | "unverified" | null>(null);
+  const [unverifiedEmail, setUnverifiedEmail] = useState("");
 
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: zodResolver(schema),
   });
 
   const onSubmit = async (data: FormData) => {
-    setServerError("");
+    setServerError(null);
+
+    // Pre-check email verification before attempting sign-in
+    const { verified } = await checkEmailVerification(data.email);
+    if (!verified) {
+      setUnverifiedEmail(data.email);
+      setServerError("unverified");
+      return;
+    }
+
     const result = await signIn("credentials", { ...data, redirect: false });
     if (result?.error) {
-      setServerError("Invalid email or password. Please try again.");
+      setServerError("invalid");
     } else {
       router.push("/dashboard");
       router.refresh();
@@ -37,7 +53,19 @@ export function LoginForm({ showRegisteredBanner }: { showRegisteredBanner?: boo
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      {showRegisteredBanner && (
+      {showVerifiedBanner && (
+        <div className="auth-registered-banner" style={{ background: "rgba(13,148,136,0.12)", border: "1px solid rgba(13,148,136,0.3)" }}>
+          <div className="auth-registered-icon" style={{ background: "#0D9488" }}>
+            <MailCheck size={12} color="white" />
+          </div>
+          <div>
+            <p className="auth-registered-title" style={{ color: "#2DD4BF" }}>Email verified!</p>
+            <p className="auth-registered-sub">Your account is active. Sign in below.</p>
+          </div>
+        </div>
+      )}
+
+      {showRegisteredBanner && !showVerifiedBanner && (
         <div className="auth-registered-banner">
           <div className="auth-registered-icon">
             <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
@@ -46,12 +74,23 @@ export function LoginForm({ showRegisteredBanner }: { showRegisteredBanner?: boo
           </div>
           <div>
             <p className="auth-registered-title">Account created!</p>
-            <p className="auth-registered-sub">Sign in below to access your dashboard.</p>
+            <p className="auth-registered-sub">Check your email for a verification link.</p>
           </div>
         </div>
       )}
 
-      {serverError && <div className="auth-error">{serverError}</div>}
+      {serverError === "invalid" && (
+        <div className="auth-error">Invalid email or password. Please try again.</div>
+      )}
+      {serverError === "unverified" && (
+        <div className="auth-error" style={{ background: "rgba(245,158,11,0.10)", border: "1px solid rgba(245,158,11,0.3)", color: "#fbbf24" }}>
+          Please verify your email before signing in.{" "}
+          <Link href={`/auth/verify-email?email=${encodeURIComponent(unverifiedEmail)}`}
+            style={{ color: "#fbbf24", fontWeight: 700, textDecoration: "underline" }}>
+            Resend link
+          </Link>
+        </div>
+      )}
 
       <div className="auth-field">
         <label className="auth-label">Email address</label>

@@ -86,9 +86,18 @@ export function PWAInstallButton({ variant = "sidebar" }: { variant?: Variant })
       return;
     }
 
-    // Chrome / Edge / Samsung Browser all fire beforeinstallprompt
+    // Check if the event was already captured globally before hydration
+    const cached = (window as unknown as { __pwaInstallPrompt?: BeforeInstallPromptEvent }).__pwaInstallPrompt;
+    if (cached) {
+      setDeferredPrompt(cached);
+      setPlatform("chrome");
+      return;
+    }
+
+    // Still listen in case it fires after hydration (slower devices)
     const handler = (e: Event) => {
       e.preventDefault();
+      (window as unknown as { __pwaInstallPrompt?: BeforeInstallPromptEvent }).__pwaInstallPrompt = e as BeforeInstallPromptEvent;
       setDeferredPrompt(e as BeforeInstallPromptEvent);
       setPlatform("chrome");
     };

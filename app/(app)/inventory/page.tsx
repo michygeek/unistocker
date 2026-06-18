@@ -6,6 +6,8 @@ import { AddProductButton } from "@/components/inventory/add-product-button";
 import { ExportInventoryButton } from "@/components/inventory/export-inventory-button";
 import { ImportProductsModal } from "@/components/inventory/import-products-modal";
 import { getActiveBranchId, getProductBranchConditions } from "@/lib/branch-filter";
+import { getOrgSubscription } from "@/lib/subscription";
+import { PLAN_FEATURES } from "@/lib/plans";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Inventory" };
@@ -16,6 +18,12 @@ interface SearchParams { search?: string; category?: string; status?: string; pa
 export default async function InventoryPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
   const session = await auth();
   if (!session?.user) return null;
+
+  const orgId = session.user.organizationId ?? undefined;
+  const subscription = orgId ? await getOrgSubscription(orgId) : null;
+  const plan = subscription?.plan ?? "FREE";
+  const canExport = PLAN_FEATURES[plan].export;
+  const canPhotoImport = PLAN_FEATURES[plan].photoImport;
 
   const params = await searchParams;
   const page = Number(params.page ?? 1);
@@ -67,8 +75,8 @@ export default async function InventoryPage({ searchParams }: { searchParams: Pr
             <p style={{ fontSize: 14, color: "var(--text-2)", marginTop: 2 }}>{total} items total</p>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            <ExportInventoryButton />
-            <ImportProductsModal userRole={session.user.role} />
+            {canExport && <ExportInventoryButton />}
+            {canPhotoImport && <ImportProductsModal userRole={session.user.role} />}
             <AddProductButton categories={categories} userRole={session.user.role} />
           </div>
         </div>

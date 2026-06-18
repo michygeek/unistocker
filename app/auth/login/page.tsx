@@ -14,11 +14,11 @@ const FEATURES = [
 ];
 
 interface Props {
-  searchParams: Promise<{ registered?: string }>;
+  searchParams: Promise<{ registered?: string; verified?: string; error?: string }>;
 }
 
 export default async function LoginPage({ searchParams }: Props) {
-  const { registered } = await searchParams;
+  const { registered, verified } = await searchParams;
 
   return (
     <div className="auth-page">
@@ -84,7 +84,7 @@ export default async function LoginPage({ searchParams }: Props) {
           <h1 className="auth-form-heading">Welcome back</h1>
           <p className="auth-form-sub">Sign in to your account to continue</p>
 
-          <LoginForm showRegisteredBanner={registered === "true"} />
+          <LoginForm showRegisteredBanner={registered === "true"} showVerifiedBanner={verified === "1"} />
 
           <p className="auth-bottom-link">
             Don&apos;t have an account?{" "}

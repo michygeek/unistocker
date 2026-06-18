@@ -6,9 +6,12 @@ import { StatsCard } from "@/components/dashboard/stats-card";
 import { SalesChart } from "@/components/dashboard/sales-chart";
 import { ExportReportsButton } from "@/components/reports/export-reports-button";
 import { DateRangePicker } from "@/components/reports/date-range-picker";
-import { Package, TrendingUp, ShoppingCart, DollarSign, BarChart3 } from "lucide-react";
+import { Package, TrendingUp, ShoppingCart, DollarSign, BarChart3, Lock } from "lucide-react";
 import { format, startOfDay, endOfDay } from "date-fns";
 import { getActiveBranchId, getSaleBranchConditions } from "@/lib/branch-filter";
+import { getOrgSubscription } from "@/lib/subscription";
+import { PLAN_FEATURES } from "@/lib/plans";
+import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Reports" };
@@ -27,13 +30,25 @@ export default async function ReportsPage({
   if (!session?.user) return null;
   if (session.user.role === "STAFF") redirect("/dashboard");
 
+  const orgId = session.user.organizationId ?? undefined;
+  const subscription = orgId ? await getOrgSubscription(orgId) : null;
+  const plan = subscription?.plan ?? "FREE";
+  const canExport = PLAN_FEATURES[plan].export;
+  const canAdvancedReports = PLAN_FEATURES[plan].advancedReports;
+
   const params = await searchParams;
   const now = new Date();
 
-  // Parse date range — default last 30 days
-  const defaultFrom = new Date(now.getTime() - 29 * 86400000);
-  const fromDate = params.from ? startOfDay(new Date(params.from)) : startOfDay(defaultFrom);
-  const toDate = params.to ? endOfDay(new Date(params.to)) : endOfDay(now);
+  // FREE plan: locked to last 7 days regardless of query params
+  const defaultFrom = canAdvancedReports
+    ? new Date(now.getTime() - 29 * 86400000)
+    : new Date(now.getTime() - 6 * 86400000);
+  const fromDate = (canAdvancedReports && params.from)
+    ? startOfDay(new Date(params.from))
+    : startOfDay(defaultFrom);
+  const toDate = (canAdvancedReports && params.to)
+    ? endOfDay(new Date(params.to))
+    : endOfDay(now);
 
   const fromStr = toInputDate(fromDate);
   const toStr = toInputDate(toDate);
@@ -128,11 +143,33 @@ export default async function ReportsPage({
             <h2 style={{ fontSize: 16, fontWeight: 700, color: "var(--text)", margin: 0 }}>Analytics Overview</h2>
             <p style={{ fontSize: 13, color: "var(--text-2)", marginTop: 2 }}>{rangeLabel}</p>
           </div>
-          <ExportReportsButton />
+          {canExport ? (
+            <ExportReportsButton />
+          ) : (
+            <Link href="/billing" style={{
+              display: "inline-flex", alignItems: "center", gap: 6,
+              padding: "7px 14px", borderRadius: 9,
+              border: "1px solid rgba(100,116,139,0.3)",
+              background: "transparent", color: "var(--text-3)",
+              fontSize: 13, fontWeight: 600, textDecoration: "none", cursor: "pointer",
+            }}>
+              <Lock size={13} />
+              Export CSV — PRO+
+            </Link>
+          )}
         </div>
 
-        {/* Date range picker */}
-        <DateRangePicker from={fromStr} to={toStr} />
+        {/* Date range picker — PRO+ only */}
+        {canAdvancedReports ? (
+          <DateRangePicker from={fromStr} to={toStr} />
+        ) : (
+          <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 16px", borderRadius: 10, background: "var(--bg-input)", border: "1px solid var(--border)" }}>
+            <Lock size={14} style={{ color: "var(--text-3)", flexShrink: 0 }} />
+            <span style={{ fontSize: 13, color: "var(--text-3)" }}>
+              Showing last 7 days — <Link href="/billing" style={{ color: "var(--accent)", fontWeight: 700 }}>Upgrade to PRO</Link> for custom date ranges
+            </span>
+          </div>
+        )}
 
         {/* Stats: 2 all-time + 3 range */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(190px, 1fr))", gap: 16 }}>

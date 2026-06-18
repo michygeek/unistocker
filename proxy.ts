@@ -12,7 +12,7 @@ export default auth(function proxy(request) {
   const isSuperAdmin = !!(session?.user as { isSuperAdmin?: boolean } | undefined)?.isSuperAdmin;
 
   // Auth pages: redirect logged-in users to the right home
-  const authPaths = ["/auth/login", "/auth/register", "/auth/error", "/auth/forgot-password", "/auth/reset-password"];
+  const authPaths = ["/auth/login", "/auth/register", "/auth/error", "/auth/forgot-password", "/auth/reset-password", "/auth/verify-email"];
   if (authPaths.some((p) => pathname.startsWith(p))) {
     if (session?.user) {
       return Response.redirect(new URL(isSuperAdmin ? "/admin" : "/dashboard", request.url));
@@ -23,8 +23,9 @@ export default auth(function proxy(request) {
   // API auth routes: always allow
   if (pathname.startsWith("/api/auth")) return;
 
-  // Paystack webhook: public
+  // Paystack webhook + email verification: public
   if (pathname.startsWith("/api/paystack")) return;
+  if (pathname.startsWith("/api/auth/verify-email")) return;
 
   // Landing page: publicly accessible
   if (pathname === "/") return;

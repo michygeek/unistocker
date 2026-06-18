@@ -13,7 +13,7 @@ export const authConfig: NextAuthConfig = {
   callbacks: {
     authorized({ auth, request }) {
       const { pathname } = request.nextUrl;
-      const publicPaths = ["/auth/login", "/auth/register", "/auth/error"];
+      const publicPaths = ["/auth/login", "/auth/register", "/auth/error", "/auth/forgot-password", "/auth/reset-password", "/auth/verify-email"];
       if (publicPaths.some((p) => pathname.startsWith(p))) return true;
       if (pathname.startsWith("/api/auth")) return true;
       if (pathname === "/" || pathname.startsWith("/_next") || pathname.startsWith("/api/paystack")) return true;

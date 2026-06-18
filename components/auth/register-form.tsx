@@ -47,7 +47,7 @@ export function RegisterForm() {
       const err = result.error as Record<string, string[]>;
       setServerError(Object.values(err).flat()[0] ?? "Registration failed");
     } else {
-      router.push("/auth/login?registered=true");
+      router.push(`/auth/verify-email?email=${encodeURIComponent(data.email)}`);
     }
   };
 
