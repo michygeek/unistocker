@@ -1,3 +1,6 @@
+[build]
+buildCommand = "npx prisma generate"
+
 [deploy]
 startCommand = "npm run workers"
 restartPolicyType = "ON_FAILURE"
