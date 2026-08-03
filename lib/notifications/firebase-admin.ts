@@ -1,11 +1,24 @@
 import admin from "firebase-admin";
 
+// Tolerant of how each hosting platform's env var UI mangles a pasted PEM key:
+// strips wrapping quotes some UIs preserve literally, trims stray whitespace,
+// and converts literal "\n" sequences to real newlines (a no-op if the value
+// already has real newlines).
+function normalizePrivateKey(key: string | undefined): string | undefined {
+  if (!key) return undefined;
+  let normalized = key.trim();
+  if (normalized.startsWith('"') && normalized.endsWith('"')) {
+    normalized = normalized.slice(1, -1);
+  }
+  return normalized.replace(/\\n/g, "\n");
+}
+
 if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.cert({
       projectId: process.env.FIREBASE_PROJECT_ID,
       clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+      privateKey: normalizePrivateKey(process.env.FIREBASE_PRIVATE_KEY),
     }),
   });
 }
