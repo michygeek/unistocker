@@ -32,7 +32,7 @@ function PlanPicker({ orgId, current }: { orgId: string; current: string }) {
   const [pending, startTransition] = useTransition();
   const router = useRouter();
 
-  function set(plan: "FREE" | "PRO" | "BUSINESS", status: "ACTIVE" | "TRIAL") {
+  function set(plan: "FREE" | "BUSINESS" | "ENTERPRISE", status: "ACTIVE" | "TRIAL") {
     setOpen(false);
     startTransition(async () => {
       await adminSetPlan(orgId, plan, status);
@@ -68,11 +68,11 @@ function PlanPicker({ orgId, current }: { orgId: string; current: string }) {
             boxShadow: "0 20px 60px rgba(0,0,0,0.5)",
           }}>
             {([
-              { plan: "FREE",     status: "ACTIVE", label: "Free — Downgrade" },
-              { plan: "PRO",      status: "ACTIVE", label: "Pro — Activate" },
-              { plan: "PRO",      status: "TRIAL",  label: "Pro — Start Trial" },
-              { plan: "BUSINESS", status: "ACTIVE", label: "Business — Activate" },
-              { plan: "BUSINESS", status: "TRIAL",  label: "Business — Start Trial" },
+              { plan: "FREE",       status: "ACTIVE", label: "Free — Downgrade" },
+              { plan: "BUSINESS",   status: "ACTIVE", label: "Business — Activate" },
+              { plan: "BUSINESS",   status: "TRIAL",  label: "Business — Start Trial" },
+              { plan: "ENTERPRISE", status: "ACTIVE", label: "Enterprise — Activate" },
+              { plan: "ENTERPRISE", status: "TRIAL",  label: "Enterprise — Start Trial" },
             ] as const).map((opt) => {
               const b = PLAN_BADGE[opt.plan];
               return (

@@ -8,7 +8,8 @@ import type { Metadata } from "next";
 export const metadata: Metadata = { title: "Admin — UniStocker" };
 export const dynamic = "force-dynamic";
 
-const PLAN_MRR: Record<string, number> = { FREE: 0, PRO: 2999, BUSINESS: 6999 };
+// Enterprise is custom-priced per deal — not tracked here, so it contributes 0 to this estimate.
+const PLAN_MRR: Record<string, number> = { FREE: 0, BUSINESS: 4999, ENTERPRISE: 0 };
 
 export default async function AdminPage() {
   const session = await auth();
@@ -43,7 +44,7 @@ export default async function AdminPage() {
     .filter(s => s.status === "ACTIVE")
     .reduce((sum, s) => sum + (PLAN_MRR[s.plan] ?? 0), 0);
 
-  const planBreakdown = { FREE: 0, PRO: 0, BUSINESS: 0 } as Record<string, number>;
+  const planBreakdown = { FREE: 0, BUSINESS: 0, ENTERPRISE: 0 } as Record<string, number>;
   subscriptions.forEach(s => { planBreakdown[s.plan] = (planBreakdown[s.plan] ?? 0) + 1; });
 
   const stats = [
@@ -91,7 +92,7 @@ export default async function AdminPage() {
         <div style={{ background: "#0C1528", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 16, padding: "22px 24px" }}>
           <h2 style={{ margin: "0 0 20px", fontSize: 15, fontWeight: 700, color: "#f1f5f9" }}>Plan Breakdown</h2>
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-            {(["FREE", "PRO", "BUSINESS"] as const).map((plan) => {
+            {(["FREE", "BUSINESS", "ENTERPRISE"] as const).map((plan) => {
               const count = planBreakdown[plan] ?? 0;
               const pct = orgCount > 0 ? Math.round((count / orgCount) * 100) : 0;
               const badge = PLAN_BADGE[plan];

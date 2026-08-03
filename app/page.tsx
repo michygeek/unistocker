@@ -1084,10 +1084,10 @@ function Pricing() {
   const plans = [
     {
       name: "Free Forever", price: "₦0", period: "", highlight: false,
-      desc: "Everything you need to get started — no card, no expiry.",
+      desc: "Get started at no cost, forever — no card, no expiry.",
       features: [
-        "Up to 10 products",
-        "1 staff account (owner only)",
+        "Up to 25 products",
+        "2 staff accounts (1 owner + 1 team member)",
         "1 branch location",
         "Basic inventory management",
         "Sales recording & receipts",
@@ -1095,43 +1095,43 @@ function Pricing() {
         "Low stock alerts",
         "Works offline (PWA)",
       ],
-      cta: "Get started free", href: "/auth/register",
+      cta: "Start Free — No Card Required", href: "/auth/register",
     },
     {
-      name: "Pro", price: "₦2,999", period: "/month", highlight: true,
-      desc: "For growing businesses with a team. Includes AI and a 30-day free trial.",
+      name: "Business", price: "₦4,999", period: "/month", highlight: true,
+      desc: "Everything a growing shop needs, in one plan. Yearly billing saves 12%.",
       features: [
-        "Up to 500 products",
-        "5 staff accounts",
-        "Up to 5 branch locations",
+        "Up to 1,000 products",
+        "Up to 10 staff accounts",
+        "Up to 10 branch locations",
         "Everything in Free",
-        "AI demand forecasting",
-        "AI smart stock alerts",
-        "AI business assistant",
+        "Full inventory management & bulk operations",
         "Date-range sales & inventory reports",
         "Export reports to CSV / Excel",
+        "AI demand forecasting",
+        "AI smart stock alerts",
+        "AI business insights — chat with your data",
+        "Weekly AI-generated business summaries",
         "Product photo import via AI",
         "Push & email notifications",
-        "30-day free trial — no card required",
+        "Earn referral points — get paid for every signup",
       ],
-      cta: "Start 30-day free trial", href: "/auth/register",
+      cta: "Subscribe Now", href: "/auth/register",
     },
     {
-      name: "Business", price: "₦6,999", period: "/month", highlight: false,
-      desc: "For large operations across multiple locations.",
+      name: "Enterprise", price: "Custom", period: "", highlight: false,
+      desc: "For operations that have outgrown a self-serve plan.",
       features: [
-        "Unlimited products",
-        "Up to 50 staff accounts",
-        "Up to 50 branch locations",
-        "Everything in Pro",
+        "Unlimited products, staff, and branches",
+        "Advanced AI analysis across all branches",
         "Multi-location analytics",
-        "Cross-branch inventory view",
         "Full activity & audit logs",
+        "Cross-branch inventory view",
         "Per-branch performance reports",
-        "Priority support",
-        "30-day free trial — no card required",
+        "Custom AI usage volume",
+        "Priority support & dedicated onboarding",
       ],
-      cta: "Start 30-day free trial", href: "/auth/register",
+      cta: "Book a Call", href: "mailto:balogunmikes@gmail.com?subject=UniStocker%20Enterprise%20Inquiry",
     },
   ];
   return (
@@ -1139,7 +1139,7 @@ function Pricing() {
       <div className="lp-pricing-hd">
         <span className="lp-eyebrow">Pricing</span>
         <h2 className="lp-section-title">Simple, honest pricing</h2>
-        <p className="lp-section-sub-c">No hidden fees. Paid plans start with a 30-day free trial — no card required.</p>
+        <p className="lp-section-sub-c">No hidden fees. Pay monthly or save 12% with yearly billing.</p>
       </div>
       <div className="lp-pricing-grid">
         {plans.map((plan) => (
