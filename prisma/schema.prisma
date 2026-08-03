@@ -33,8 +33,8 @@ enum NotificationStatus {
 
 enum Plan {
   FREE
-  PRO
   BUSINESS
+  ENTERPRISE
 }
 
 enum SubscriptionStatus {
@@ -42,6 +42,11 @@ enum SubscriptionStatus {
   ACTIVE
   EXPIRED
   CANCELLED
+}
+
+enum BillingCycle {
+  MONTHLY
+  YEARLY
 }
 
 model Organization {
@@ -53,11 +58,19 @@ model Organization {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  referralCode        String   @unique @default(cuid())
+  referredByOrgId      String?
+  referralPoints       Int      @default(0)
+  referralRewardGiven  Boolean  @default(false)
+
   users        User[]
   branches     Branch[]
   products     Product[]
   sales        Sale[]
   subscription Subscription?
+
+  referredBy Organization?  @relation("OrgReferrals", fields: [referredByOrgId], references: [id])
+  referrals  Organization[] @relation("OrgReferrals")
 }
 
 model Subscription {
@@ -65,8 +78,10 @@ model Subscription {
   organizationId           String             @unique
   plan                     Plan               @default(FREE)
   status                   SubscriptionStatus @default(ACTIVE)
+  billingCycle             BillingCycle       @default(MONTHLY)
   trialEndsAt              DateTime?
   currentPeriodEnd         DateTime?
+  aiDailyLimit             Int?
   paystackCustomerCode     String?
   paystackSubscriptionCode String?
   paystackPlanCode         String?
@@ -74,6 +89,16 @@ model Subscription {
   updatedAt                DateTime           @updatedAt
 
   organization Organization @relation(fields: [organizationId], references: [id])
+}
+
+model AiRequest {
+  id             String   @id @default(cuid())
+  organizationId String
+  userId         String?
+  feature        String
+  createdAt      DateTime @default(now())
+
+  @@index([organizationId, createdAt])
 }
 
 model Account {
@@ -338,14 +363,16 @@ model InsightChat {
 }
 
 model WeeklyInsight {
-  id          String   @id @default(cuid())
-  branchId    String?
-  weekOf      DateTime
-  summary     String
-  topProducts Json
-  alerts      Json
-  highlights  Json
-  createdAt   DateTime @default(now())
+  id             String   @id @default(cuid())
+  organizationId String?
+  branchId       String?
+  weekOf         DateTime
+  summary        String
+  topProducts    Json
+  alerts         Json
+  highlights     Json
+  createdAt      DateTime @default(now())
 
   @@index([weekOf])
+  @@index([organizationId, createdAt])
 }
