@@ -15,6 +15,7 @@ const schema = z
     email: z.string().email("Invalid email"),
     password: z.string().min(8, "Min. 8 characters"),
     confirmPassword: z.string().min(1, "Please confirm your password"),
+    referralCode: z.string().optional(),
   })
   .refine((d) => d.password === d.confirmPassword, {
     message: "Passwords don't match",
@@ -23,7 +24,11 @@ const schema = z
 
 type FormData = z.infer<typeof schema>;
 
-export function RegisterForm() {
+interface Props {
+  defaultReferralCode?: string;
+}
+
+export function RegisterForm({ defaultReferralCode }: Props) {
   const router = useRouter();
   const [serverError, setServerError] = useState("");
   const [showPw, setShowPw] = useState(false);
@@ -31,6 +36,7 @@ export function RegisterForm() {
 
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: zodResolver(schema),
+    defaultValues: { referralCode: defaultReferralCode ?? "" },
   });
 
   const onSubmit = async (data: FormData) => {
@@ -41,6 +47,7 @@ export function RegisterForm() {
     fd.append("name", data.name);
     fd.append("email", data.email);
     fd.append("password", data.password);
+    if (data.referralCode) fd.append("referralCode", data.referralCode);
 
     const result = await registerUser(fd);
     if ("error" in result && result.error) {
@@ -122,6 +129,19 @@ export function RegisterForm() {
           </div>
           {errors.confirmPassword && <p className="auth-field-err">{errors.confirmPassword.message}</p>}
         </div>
+      </div>
+
+      {/* Referral code */}
+      <div className="auth-field">
+        <label className="auth-label">Referral code (optional)</label>
+        <input
+          {...register("referralCode")}
+          type="text"
+          placeholder="e.g. A1B2C3D4E5"
+          autoComplete="off"
+          className="auth-input"
+          style={{ textTransform: "uppercase" }}
+        />
       </div>
 
       <button type="submit" disabled={isSubmitting} className="auth-btn" style={{ marginTop: 4 }}>

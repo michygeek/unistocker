@@ -10,6 +10,7 @@ import { addActivityLogJob } from "@/lib/queue";
 import { revalidatePath } from "next/cache";
 import { sendPasswordResetEmail, sendWelcomeEmail, sendStaffInviteEmail, sendVerificationEmail } from "@/lib/email";
 import { checkStaffLimit } from "@/lib/subscription";
+import { uniqueReferralCode } from "@/lib/referrals";
 import type { UserRole } from "@prisma/client";
 
 const RegisterSchema = z.object({
@@ -18,6 +19,7 @@ const RegisterSchema = z.object({
   password: z.string().min(8),
   organizationName: z.string().min(2).max(100),
   role: z.enum(["BOSS", "MANAGER", "STAFF"]).default("BOSS"),
+  referralCode: z.string().trim().optional(),
 });
 
 function slugify(text: string): string {
@@ -39,16 +41,27 @@ export async function registerUser(formData: FormData) {
   const parsed = RegisterSchema.safeParse(raw);
   if (!parsed.success) return { error: parsed.error.flatten().fieldErrors };
 
-  const { name, email, password, organizationName } = parsed.data;
+  const { name, email, password, organizationName, referralCode } = parsed.data;
 
   const existing = await db.user.findUnique({ where: { email } });
   if (existing) return { error: { email: ["Email already registered"] } };
 
   const hash = await bcrypt.hash(password, 12);
   const slug = await uniqueSlug(organizationName);
+  const newReferralCode = await uniqueReferralCode();
+
+  // A stale/mistyped referral code shouldn't block signup — just skip linking it.
+  let referredByOrgId: string | null = null;
+  if (referralCode) {
+    const referrer = await db.organization.findUnique({
+      where: { referralCode: referralCode.toUpperCase() },
+      select: { id: true },
+    });
+    referredByOrgId = referrer?.id ?? null;
+  }
 
   const org = await db.organization.create({
-    data: { name: organizationName, slug },
+    data: { name: organizationName, slug, referralCode: newReferralCode, referredByOrgId },
   });
 
   await db.subscription.create({

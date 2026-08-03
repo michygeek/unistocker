@@ -13,7 +13,12 @@ const PERKS = [
   { icon: Shield, text: "Your data is secure & private" },
 ];
 
-export default function RegisterPage() {
+interface Props {
+  searchParams: Promise<{ ref?: string }>;
+}
+
+export default async function RegisterPage({ searchParams }: Props) {
+  const { ref } = await searchParams;
   return (
     <div className="auth-page">
       {/* ── Left panel ───────────────────────────────────── */}
@@ -71,7 +76,7 @@ export default function RegisterPage() {
           <h1 className="auth-form-heading">Create your account</h1>
           <p className="auth-form-sub">Set up your business in under 2 minutes</p>
 
-          <RegisterForm />
+          <RegisterForm defaultReferralCode={ref} />
 
           <p className="auth-bottom-link">
             Already have an account?{" "}

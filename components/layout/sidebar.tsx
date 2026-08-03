@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import {
   LayoutDashboard, Package, ShoppingCart, BarChart3,
-  Users, Settings, Bell, LogOut, Menu, X, TrendingUp, AlertTriangle, Lightbulb, Building2, CreditCard,
+  Users, Settings, Bell, LogOut, Menu, X, TrendingUp, AlertTriangle, Lightbulb, Building2, CreditCard, Gift,
 } from "lucide-react";
 import { PWAInstallButton } from "@/components/pwa/install-button";
 import { BranchPicker } from "@/components/branches/branch-picker";
@@ -23,6 +23,7 @@ const NAV = [
   { href: "/settings/staff",     label: "Staff",     icon: Users,     roles: ["BOSS","MANAGER"] },
   { href: "/settings/branches", label: "Branches",  icon: Building2, roles: ["BOSS"] },
   { href: "/billing",            label: "Billing",    icon: CreditCard, roles: ["BOSS"] },
+  { href: "/settings/referrals", label: "Referrals",  icon: Gift,       roles: ["BOSS"] },
   { href: "/settings",          label: "My Account", icon: Settings },
 ] as const;
 
