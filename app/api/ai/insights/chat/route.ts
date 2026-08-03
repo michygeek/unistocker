@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { callClaudeStream } from "@/lib/ai/claude";
+import { checkAiLimit, logAiRequest } from "@/lib/subscription";
 import { subDays } from "date-fns";
 
 export async function POST(req: NextRequest) {
@@ -16,6 +17,12 @@ export async function POST(req: NextRequest) {
     if (!messages.length) {
       return NextResponse.json({ error: "No messages provided" }, { status: 400 });
     }
+
+    const gate = await checkAiLimit(session.user.organizationId, session.user.id, session.user.role);
+    if (!gate.allowed) {
+      return NextResponse.json({ error: gate.reason }, { status: 403 });
+    }
+    await logAiRequest(session.user.organizationId!, session.user.id, "chat");
 
     // Fetch live business context
     const since30 = subDays(new Date(), 30);

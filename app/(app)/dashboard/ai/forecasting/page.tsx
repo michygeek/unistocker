@@ -23,7 +23,7 @@ export default async function ForecastingPage() {
     return (
       <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
         <Header title="AI Demand Forecasting" unreadCount={unreadCount} />
-        <PlanGate requiredPlan="PRO" feature="AI Demand Forecasting" />
+        <PlanGate requiredPlan="BUSINESS" feature="AI Demand Forecasting" />
       </div>
     );
   }

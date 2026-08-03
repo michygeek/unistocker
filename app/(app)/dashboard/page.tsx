@@ -65,7 +65,7 @@ export default async function DashboardPage() {
         createdAt: { gte: subDays(new Date(), 4) },
       },
     }),
-    db.weeklyInsight.findFirst({ orderBy: { createdAt: "desc" } }),
+    db.weeklyInsight.findFirst({ where: { organizationId: session.user.organizationId ?? "none" }, orderBy: { createdAt: "desc" } }),
   ]);
 
   const chartData = await Promise.all(

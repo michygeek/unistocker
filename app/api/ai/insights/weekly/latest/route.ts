@@ -8,7 +8,7 @@ export async function GET() {
     if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const insight = await db.weeklyInsight.findFirst({
-      where: { branchId: session.user.branchId ?? null },
+      where: { organizationId: session.user.organizationId ?? "none", branchId: session.user.branchId ?? null },
       orderBy: { createdAt: "desc" },
     });
 

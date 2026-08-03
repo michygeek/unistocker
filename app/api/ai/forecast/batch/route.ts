@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { callClaudeJSON, isCacheFresh, checkRateLimit } from "@/lib/ai/claude";
+import { callClaudeJSON, isCacheFresh, CHEAP_MODEL } from "@/lib/ai/claude";
+import { checkAiLimit, logAiRequest } from "@/lib/subscription";
 import { subDays, format } from "date-fns";
 
 const DELAY_MS = 200;
@@ -19,10 +20,11 @@ export async function POST(req: NextRequest) {
     const body = await req.json().catch(() => ({}));
     const branchId = body.branchId ?? session.user.branchId ?? undefined;
 
-    const rateCheck = await checkRateLimit(session.user.organizationId);
-    if (!rateCheck.allowed) {
-      return NextResponse.json({ error: rateCheck.reason }, { status: 429 });
+    const gate = await checkAiLimit(session.user.organizationId, session.user.id, session.user.role);
+    if (!gate.allowed) {
+      return NextResponse.json({ error: gate.reason }, { status: 403 });
     }
+    await logAiRequest(session.user.organizationId!, session.user.id, "forecast-batch");
 
     const products = await db.product.findMany({
       where: {
@@ -89,7 +91,7 @@ Today: ${format(new Date(), "yyyy-MM-dd")}`;
         const result = await callClaudeJSON<{
           next7Days: number; next14Days: number; next30Days: number;
           reorderQty: number; reorderByDate: string; confidence: number; reasoning: string;
-        }>(systemPrompt, userMessage, "forecast-batch");
+        }>(systemPrompt, userMessage, "forecast-batch", CHEAP_MODEL);
 
         const forecast = await db.demandForecast.create({
           data: {

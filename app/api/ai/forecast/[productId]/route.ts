@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { callClaudeJSON, isCacheFresh, checkRateLimit } from "@/lib/ai/claude";
+import { callClaudeJSON, isCacheFresh, CHEAP_MODEL } from "@/lib/ai/claude";
+import { checkAiLimit, logAiRequest } from "@/lib/subscription";
 import { subDays, addDays, format } from "date-fns";
 
 interface ForecastResponse {
@@ -39,9 +40,9 @@ export async function POST(
       return NextResponse.json({ forecast: cached, cached: true });
     }
 
-    const rateCheck = await checkRateLimit(product.organizationId);
-    if (!rateCheck.allowed) {
-      return NextResponse.json({ error: rateCheck.reason }, { status: 429 });
+    const gate = await checkAiLimit(session.user.organizationId, session.user.id, session.user.role);
+    if (!gate.allowed) {
+      return NextResponse.json({ error: gate.reason }, { status: 403 });
     }
 
     // Fetch last 90 days of sales grouped by day
@@ -86,10 +87,11 @@ Today: ${format(new Date(), "yyyy-MM-dd")}`;
 
     let result: ForecastResponse;
     try {
-      result = await callClaudeJSON<ForecastResponse>(systemPrompt, userMessage, "forecast");
+      result = await callClaudeJSON<ForecastResponse>(systemPrompt, userMessage, "forecast", CHEAP_MODEL);
     } catch {
       return NextResponse.json({ error: "AI temporarily unavailable. Please try again later." }, { status: 503 });
     }
+    await logAiRequest(session.user.organizationId!, session.user.id, "forecast");
 
     // Validate required fields
     if (

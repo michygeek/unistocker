@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { callClaudeJSON, isCacheFresh } from "@/lib/ai/claude";
+import { callClaudeJSON, isCacheFresh, CHEAP_MODEL } from "@/lib/ai/claude";
 import { subDays, format, addDays } from "date-fns";
 import { notifyAllBossUsers } from "@/lib/notifications";
 
@@ -54,7 +54,8 @@ export async function GET(req: NextRequest) {
       }>(
         `You are a stock depletion AI. Return ONLY valid JSON: {"daysUntilStockout":number,"urgencyLevel":"CRITICAL"|"WARNING"|"WATCH"|"HEALTHY","dailyVelocity":float,"suggestedReorderLevel":integer|null,"reorderLevelReason":string|null}`,
         `Product: ${product.name}\nStock: ${product.quantity}\nReorder level: ${product.lowStockAlert}\nAvg daily — 7d:${avg7.toFixed(2)}, 14d:${avg14.toFixed(2)}, 30d:${avg30.toFixed(2)}\nTrend:${trend}\nToday:${format(new Date(), "yyyy-MM-dd")}`,
-        "cron-stock"
+        "cron-stock",
+        CHEAP_MODEL
       );
 
       const daysUntil = Math.max(0, result.daysUntilStockout);

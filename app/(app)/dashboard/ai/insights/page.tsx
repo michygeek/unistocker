@@ -24,7 +24,7 @@ export default async function InsightsPage() {
     return (
       <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
         <Header title="AI Business Insights" unreadCount={unreadCount} />
-        <PlanGate requiredPlan="PRO" feature="AI Business Insights" />
+        <PlanGate requiredPlan="BUSINESS" feature="AI Business Insights" />
       </div>
     );
   }

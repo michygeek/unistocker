@@ -64,3 +64,22 @@ export async function notifyAllBossUsers(
     )
   );
 }
+
+export async function notifyAllOrgUsers(
+  organizationId: string,
+  title: string,
+  body: string,
+  type: string,
+  metadata?: Record<string, unknown>
+): Promise<void> {
+  const orgUsers = await db.user.findMany({
+    where: { organizationId, isActive: true },
+    select: { id: true },
+  });
+
+  await Promise.all(
+    orgUsers.map((user) =>
+      createAndSendNotification({ userId: user.id, title, body, type, metadata })
+    )
+  );
+}

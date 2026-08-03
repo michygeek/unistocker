@@ -1,10 +1,11 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { db } from "@/lib/db";
 
 const MODEL = "claude-sonnet-4-6";
+// Routine, structured tasks (forecasts, stock alerts, weekly summaries) don't need
+// heavy reasoning — route them to a cheaper model and reserve MODEL for freeform chat.
+const CHEAP_MODEL = "claude-haiku-4-5-20251001";
 const MAX_TOKENS = 1000;
 const CACHE_TTL_MS = 4 * 60 * 60 * 1000; // 4 hours
-const FREE_PLAN_DAILY_LIMIT = 50;
 
 let _client: Anthropic | null = null;
 function getClient(): Anthropic {
@@ -17,37 +18,18 @@ export function isCacheFresh(createdAt: Date): boolean {
   return Date.now() - createdAt.getTime() < CACHE_TTL_MS;
 }
 
-// Check & enforce daily AI call quota per organization
-export async function checkRateLimit(organizationId: string | undefined | null): Promise<{ allowed: boolean; reason?: string }> {
-  if (!organizationId) return { allowed: true };
-
-  const since = new Date();
-  since.setHours(0, 0, 0, 0);
-
-  // Count today's forecasts + stock predictions as a proxy for AI calls
-  const [forecastCount, predictionCount] = await Promise.all([
-    db.demandForecast.count({ where: { product: { organizationId }, createdAt: { gte: since } } }),
-    db.stockPrediction.count({ where: { product: { organizationId }, createdAt: { gte: since } } }),
-  ]);
-
-  const total = forecastCount + predictionCount;
-  if (total >= FREE_PLAN_DAILY_LIMIT) {
-    return { allowed: false, reason: `Daily AI call limit (${FREE_PLAN_DAILY_LIMIT}) reached. Resets at midnight.` };
-  }
-  return { allowed: true };
-}
-
 // Call Claude and parse JSON response; retry once on parse failure
 export async function callClaudeJSON<T>(
   systemPrompt: string,
   userMessage: string,
-  feature: string
+  feature: string,
+  model: string = MODEL
 ): Promise<T> {
   const client = getClient();
 
   async function attempt(): Promise<T> {
     const message = await client.messages.create({
-      model: MODEL,
+      model,
       max_tokens: MAX_TOKENS,
       thinking: { type: "disabled" },
       output_config: { effort: "low" },
@@ -105,4 +87,4 @@ export async function* callClaudeStream(
   }
 }
 
-export { MODEL, MAX_TOKENS };
+export { MODEL, CHEAP_MODEL, MAX_TOKENS };

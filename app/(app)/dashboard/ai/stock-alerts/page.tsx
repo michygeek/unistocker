@@ -23,7 +23,7 @@ export default async function StockAlertsPage() {
     return (
       <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
         <Header title="Smart Stock Alerts" unreadCount={unreadCount} />
-        <PlanGate requiredPlan="PRO" feature="Smart Stock Alerts" />
+        <PlanGate requiredPlan="BUSINESS" feature="Smart Stock Alerts" />
       </div>
     );
   }
