@@ -35,8 +35,8 @@ export function PlanGate({ requiredPlan, feature, children }: Props) {
         {feature}
       </h2>
       <p style={{ margin: "0 0 24px", fontSize: 14, color: "var(--text-muted)", maxWidth: 360 }}>
-        This feature is available on the {requiredPlan === "PRO" ? "Pro" : "Business"} plan.
-        Upgrade to unlock it — start with a 30-day free trial, no card required.
+        This feature is available on the {requiredPlan === "BUSINESS" ? "Business" : "Enterprise"} plan.
+        Upgrade to unlock it.
       </p>
       <Link
         href="/billing"

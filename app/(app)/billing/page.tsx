@@ -24,11 +24,12 @@ export default async function BillingPageRoute({ searchParams }: Props) {
 
   const params = await searchParams;
 
-  const [subscription, productCount, staffCount, branchCount] = await Promise.all([
+  const [subscription, productCount, staffCount, branchCount, org] = await Promise.all([
     getOrgSubscription(orgId),
     db.product.count({ where: { organizationId: orgId, isActive: true } }),
     db.user.count({ where: { organizationId: orgId, isActive: true } }),
     db.branch.count({ where: { organizationId: orgId } }),
+    db.organization.findUnique({ where: { id: orgId }, select: { referralPoints: true } }),
   ]);
 
   const features = PLAN_FEATURES[subscription.plan];
@@ -46,6 +47,7 @@ export default async function BillingPageRoute({ searchParams }: Props) {
         <BillingPage
           subscription={subscription}
           usage={usage}
+          referralPoints={org?.referralPoints ?? 0}
           successParam={params.success === "1"}
           errorParam={params.error}
         />

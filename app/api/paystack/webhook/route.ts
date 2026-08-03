@@ -2,6 +2,8 @@ import { createHmac } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import type { PlanType } from "@/lib/plans";
+import { awardReferralPoints } from "@/lib/referrals";
+import type { BillingCycle } from "@prisma/client";
 
 function verifySignature(body: string, signature: string): boolean {
   const secret = process.env.PAYSTACK_SECRET_KEY;
@@ -12,7 +14,6 @@ function verifySignature(body: string, signature: string): boolean {
 
 function planFromCode(planCode: string | undefined): PlanType | null {
   if (!planCode) return null;
-  if (planCode === process.env.PAYSTACK_PRO_PLAN_CODE) return "PRO";
   if (planCode === process.env.PAYSTACK_BUSINESS_PLAN_CODE) return "BUSINESS";
   return null;
 }
@@ -37,10 +38,13 @@ export async function POST(req: NextRequest) {
       const metadata = data.metadata as Record<string, string> | undefined;
       const organizationId = metadata?.organizationId;
       const plan = (metadata?.plan ?? null) as PlanType | null;
+      const billingCycle = (metadata?.billingCycle ?? "MONTHLY") as BillingCycle;
+      const redeemedPoints = Number(metadata?.redeemedPoints ?? 0);
 
       if (!organizationId || !plan || plan === "FREE") break;
 
-      const currentPeriodEnd = new Date(Date.now() + 30 * 86400000);
+      const periodDays = billingCycle === "YEARLY" ? 365 : 30;
+      const currentPeriodEnd = new Date(Date.now() + periodDays * 86400000);
       const customer = data.customer as { customer_code: string } | undefined;
       const subscription = data.subscription as { subscription_code?: string; plan_code?: string } | undefined;
 
@@ -50,6 +54,7 @@ export async function POST(req: NextRequest) {
           organizationId,
           plan,
           status: "ACTIVE",
+          billingCycle,
           currentPeriodEnd,
           paystackCustomerCode: customer?.customer_code ?? null,
           paystackSubscriptionCode: subscription?.subscription_code ?? null,
@@ -58,6 +63,7 @@ export async function POST(req: NextRequest) {
         update: {
           plan,
           status: "ACTIVE",
+          billingCycle,
           currentPeriodEnd,
           trialEndsAt: null,
           paystackCustomerCode: customer?.customer_code ?? null,
@@ -65,6 +71,17 @@ export async function POST(req: NextRequest) {
           paystackPlanCode: subscription?.plan_code ?? null,
         },
       });
+
+      // Referral award/redemption live here exclusively (not in the callback-page
+      // path) since increment/decrement isn't naturally idempotent like the
+      // plan/status upsert above.
+      await awardReferralPoints(organizationId);
+      if (redeemedPoints > 0) {
+        await db.organization.updateMany({
+          where: { id: organizationId, referralPoints: { gte: redeemedPoints } },
+          data: { referralPoints: { decrement: redeemedPoints } },
+        });
+      }
       break;
     }
 
@@ -99,11 +116,12 @@ export async function POST(req: NextRequest) {
       });
       if (!existing) break;
 
-      // Extend period by 30 days from the later of now vs current end
+      // Extend period from the later of now vs current end, by the org's billing cycle
       const base = existing.currentPeriodEnd
         ? Math.max(existing.currentPeriodEnd.getTime(), Date.now())
         : Date.now();
-      const newEnd = new Date(base + 30 * 86400000);
+      const periodDays = existing.billingCycle === "YEARLY" ? 365 : 30;
+      const newEnd = new Date(base + periodDays * 86400000);
 
       await db.subscription.update({
         where: { id: existing.id },

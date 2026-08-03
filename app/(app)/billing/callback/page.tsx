@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { paystackVerify } from "@/lib/paystack";
 import { activateSubscription } from "@/lib/actions/billing";
 import type { PlanType } from "@/lib/plans";
+import type { BillingCycle } from "@prisma/client";
 
 interface Props {
   searchParams: Promise<{ reference?: string; trxref?: string }>;
@@ -25,6 +26,7 @@ export default async function BillingCallbackPage({ searchParams }: Props) {
 
   const metadata = result.data.metadata as Record<string, string> | undefined;
   const plan = (metadata?.plan ?? null) as PlanType | null;
+  const billingCycle = (metadata?.billingCycle ?? "MONTHLY") as BillingCycle;
   const orgIdFromMeta = metadata?.organizationId;
 
   // Guard: metadata must match the logged-in org
@@ -32,6 +34,6 @@ export default async function BillingCallbackPage({ searchParams }: Props) {
     redirect("/billing?error=invalid_payment");
   }
 
-  await activateSubscription(session.user.organizationId, plan);
+  await activateSubscription(session.user.organizationId, plan, billingCycle);
   redirect("/billing?success=1");
 }

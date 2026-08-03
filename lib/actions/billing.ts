@@ -4,39 +4,15 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { paystackInitialize } from "@/lib/paystack";
-import { getOrgSubscription } from "@/lib/subscription";
-import type { PlanType } from "@/lib/plans";
+import { yearlyPriceKobo, type PlanType } from "@/lib/plans";
+import { computePointsRedemption } from "@/lib/referrals";
+import type { BillingCycle } from "@prisma/client";
 
-const PLAN_PRICES_KOBO: Record<"PRO" | "BUSINESS", number> = {
-  PRO: 299900,      // ₦2,999
-  BUSINESS: 699900, // ₦6,999
+const PLAN_PRICES_KOBO: Record<"BUSINESS", number> = {
+  BUSINESS: 499900, // ₦4,999
 };
 
-export async function startTrial(plan: "PRO" | "BUSINESS") {
-  const session = await auth();
-  if (!session?.user || session.user.role !== "BOSS") throw new Error("Forbidden");
-
-  const orgId = session.user.organizationId;
-  if (!orgId) throw new Error("No organization");
-
-  const current = await getOrgSubscription(orgId);
-  if (current.plan !== "FREE") {
-    return { error: "You already have a paid plan or an active trial" };
-  }
-
-  const trialEndsAt = new Date(Date.now() + 30 * 86400000);
-
-  await db.subscription.upsert({
-    where: { organizationId: orgId },
-    create: { organizationId: orgId, plan, status: "TRIAL", trialEndsAt },
-    update: { plan, status: "TRIAL", trialEndsAt, currentPeriodEnd: null },
-  });
-
-  revalidatePath("/billing");
-  return { success: true };
-}
-
-export async function initializePayment(plan: "PRO" | "BUSINESS") {
+export async function initializePayment(cycle: BillingCycle, useReferralPoints: boolean) {
   const session = await auth();
   if (!session?.user || session.user.role !== "BOSS") throw new Error("Forbidden");
 
@@ -44,19 +20,27 @@ export async function initializePayment(plan: "PRO" | "BUSINESS") {
   const email = session.user.email;
   if (!orgId || !email) throw new Error("Missing organization or email");
 
-  const planCode =
-    plan === "PRO"
-      ? process.env.PAYSTACK_PRO_PLAN_CODE
-      : process.env.PAYSTACK_BUSINESS_PLAN_CODE;
+  const basePrice = cycle === "YEARLY" ? yearlyPriceKobo(PLAN_PRICES_KOBO.BUSINESS) : PLAN_PRICES_KOBO.BUSINESS;
+
+  let redeemedPoints = 0;
+  let amount = basePrice;
+  if (useReferralPoints) {
+    const org = await db.organization.findUnique({ where: { id: orgId }, select: { referralPoints: true } });
+    const { pointsUsed, discountKobo } = computePointsRedemption(org?.referralPoints ?? 0, basePrice);
+    redeemedPoints = pointsUsed;
+    amount = basePrice - discountKobo;
+  }
+
+  const planCode = cycle === "YEARLY" ? process.env.PAYSTACK_BUSINESS_PLAN_CODE_YEARLY : process.env.PAYSTACK_BUSINESS_PLAN_CODE;
 
   const callbackUrl = `${process.env.NEXTAUTH_URL}/billing/callback`;
 
   const result = await paystackInitialize({
     email,
-    amount: PLAN_PRICES_KOBO[plan],
+    amount,
     planCode: planCode || undefined,
     callbackUrl,
-    metadata: { organizationId: orgId, plan, userId: session.user.id },
+    metadata: { organizationId: orgId, plan: "BUSINESS", billingCycle: cycle, redeemedPoints, userId: session.user.id },
   });
 
   if (!result.status) return { error: result.message ?? "Payment initialization failed" };
@@ -79,14 +63,18 @@ export async function cancelSubscription() {
   return { success: true };
 }
 
-// Called by the Paystack callback page after verifying a successful payment
-export async function activateSubscription(organizationId: string, plan: PlanType) {
-  const currentPeriodEnd = new Date(Date.now() + 30 * 86400000);
+// Called by the Paystack callback page after verifying a successful payment.
+// Only touches plan/status/period — referral points award & redemption happen
+// exclusively in the webhook (see app/api/paystack/webhook/route.ts) so they
+// can't be double-counted if both paths fire for the same payment.
+export async function activateSubscription(organizationId: string, plan: PlanType, billingCycle: BillingCycle = "MONTHLY") {
+  const periodDays = billingCycle === "YEARLY" ? 365 : 30;
+  const currentPeriodEnd = new Date(Date.now() + periodDays * 86400000);
 
   await db.subscription.upsert({
     where: { organizationId },
-    create: { organizationId, plan, status: "ACTIVE", currentPeriodEnd },
-    update: { plan, status: "ACTIVE", currentPeriodEnd, trialEndsAt: null },
+    create: { organizationId, plan, status: "ACTIVE", billingCycle, currentPeriodEnd },
+    update: { plan, status: "ACTIVE", billingCycle, currentPeriodEnd, trialEndsAt: null },
   });
 
   revalidatePath("/billing");
