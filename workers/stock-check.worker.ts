@@ -17,11 +17,11 @@ const worker = new Worker(
 
     if (!product) return;
 
-    if (product.quantity <= product.lowStockAlert) {
+    if (product.quantity <= product.lowStockAlert && product.organizationId) {
       const title = `Low Stock Alert: ${product.name}`;
       const body = `${product.name} has only ${product.quantity} units left (threshold: ${product.lowStockAlert}).`;
 
-      await notifyAllBossUsers(title, body, "LOW_STOCK", {
+      await notifyAllBossUsers(product.organizationId, title, body, "LOW_STOCK", {
         productId: product.id,
         productName: product.name,
         quantity: product.quantity,
@@ -33,6 +33,7 @@ const worker = new Worker(
         title,
         body,
         type: "LOW_STOCK",
+        channel: "PUSH",
         metadata: { productId: product.id },
       });
     }

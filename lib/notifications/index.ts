@@ -47,20 +47,24 @@ export async function createAndSendNotification(
   });
 }
 
+// organizationId is required — without it this would notify every BOSS across
+// every organization in the system, not just the one the event happened in.
 export async function notifyAllBossUsers(
+  organizationId: string,
   title: string,
   body: string,
   type: string,
-  metadata?: Record<string, unknown>
+  metadata?: Record<string, unknown>,
+  channel: NotificationChannel = NotificationChannel.PUSH
 ): Promise<void> {
   const bossUsers = await db.user.findMany({
-    where: { role: "BOSS", isActive: true },
+    where: { role: "BOSS", isActive: true, organizationId },
     select: { id: true },
   });
 
   await Promise.all(
     bossUsers.map((user) =>
-      createAndSendNotification({ userId: user.id, title, body, type, metadata })
+      createAndSendNotification({ userId: user.id, title, body, type, metadata, channel })
     )
   );
 }
@@ -70,7 +74,8 @@ export async function notifyAllOrgUsers(
   title: string,
   body: string,
   type: string,
-  metadata?: Record<string, unknown>
+  metadata?: Record<string, unknown>,
+  channel: NotificationChannel = NotificationChannel.PUSH
 ): Promise<void> {
   const orgUsers = await db.user.findMany({
     where: { organizationId, isActive: true },
@@ -79,7 +84,7 @@ export async function notifyAllOrgUsers(
 
   await Promise.all(
     orgUsers.map((user) =>
-      createAndSendNotification({ userId: user.id, title, body, type, metadata })
+      createAndSendNotification({ userId: user.id, title, body, type, metadata, channel })
     )
   );
 }

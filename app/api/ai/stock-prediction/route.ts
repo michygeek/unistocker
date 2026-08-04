@@ -116,8 +116,9 @@ Today: ${format(new Date(), "yyyy-MM-dd")}`;
         },
       });
 
-      if (result.urgencyLevel === "CRITICAL") {
+      if (result.urgencyLevel === "CRITICAL" && product.organizationId) {
         void notifyAllBossUsers(
+          product.organizationId,
           "Critical Stock Alert",
           `"${product.name}" will run out in ${Math.round(daysUntil)} days — only ${product.quantity} units left.`,
           "CRITICAL_STOCK",

@@ -128,23 +128,27 @@ export async function recordSale(data: z.infer<typeof SaleSchema>) {
     metadata: { receiptNumber, total: finalTotal, items: items.length },
   });
 
-  await notifyAllBossUsers(
-    "New Sale Recorded",
-    `${session.user.name ?? session.user.email} recorded a sale of $${finalTotal.toFixed(2)} (Receipt: ${receiptNumber})`,
-    "SALE_RECORDED",
-    { saleId: sale.id, total: finalTotal }
-  );
+  if (session.user.organizationId) {
+    await notifyAllBossUsers(
+      session.user.organizationId,
+      "New Sale Recorded",
+      `${session.user.name ?? session.user.email} recorded a sale of $${finalTotal.toFixed(2)} (Receipt: ${receiptNumber})`,
+      "SALE_RECORDED",
+      { saleId: sale.id, total: finalTotal }
+    );
 
-  for (const item of items) {
-    const product = products.find((p) => p.id === item.productId)!;
-    const newQty = product.quantity - item.quantity;
-    if (newQty <= product.lowStockAlert) {
-      await notifyAllBossUsers(
-        `Low Stock: ${product.name}`,
-        `After this sale, "${product.name}" has only ${newQty} units left.`,
-        "LOW_STOCK",
-        { productId: product.id, newQty }
-      );
+    for (const item of items) {
+      const product = products.find((p) => p.id === item.productId)!;
+      const newQty = product.quantity - item.quantity;
+      if (newQty <= product.lowStockAlert) {
+        await notifyAllBossUsers(
+          session.user.organizationId,
+          `Low Stock: ${product.name}`,
+          `After this sale, "${product.name}" has only ${newQty} units left.`,
+          "LOW_STOCK",
+          { productId: product.id, newQty }
+        );
+      }
     }
   }
 

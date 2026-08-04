@@ -109,12 +109,15 @@ export async function createProduct(formData: FormData) {
     description: `Created product "${product.name}" (SKU: ${product.sku}) with ${product.quantity} units`,
   });
 
-  void notifyAllBossUsers(
-    "New Product Added",
-    `${session.user.name ?? session.user.email} added "${product.name}" to inventory`,
-    "PRODUCT_CREATED",
-    { productId: product.id }
-  );
+  if (product.organizationId) {
+    void notifyAllBossUsers(
+      product.organizationId,
+      "New Product Added",
+      `${session.user.name ?? session.user.email} added "${product.name}" to inventory`,
+      "PRODUCT_CREATED",
+      { productId: product.id }
+    );
+  }
 
   revalidatePath("/inventory");
   return { success: true, product };
@@ -170,8 +173,9 @@ export async function updateProduct(productId: string, formData: FormData) {
     metadata: { changes: parsed.data },
   });
 
-  if (priceChanged) {
+  if (priceChanged && product.organizationId) {
     void notifyAllBossUsers(
+      product.organizationId,
       "Product Price Changed",
       `"${product.name}" price changed from ₦${existing.sellingPrice} to ₦${product.sellingPrice} by ${session.user.name ?? session.user.email}`,
       "PRICE_CHANGE",
@@ -219,12 +223,15 @@ export async function adjustStock(
     description: `${actionLabel} ${Math.abs(quantity)} units of "${product.name}". New total: ${newQty}`,
   });
 
-  await notifyAllBossUsers(
-    `Stock ${actionLabel.charAt(0).toUpperCase() + actionLabel.slice(1)}`,
-    `${session.user.name ?? session.user.email} ${actionLabel} ${Math.abs(quantity)} units of "${product.name}". Stock: ${newQty}`,
-    `STOCK_${type}`,
-    { productId, quantity: delta, newQty }
-  );
+  if (product.organizationId) {
+    await notifyAllBossUsers(
+      product.organizationId,
+      `Stock ${actionLabel.charAt(0).toUpperCase() + actionLabel.slice(1)}`,
+      `${session.user.name ?? session.user.email} ${actionLabel} ${Math.abs(quantity)} units of "${product.name}". Stock: ${newQty}`,
+      `STOCK_${type}`,
+      { productId, quantity: delta, newQty }
+    );
+  }
 
   await addStockCheckJob(productId);
 
@@ -254,12 +261,15 @@ export async function deleteProduct(productId: string) {
     description: `Deleted product "${product.name}"`,
   });
 
-  await notifyAllBossUsers(
-    "Product Removed",
-    `${session.user.name ?? session.user.email} removed "${product.name}" from inventory`,
-    "PRODUCT_DELETED",
-    { productId }
-  );
+  if (product.organizationId) {
+    await notifyAllBossUsers(
+      product.organizationId,
+      "Product Removed",
+      `${session.user.name ?? session.user.email} removed "${product.name}" from inventory`,
+      "PRODUCT_DELETED",
+      { productId }
+    );
+  }
 
   revalidatePath("/inventory");
   return { success: true };

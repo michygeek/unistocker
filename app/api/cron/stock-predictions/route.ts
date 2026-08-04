@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
 
   const products = await db.product.findMany({
     where: { isActive: true },
-    select: { id: true, name: true, quantity: true, lowStockAlert: true },
+    select: { id: true, name: true, quantity: true, lowStockAlert: true, organizationId: true },
   });
 
   let processed = 0;
@@ -80,12 +80,15 @@ export async function GET(req: NextRequest) {
 
       if (result.urgencyLevel === "CRITICAL") {
         criticalCount++;
-        void notifyAllBossUsers(
-          "Critical Stock Alert",
-          `"${product.name}" runs out in ${Math.round(daysUntil)} days — ${product.quantity} units left.`,
-          "CRITICAL_STOCK",
-          { productId: product.id }
-        );
+        if (product.organizationId) {
+          void notifyAllBossUsers(
+            product.organizationId,
+            "Critical Stock Alert",
+            `"${product.name}" runs out in ${Math.round(daysUntil)} days — ${product.quantity} units left.`,
+            "CRITICAL_STOCK",
+            { productId: product.id }
+          );
+        }
       }
     } catch {
       console.error(`[cron:stock] failed for ${product.id}`);
