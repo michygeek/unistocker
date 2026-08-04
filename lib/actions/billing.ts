@@ -77,6 +77,8 @@ export async function activateSubscription(organizationId: string, plan: PlanTyp
     update: { plan, status: "ACTIVE", billingCycle, currentPeriodEnd, trialEndsAt: null },
   });
 
-  revalidatePath("/billing");
-  revalidatePath("/dashboard");
+  // No revalidatePath here — this only runs from the /billing/callback page's
+  // render (not a user-triggered Server Action), where revalidatePath during
+  // render is disallowed. Both /billing and /dashboard are already
+  // force-dynamic, so they render fresh on every visit without it anyway.
 }
