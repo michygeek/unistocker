@@ -5,7 +5,7 @@ import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { hasPermission } from "@/lib/auth/permissions";
-import { getActiveBranchId } from "@/lib/branch-filter";
+import { getRequiredBranchId, REQUIRED_BRANCH_ERROR_MESSAGES } from "@/lib/branch-filter";
 import { addActivityLogJob } from "@/lib/queue";
 import { notifyAllBossUsers } from "@/lib/notifications";
 
@@ -77,7 +77,11 @@ export async function recordSale(data: z.infer<typeof SaleSchema>) {
   const finalTotal = subtotal - discount + taxAmount;
   const receiptNumber = generateReceiptNumber();
 
-  const branchId = (await getActiveBranchId(session.user)) ?? undefined;
+  const branchResult = await getRequiredBranchId(session.user);
+  if ("error" in branchResult) {
+    return { error: REQUIRED_BRANCH_ERROR_MESSAGES[branchResult.error] };
+  }
+  const branchId = branchResult.branchId;
 
   const sale = await db.$transaction(async (tx) => {
     const newSale = await tx.sale.create({

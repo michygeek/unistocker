@@ -48,7 +48,7 @@ export default async function InventoryPage({ searchParams }: { searchParams: Pr
     ],
   };
 
-  const [products, total, categories, unreadCount] = await Promise.all([
+  const [products, total, categories, unreadCount, branchCount] = await Promise.all([
     db.product.findMany({
       where: productWhere,
       include: {
@@ -63,6 +63,7 @@ export default async function InventoryPage({ searchParams }: { searchParams: Pr
     db.product.count({ where: productWhere }),
     db.category.findMany({ orderBy: { name: "asc" } }),
     db.notification.count({ where: { userId: session.user.id, readAt: null, status: "SENT" } }),
+    orgId ? db.branch.count({ where: { organizationId: orgId, isActive: true } }) : Promise.resolve(0),
   ]);
 
   return (
@@ -77,7 +78,7 @@ export default async function InventoryPage({ searchParams }: { searchParams: Pr
           <div className="flex items-center gap-2 flex-wrap">
             {canExport && <ExportInventoryButton />}
             {canPhotoImport && <ImportProductsModal userRole={session.user.role} />}
-            <AddProductButton categories={categories} userRole={session.user.role} />
+            <AddProductButton categories={categories} userRole={session.user.role} hasBranches={branchCount > 0} />
           </div>
         </div>
 

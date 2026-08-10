@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { createProduct } from "@/lib/actions/products";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import type { UserRole } from "@prisma/client";
 import { BarcodeScanner } from "@/components/inventory/barcode-scanner";
 import { PhotoEntryButton } from "@/components/ai/photo-entry-button";
@@ -29,7 +30,7 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>;
 
-export function AddProductButton({ categories, userRole }: { categories: { id: string; name: string }[]; userRole: UserRole }) {
+export function AddProductButton({ categories, userRole, hasBranches }: { categories: { id: string; name: string }[]; userRole: UserRole; hasBranches: boolean }) {
   const [open, setOpen] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
   const [imageError, setImageError] = useState("");
@@ -49,6 +50,14 @@ export function AddProductButton({ categories, userRole }: { categories: { id: s
   const hasCartons = piecesPerCarton && piecesPerCarton >= 1;
 
   if (userRole === "STAFF") return null;
+
+  if (!hasBranches) {
+    return (
+      <Link href="/settings/branches" className="uni-btn uni-btn-primary">
+        <Plus size={16} /> Create a branch to add inventory
+      </Link>
+    );
+  }
 
   const onPhotoResult = (result: {
     name?: string; description?: string; category?: string;

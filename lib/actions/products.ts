@@ -5,7 +5,7 @@ import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { hasPermission } from "@/lib/auth/permissions";
-import { getActiveBranchId } from "@/lib/branch-filter";
+import { getRequiredBranchId, REQUIRED_BRANCH_ERROR_MESSAGES } from "@/lib/branch-filter";
 import { addNotificationJob, addActivityLogJob, addStockCheckJob } from "@/lib/queue";
 import { checkProductLimit } from "@/lib/subscription";
 import { notifyAllBossUsers } from "@/lib/notifications";
@@ -67,10 +67,15 @@ export async function createProduct(formData: FormData) {
     imagePublicId = result.public_id;
   }
 
+  const branchResult = await getRequiredBranchId(session.user);
+  if ("error" in branchResult) {
+    return { error: { _branch: [REQUIRED_BRANCH_ERROR_MESSAGES[branchResult.error]] } };
+  }
+  const branchId = branchResult.branchId;
+
   // DB unique constraint on sku handles duplicates — no pre-check needed
   let product;
   try {
-    const branchId = (await getActiveBranchId(session.user)) ?? undefined;
     product = await db.product.create({
       data: {
         ...data,
