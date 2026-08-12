@@ -34,12 +34,16 @@ export function LoginForm({ showRegisteredBanner, showVerifiedBanner }: LoginFor
   const onSubmit = async (data: FormData) => {
     setServerError(null);
 
-    // Pre-check email verification before attempting sign-in
-    const { verified } = await checkEmailVerification(data.email);
-    if (!verified) {
-      setUnverifiedEmail(data.email);
-      setServerError("unverified");
-      return;
+    // Pre-check email verification before attempting sign-in (skipped in dev —
+    // verification emails link to the production domain, so local accounts
+    // can never complete this step on localhost)
+    if (process.env.NODE_ENV === "production") {
+      const { verified } = await checkEmailVerification(data.email);
+      if (!verified) {
+        setUnverifiedEmail(data.email);
+        setServerError("unverified");
+        return;
+      }
     }
 
     const result = await signIn("credentials", { ...data, redirect: false });

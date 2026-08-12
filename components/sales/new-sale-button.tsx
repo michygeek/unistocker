@@ -231,11 +231,11 @@ export function NewSaleButton({ products, userName, organizationName }: Props) {
       {scannerOpen && <BarcodeScanner onScan={handleCameraScan} onClose={() => setScannerOpen(false)} />}
 
       {open && (
-        <div className="uni-overlay" style={{ alignItems: "flex-start", paddingTop: 32 }}>
+        <div className="uni-overlay uni-overlay-sheet" style={{ alignItems: "flex-start", paddingTop: 32 }}>
           <div className="uni-overlay-backdrop" onClick={() => setOpen(false)} />
-          <div className="uni-modal" style={{ maxWidth: 820, display: "flex", flexDirection: "column", maxHeight: "90vh" }}>
+          <div className="uni-modal uni-modal-sheet animate-in" style={{ maxWidth: 820, display: "flex", flexDirection: "column", maxHeight: "90vh" }}>
             {/* Header */}
-            <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
+            <div style={{ padding: "14px 18px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
               <h2 style={{ fontSize: 16, fontWeight: 700, color: "var(--text)", margin: 0, display: "flex", alignItems: "center", gap: 8 }}>
                 <ShoppingCart size={16} style={{ color: "var(--accent)" }} /> New Sale
               </h2>
@@ -245,9 +245,11 @@ export function NewSaleButton({ products, userName, organizationName }: Props) {
             </div>
 
             {/* Split body */}
-            <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
+            <div className="flex flex-col sm:flex-row" style={{ flex: 1, overflow: "hidden" }}>
               {/* ── Left: Products ── */}
-              <div style={{ width: "50%", borderRight: "1px solid var(--border)", display: "flex", flexDirection: "column" }}>
+              <div
+                className="w-full sm:w-1/2 flex flex-col border-b sm:border-b-0 sm:border-r border-[var(--border)] max-h-[42vh] sm:max-h-none"
+              >
                 {/* Barcode / search input */}
                 <div style={{ padding: "12px 14px", borderBottom: "1px solid var(--border)", flexShrink: 0 }}>
                   <div style={{ display: "flex", gap: 6 }}>
@@ -308,6 +310,7 @@ export function NewSaleButton({ products, userName, organizationName }: Props) {
                           cursor: p.quantity === 0 ? "not-allowed" : "pointer",
                           opacity: p.quantity === 0 ? 0.45 : 1,
                           textAlign: "left", transition: "all 0.15s", width: "100%",
+                          minWidth: 0,
                         }}
                         onMouseEnter={(e) => {
                           if (p.quantity > 0) {
@@ -320,9 +323,9 @@ export function NewSaleButton({ products, userName, organizationName }: Props) {
                           (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border)";
                         }}
                       >
-                        <div style={{ minWidth: 0 }}>
+                        <div style={{ minWidth: 0, flex: 1 }}>
                           <p style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</p>
-                          <p style={{ fontSize: 11, color: "var(--text-3)", marginTop: 1 }}>
+                          <p style={{ fontSize: 11, color: "var(--text-3)", marginTop: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                             {p.sku}{p.barcode ? ` · ${p.barcode}` : ""} · {stockLabel(p)}
                           </p>
                         </div>
@@ -336,7 +339,7 @@ export function NewSaleButton({ products, userName, organizationName }: Props) {
               </div>
 
               {/* ── Right: Cart ── */}
-              <div style={{ width: "50%", display: "flex", flexDirection: "column" }}>
+              <div className="w-full sm:w-1/2 flex flex-col" style={{ minHeight: 0, flex: 1 }}>
                 <div style={{ flex: 1, overflowY: "auto", padding: "12px 14px" }}>
                   <p style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--text-2)", marginBottom: 10 }}>
                     Cart ({cart.length} item{cart.length !== 1 ? "s" : ""})

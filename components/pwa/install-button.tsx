@@ -6,12 +6,12 @@ import { Download, X, Share } from "lucide-react";
 type Platform = "chrome" | "ios" | null;
 type Variant = "sidebar" | "header";
 
-interface BeforeInstallPromptEvent extends Event {
+export interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 }
 
-function IOSGuide({ onClose }: { onClose: () => void }) {
+export function IOSGuide({ onClose }: { onClose: () => void }) {
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 9999, display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
       <div

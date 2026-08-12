@@ -203,8 +203,99 @@ export function InventoryTable({ products, total, page, limit, userRole, search 
         <button type="submit" className="uni-btn uni-btn-primary">Search</button>
       </form>
 
-      {/* Table card */}
-      <div className="uni-card" style={{ overflow: "hidden" }}>
+      {/* Empty state (mobile only — desktop table shows its own empty row) */}
+      {products.length === 0 && (
+        <div className="uni-card sm:hidden" style={{ textAlign: "center", padding: "48px 24px", color: "var(--text-3)" }}>
+          <Package size={32} style={{ margin: "0 auto 8px", opacity: 0.4 }} />
+          <p>No products found</p>
+        </div>
+      )}
+
+      {/* Mobile: card list */}
+      {products.length > 0 && (
+        <div className="sm:hidden" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {products.map((p) => (
+            <div key={p.id} className="uni-card uni-product-card" style={{ padding: 14 }}>
+              <div style={{ display: "flex", gap: 12 }}>
+                {p.imageUrl ? (
+                  <img src={p.imageUrl} alt={p.name} style={{ width: 48, height: 48, borderRadius: 10, objectFit: "cover", flexShrink: 0 }} />
+                ) : (
+                  <div style={{ width: 48, height: 48, borderRadius: 10, background: "var(--bg-input)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <Package size={18} style={{ color: "var(--text-3)" }} />
+                  </div>
+                )}
+                <div style={{ minWidth: 0, flex: 1 }}>
+                  <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
+                    <div style={{ minWidth: 0, flex: 1 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                        <p style={{ fontWeight: 700, fontSize: 14, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</p>
+                        {p.expirationDate && differenceInDays(new Date(p.expirationDate), new Date()) <= 60 && (
+                          <CalendarClock size={13} style={{ flexShrink: 0, color: differenceInDays(new Date(p.expirationDate), new Date()) <= 30 ? "var(--danger)" : "var(--warning)" }} />
+                        )}
+                      </div>
+                      <p style={{ fontSize: 12, fontFamily: "monospace", color: "var(--text-3)", marginTop: 1 }}>{p.sku}</p>
+                    </div>
+                    <div style={{ textAlign: "right", flexShrink: 0 }}>
+                      <p style={{ fontWeight: 700, fontSize: 15, color: "var(--text)" }}>₦{p.sellingPrice.toFixed(2)}</p>
+                      <p style={{
+                        fontWeight: 700, fontSize: 13, marginTop: 2,
+                        color: p.quantity <= p.lowStockAlert ? "var(--danger)" : p.quantity <= p.lowStockAlert * 2 ? "var(--warning)" : "var(--text-2)",
+                      }}>
+                        {formatQty(p.quantity, p.piecesPerCarton)}
+                      </p>
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 6, flexWrap: "wrap" }}>
+                    {p.category && (
+                      <span style={{ fontSize: 11, fontWeight: 600, padding: "2px 7px", borderRadius: 6, background: "var(--accent-sub)", color: "var(--accent)" }}>
+                        {p.category.name}
+                      </span>
+                    )}
+                    <ExpiryBadge date={p.expirationDate} />
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 4, marginTop: 12, paddingTop: 10, borderTop: "1px solid var(--border)" }}>
+                <ActionBtn
+                  onClick={() => setAdjustModal({ product: p, type: "STOCK_IN" })}
+                  disabled={loading === `${p.id}-STOCK_IN`}
+                  color="var(--accent)" hoverBg="var(--accent-sub)" title="Add stock" size={34}
+                >
+                  <Plus size={16} />
+                </ActionBtn>
+                <ActionBtn
+                  onClick={() => setAdjustModal({ product: p, type: "STOCK_OUT" })}
+                  disabled={loading === `${p.id}-STOCK_OUT`}
+                  color="#fb923c" hoverBg="rgba(251,146,60,0.10)" title="Remove stock" size={34}
+                >
+                  <Minus size={16} />
+                </ActionBtn>
+                <ActionBtn href={`/inventory/${p.id}`} color="var(--info)" hoverBg="rgba(59,130,246,0.10)" title="View details" size={34}>
+                  <Eye size={16} />
+                </ActionBtn>
+                {canEdit && (
+                  <>
+                    <ActionBtn href={`/inventory/${p.id}/edit`} color="var(--text-2)" hoverBg="var(--bg-card-2)" title="Edit" size={34}>
+                      <Edit size={16} />
+                    </ActionBtn>
+                    <ActionBtn
+                      onClick={() => handleDelete(p.id, p.name)}
+                      disabled={loading === p.id}
+                      color="var(--danger)" hoverBg="rgba(239,68,68,0.10)" title="Delete" size={34}
+                    >
+                      <Trash2 size={16} />
+                    </ActionBtn>
+                  </>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Desktop: table card */}
+      <div className="hidden sm:block uni-card" style={{ overflow: "hidden" }}>
         <div style={{ overflowX: "auto" }}>
           <table className="uni-table">
             <thead>
@@ -344,7 +435,7 @@ export function InventoryTable({ products, total, page, limit, userRole, search 
 }
 
 function ActionBtn({
-  children, onClick, href, disabled, color, hoverBg, title,
+  children, onClick, href, disabled, color, hoverBg, title, size = 28,
 }: {
   children: React.ReactNode;
   onClick?: () => void;
@@ -353,10 +444,11 @@ function ActionBtn({
   color: string;
   hoverBg: string;
   title?: string;
+  size?: number;
 }) {
   const style: React.CSSProperties = {
     display: "inline-flex", alignItems: "center", justifyContent: "center",
-    width: 28, height: 28, borderRadius: 7, border: "none", background: "transparent",
+    width: size, height: size, borderRadius: 7, border: "none", background: "transparent",
     color, cursor: disabled ? "not-allowed" : "pointer", opacity: disabled ? 0.5 : 1,
     transition: "background 0.15s", textDecoration: "none",
   };

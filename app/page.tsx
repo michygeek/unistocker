@@ -6,6 +6,7 @@ import {
   ShoppingCart, Globe, Smartphone, Star,
   TrendingUp, AlertTriangle, MessageSquare, Camera, Bot, Zap,
 } from "lucide-react";
+import { InstallPromptPopup } from "@/components/pwa/install-prompt-popup";
 
 /* ─── Design tokens ─────────────────────────────────────────────────────── */
 const C = {
@@ -700,6 +701,7 @@ export default function LandingPage() {
       <Pricing />
       <CTA />
       <Footer />
+      <InstallPromptPopup />
     </div>
   );
 }
