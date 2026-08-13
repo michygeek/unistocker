@@ -128,7 +128,7 @@ export async function recordSale(data: z.infer<typeof SaleSchema>) {
     action: "SALE",
     entity: "Sale",
     entityId: sale.id,
-    description: `Recorded sale #${receiptNumber} — $${finalTotal.toFixed(2)} for ${items.length} item(s): ${itemNames}`,
+    description: `Recorded sale #${receiptNumber} — ₦${finalTotal.toFixed(2)} for ${items.length} item(s): ${itemNames}`,
     metadata: { receiptNumber, total: finalTotal, items: items.length },
   });
 
@@ -136,7 +136,7 @@ export async function recordSale(data: z.infer<typeof SaleSchema>) {
     await notifyAllBossUsers(
       session.user.organizationId,
       "New Sale Recorded",
-      `${session.user.name ?? session.user.email} recorded a sale of $${finalTotal.toFixed(2)} (Receipt: ${receiptNumber})`,
+      `${session.user.name ?? session.user.email} recorded a sale of ₦${finalTotal.toFixed(2)} (Receipt: ${receiptNumber})`,
       "SALE_RECORDED",
       { saleId: sale.id, total: finalTotal }
     );
