@@ -358,10 +358,10 @@ export function NewSaleButton({ products, userName, organizationName }: Props) {
                               <p style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.name}</p>
                               <p style={{ fontSize: 11, color: "var(--text-3)", marginTop: 1 }}>₦{item.sellingPrice.toFixed(2)} / pc</p>
                             </div>
-                            <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text)", width: 72, textAlign: "right" }}>
+                            <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text)", textAlign: "right", whiteSpace: "nowrap", flexShrink: 0 }}>
                               ₦{(item.sellingPrice * totalPieces(item)).toFixed(2)}
                             </span>
-                            <button onClick={() => removeFromCart(item.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--danger)", display: "flex", padding: 2 }}>
+                            <button onClick={() => removeFromCart(item.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--danger)", display: "flex", padding: 2, flexShrink: 0 }}>
                               <Trash2 size={13} />
                             </button>
                           </div>
