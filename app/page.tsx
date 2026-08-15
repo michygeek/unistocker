@@ -533,6 +533,14 @@ const CSS = `
   }
   .lp-footer-name  { font-weight: 800; font-size: 15px; color: ${C.text}; letter-spacing: -0.02em; }
   .lp-footer-tagline { font-size: 13px; color: ${C.text3}; line-height: 1.65; max-width: 230px; margin-bottom: 20px; }
+  .lp-footer-social { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+  .lp-footer-social-link {
+    width: 32px; height: 32px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: ${C.text3}; background: ${C.bgAlt}; border: 1px solid ${C.border};
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+  }
+  .lp-footer-social-link:hover { color: ${C.accent}; border-color: rgba(13,148,136,0.30); background: ${C.accentSub}; }
   .lp-footer-copy  { font-size: 12px; color: ${C.text3}; }
   .lp-footer-col-title {
     font-size: 11px; font-weight: 700; color: ${C.text2};
@@ -693,7 +701,6 @@ export default function LandingPage() {
       <style>{CSS}</style>
       <Nav />
       <Hero />
-      <Logos />
       <AIFeatures />
       <Features />
       <HowItWorks />
@@ -764,22 +771,6 @@ function Hero() {
             <span className="lp-hero-ai-chip"><MessageSquare size={11} /> Business Chat</span>
             <span className="lp-hero-ai-chip"><Camera size={11} /> Photo Product Entry</span>
           </div>
-          <div className="lp-hero-proof anim-4">
-            <div className="lp-proof-stat">
-              <span className="lp-proof-val">500+</span>
-              <span className="lp-proof-lbl">Businesses</span>
-            </div>
-            <div className="lp-proof-sep" />
-            <div className="lp-proof-stat">
-              <span className="lp-proof-val">₦2B+</span>
-              <span className="lp-proof-lbl">Revenue tracked</span>
-            </div>
-            <div className="lp-proof-sep" />
-            <div className="lp-proof-stat">
-              <span className="lp-proof-val">4.9★</span>
-              <span className="lp-proof-lbl">User rating</span>
-            </div>
-          </div>
         </div>
 
         {/* Right — mockup */}
@@ -846,21 +837,6 @@ function Hero() {
         </div>
       </div>
     </section>
-  );
-}
-
-/* ─── Logos ──────────────────────────────────────────────────────────────── */
-function Logos() {
-  const names = ["Supermart NG", "TechHub Lagos", "FoodPlus Abuja", "QuickStock GH", "RetailPro KE"];
-  return (
-    <div className="lp-logos-strip">
-      <div className="lp-logos-inner">
-        <p className="lp-logos-label">Trusted by growing businesses across Africa</p>
-        <div className="lp-logos-row">
-          {names.map((n) => <span key={n} className="lp-logo-name">{n}</span>)}
-        </div>
-      </div>
-    </div>
   );
 }
 
@@ -1049,14 +1025,14 @@ function Testimonials() {
   const reviews = [
     { name: "Emeka O.",  biz: "SuperMart Lagos", quote: "Before UniStocker I was using paper and Excel. Now I know exactly what's in stock at both shops without being there." },
     { name: "Fatima A.", biz: "FoodPlus Abuja",  quote: "The low stock alerts alone saved my business. I used to run out of fast-moving items without warning. Not anymore." },
-    { name: "Kwame B.",  biz: "TechHub Accra",   quote: "Every transaction is logged with the staff name and time. The boss dashboard is everything I needed." },
+    { name: "Tunde K.",  biz: "TechHub Ikeja",   quote: "Every transaction is logged with the staff name and time. The boss dashboard is everything I needed." },
   ];
   return (
     <section className="lp-testi-section">
       <div className="lp-testi-hd">
         <span className="lp-eyebrow-mint">Testimonials</span>
         <h2 className="lp-section-title lp-title-mint">Business owners love it</h2>
-        <p className="lp-section-sub-c lp-sub-mint">Real results from real businesses across Africa.</p>
+        <p className="lp-section-sub-c lp-sub-mint">Real results from real businesses across Nigeria.</p>
       </div>
       <div className="lp-inner-md">
         <div className="lp-reviews-grid">
@@ -1208,6 +1184,31 @@ function CTA() {
   );
 }
 
+/* ─── Social icons (lucide-react ships no brand icons) ──────────────────── */
+function TikTokIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M16.6 5.82c-.9-.98-1.44-2.24-1.53-3.62h-3.14v13.7c0 1.68-1.36 3.04-3.04 3.04a3.04 3.04 0 0 1 0-6.08c.32 0 .62.05.9.14V9.86a6.2 6.2 0 0 0-.9-.07 6.2 6.2 0 1 0 6.2 6.2V9.4a9.3 9.3 0 0 0 4.51 1.16V7.42c-1.06 0-2.04-.32-2.86-.87a5.72 5.72 0 0 1-.94-.73z" />
+    </svg>
+  );
+}
+function InstagramIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+      <rect x="3" y="3" width="18" height="18" rx="5" />
+      <circle cx="12" cy="12" r="4.2" />
+      <circle cx="17.4" cy="6.6" r="1.15" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+function FacebookIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M14.5 21v-7.6h2.55l.38-2.96h-2.93V8.55c0-.86.24-1.44 1.47-1.44h1.57V4.46c-.27-.04-1.2-.12-2.28-.12-2.26 0-3.8 1.38-3.8 3.9v2.18H8.99v2.96h2.47V21h3.04z" />
+    </svg>
+  );
+}
+
 /* ─── Footer ─────────────────────────────────────────────────────────────── */
 function Footer() {
   return (
@@ -1224,6 +1225,17 @@ function Footer() {
           <p className="lp-footer-tagline">
             Inventory management built for African businesses that are ready to grow.
           </p>
+          <div className="lp-footer-social">
+            <a href="https://www.tiktok.com/@unistocker_app" target="_blank" rel="noopener noreferrer" aria-label="UniStocker on TikTok" className="lp-footer-social-link">
+              <TikTokIcon />
+            </a>
+            <a href="https://www.instagram.com/unistocker_app" target="_blank" rel="noopener noreferrer" aria-label="UniStocker on Instagram" className="lp-footer-social-link">
+              <InstagramIcon />
+            </a>
+            <a href="https://www.facebook.com/share/18T66jJhaz/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" aria-label="UniStocker on Facebook" className="lp-footer-social-link">
+              <FacebookIcon />
+            </a>
+          </div>
           <p className="lp-footer-copy">&copy; {new Date().getFullYear()} UniStocker. All rights reserved.</p>
         </div>
         {/* Product */}
