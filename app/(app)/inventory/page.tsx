@@ -33,7 +33,7 @@ export default async function InventoryPage({ searchParams }: { searchParams: Pr
   const showInactive = params.status === "inactive";
 
   const activeBranchId = await getActiveBranchId(session.user);
-  const branchConds = getProductBranchConditions(activeBranchId);
+  const branchConds = getProductBranchConditions(session.user.organizationId, activeBranchId);
 
   const productWhere = {
     AND: [

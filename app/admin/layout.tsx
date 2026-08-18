@@ -7,11 +7,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   if (!session?.user?.isSuperAdmin) redirect("/auth/login");
 
   return (
-    <div style={{ minHeight: "100vh", background: "#080D18", display: "flex" }}>
+    <div style={{ minHeight: "100vh", background: "var(--bg)", display: "flex" }}>
       <AdminSidebar adminEmail={session.user.email ?? ""} />
-      <main style={{ flex: 1, marginLeft: 240, minHeight: "100vh", display: "flex", flexDirection: "column" }}>
-        {children}
-      </main>
+      <main className="flex-1 lg:ml-64 min-h-screen flex flex-col min-w-0">{children}</main>
     </div>
   );
 }

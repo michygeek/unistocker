@@ -29,7 +29,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
     db.notification.count({ where: { userId: session.user.id, readAt: null, status: "SENT" } }),
   ]);
 
-  if (!product) notFound();
+  if (!product || (product.organizationId ?? "none") !== (session.user.organizationId ?? "none")) notFound();
 
   return (
     <div className="flex flex-col flex-1">

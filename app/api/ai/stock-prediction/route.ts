@@ -31,7 +31,8 @@ export async function POST(req: NextRequest) {
     const products = await db.product.findMany({
       where: {
         isActive: true,
-        ...(productIds ? { id: { in: productIds } } : { organizationId: session.user.organizationId ?? undefined }),
+        organizationId: session.user.organizationId ?? "none",
+        ...(productIds ? { id: { in: productIds } } : {}),
       },
       select: { id: true, name: true, quantity: true, lowStockAlert: true, organizationId: true },
     });

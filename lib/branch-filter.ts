@@ -48,14 +48,25 @@ export const REQUIRED_BRANCH_ERROR_MESSAGES: Record<RequiredBranchError, string>
   NOT_ASSIGNED: "You haven't been assigned to a branch yet. Contact your admin.",
 };
 
-// Returns AND conditions for product queries (strict branch isolation)
-export function getProductBranchConditions(branchId: string | null): Prisma.ProductWhereInput[] {
-  if (!branchId) return [];
-  return [{ branchId }];
+// Returns AND conditions for product queries. Always enforces the
+// organization boundary (the tenant isolation floor) and, when a branch is
+// active, adds branch-level isolation on top of it.
+export function getProductBranchConditions(
+  organizationId: string | null | undefined,
+  branchId: string | null
+): Prisma.ProductWhereInput[] {
+  const conds: Prisma.ProductWhereInput[] = [{ organizationId: organizationId ?? "none" }];
+  if (branchId) conds.push({ branchId });
+  return conds;
 }
 
-// Returns AND conditions for sale queries (branch-specific only)
-export function getSaleBranchConditions(branchId: string | null): Prisma.SaleWhereInput[] {
-  if (!branchId) return [];
-  return [{ branchId }];
+// Returns AND conditions for sale queries. Always enforces the organization
+// boundary, plus branch-level isolation when a branch is active.
+export function getSaleBranchConditions(
+  organizationId: string | null | undefined,
+  branchId: string | null
+): Prisma.SaleWhereInput[] {
+  const conds: Prisma.SaleWhereInput[] = [{ organizationId: organizationId ?? "none" }];
+  if (branchId) conds.push({ branchId });
+  return conds;
 }

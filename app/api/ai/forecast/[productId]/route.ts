@@ -30,6 +30,9 @@ export async function POST(
       select: { id: true, name: true, quantity: true, lowStockAlert: true, organizationId: true },
     });
     if (!product) return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    if ((product.organizationId ?? "none") !== (session.user.organizationId ?? "none")) {
+      return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    }
 
     // Return fresh cache if available
     const cached = await db.demandForecast.findFirst({

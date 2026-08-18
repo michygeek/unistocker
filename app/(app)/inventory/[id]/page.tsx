@@ -58,7 +58,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
     db.demandForecast.findFirst({ where: { productId: id }, orderBy: { createdAt: "desc" } }),
   ]);
 
-  if (!product) notFound();
+  if (!product || (product.organizationId ?? "none") !== (session.user.organizationId ?? "none")) notFound();
 
   const costPrice = Number(product.costPrice);
   const sellingPrice = Number(product.sellingPrice);

@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { Building2, Users, CreditCard, TrendingUp, Package, ShoppingCart } from "lucide-react";
+import { StatsCard } from "@/components/dashboard/stats-card";
 import { PLAN_BADGE } from "@/lib/plans";
 import type { Metadata } from "next";
 
@@ -48,49 +49,40 @@ export default async function AdminPage() {
   subscriptions.forEach(s => { planBreakdown[s.plan] = (planBreakdown[s.plan] ?? 0) + 1; });
 
   const stats = [
-    { label: "Organizations", value: orgCount, icon: Building2, color: "#0D9488", bg: "rgba(13,148,136,0.12)" },
-    { label: "Total Users", value: userCount, icon: Users, color: "#3b82f6", bg: "rgba(59,130,246,0.12)" },
-    { label: "Active Subscriptions", value: activeSubscriptions.length, icon: CreditCard, color: "#a855f7", bg: "rgba(168,85,247,0.12)" },
-    { label: "Monthly Revenue (₦)", value: `₦${mrr.toLocaleString()}`, icon: TrendingUp, color: "#10b981", bg: "rgba(16,185,129,0.12)" },
-    { label: "Total Products", value: productCount.toLocaleString(), icon: Package, color: "#f59e0b", bg: "rgba(245,158,11,0.12)" },
-    { label: "Total Sales", value: saleCount.toLocaleString(), icon: ShoppingCart, color: "#f87171", bg: "rgba(248,113,113,0.12)" },
+    { title: "Organizations", value: orgCount, icon: Building2, color: "green" as const },
+    { title: "Total Users", value: userCount, icon: Users, color: "blue" as const },
+    { title: "Active Subscriptions", value: activeSubscriptions.length, icon: CreditCard, color: "purple" as const },
+    { title: "Monthly Revenue", value: `₦${mrr.toLocaleString()}`, icon: TrendingUp, color: "green" as const },
+    { title: "Total Products", value: productCount.toLocaleString(), icon: Package, color: "yellow" as const },
+    { title: "Total Sales", value: saleCount.toLocaleString(), icon: ShoppingCart, color: "red" as const },
   ];
 
   return (
-    <div style={{ padding: "32px 32px" }}>
+    <div style={{ flex: 1, padding: 24 }}>
       {/* Header */}
-      <div style={{ marginBottom: 32 }}>
-        <h1 style={{ margin: "0 0 4px", fontSize: 26, fontWeight: 800, color: "#f1f5f9", letterSpacing: "-0.02em" }}>
+      <div style={{ marginBottom: 24 }}>
+        <h1 className="lg:ml-0" style={{ margin: "0 0 4px", marginLeft: 48, fontSize: 22, fontWeight: 700, color: "var(--text)", letterSpacing: "-0.02em" }}>
           Platform Overview
         </h1>
-        <p style={{ margin: 0, fontSize: 14, color: "rgba(255,255,255,0.4)" }}>
+        <p style={{ margin: 0, fontSize: 13, color: "var(--text-2)" }}>
           Real-time stats across all UniStocker organizations
         </p>
       </div>
 
       {/* Stats grid */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 32 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16, marginBottom: 24 }}>
         {stats.map((s) => (
-          <div key={s.label} style={{
-            background: "#0C1528", border: "1px solid rgba(255,255,255,0.07)",
-            borderRadius: 16, padding: "20px 22px", display: "flex", alignItems: "center", gap: 16,
-          }}>
-            <div style={{ width: 46, height: 46, borderRadius: 12, background: s.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-              <s.icon size={20} style={{ color: s.color }} />
-            </div>
-            <div>
-              <div style={{ fontSize: 24, fontWeight: 900, color: "#f1f5f9", letterSpacing: "-0.03em", lineHeight: 1 }}>{s.value}</div>
-              <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginTop: 4 }}>{s.label}</div>
-            </div>
-          </div>
+          <StatsCard key={s.title} title={s.title} value={s.value} icon={s.icon} color={s.color} />
         ))}
       </div>
 
       {/* Plan breakdown + recent orgs */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 20 }}>
+      <div className="admin-grid" style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 16 }}>
+        <style>{`@media (max-width: 900px) { .admin-grid { grid-template-columns: 1fr !important; } }`}</style>
+
         {/* Plan breakdown */}
-        <div style={{ background: "#0C1528", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 16, padding: "22px 24px" }}>
-          <h2 style={{ margin: "0 0 20px", fontSize: 15, fontWeight: 700, color: "#f1f5f9" }}>Plan Breakdown</h2>
+        <div className="uni-card" style={{ padding: "22px 24px" }}>
+          <h2 style={{ margin: "0 0 20px", fontSize: 15, fontWeight: 700, color: "var(--text)" }}>Plan Breakdown</h2>
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             {(["FREE", "BUSINESS", "ENTERPRISE"] as const).map((plan) => {
               const count = planBreakdown[plan] ?? 0;
@@ -100,9 +92,9 @@ export default async function AdminPage() {
                 <div key={plan}>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, fontSize: 13 }}>
                     <span style={{ fontWeight: 700, color: badge.color }}>{plan}</span>
-                    <span style={{ color: "rgba(255,255,255,0.5)" }}>{count} org{count !== 1 ? "s" : ""} · {pct}%</span>
+                    <span style={{ color: "var(--text-2)" }}>{count} org{count !== 1 ? "s" : ""} · {pct}%</span>
                   </div>
-                  <div style={{ height: 6, background: "rgba(255,255,255,0.06)", borderRadius: 99, overflow: "hidden" }}>
+                  <div style={{ height: 6, background: "var(--bg-input)", borderRadius: 99, overflow: "hidden" }}>
                     <div style={{ width: `${pct}%`, height: "100%", background: badge.color, borderRadius: 99, opacity: 0.7 }} />
                   </div>
                 </div>
@@ -112,10 +104,10 @@ export default async function AdminPage() {
         </div>
 
         {/* Recent orgs */}
-        <div style={{ background: "#0C1528", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 16, padding: "22px 24px" }}>
+        <div className="uni-card" style={{ padding: "22px 24px" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-            <h2 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: "#f1f5f9" }}>Recent Signups</h2>
-            <a href="/admin/organizations" style={{ fontSize: 12, color: "#0D9488", textDecoration: "none", fontWeight: 600 }}>View all →</a>
+            <h2 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: "var(--text)" }}>Recent Signups</h2>
+            <a href="/admin/organizations" style={{ fontSize: 12, color: "var(--accent)", textDecoration: "none", fontWeight: 600 }}>View all →</a>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
             {recentOrgs.map((org) => {
@@ -124,18 +116,18 @@ export default async function AdminPage() {
               return (
                 <div key={org.id} style={{
                   display: "flex", alignItems: "center", gap: 12, padding: "10px 12px",
-                  borderRadius: 10, background: "rgba(255,255,255,0.02)",
-                  border: "1px solid rgba(255,255,255,0.04)",
+                  borderRadius: 10, background: "var(--bg-input)",
+                  border: "1px solid var(--border)",
                 }}>
-                  <div style={{ width: 34, height: 34, borderRadius: 9, background: "rgba(13,148,136,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    <span style={{ fontSize: 13, fontWeight: 800, color: "#0D9488" }}>{org.name.charAt(0).toUpperCase()}</span>
+                  <div style={{ width: 34, height: 34, borderRadius: 9, background: "var(--accent-sub)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <span style={{ fontSize: 13, fontWeight: 800, color: "var(--accent)" }}>{org.name.charAt(0).toUpperCase()}</span>
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: "#e2e8f0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{org.name}</p>
-                    <p style={{ margin: 0, fontSize: 11, color: "rgba(255,255,255,0.35)" }}>{org._count.users} user{org._count.users !== 1 ? "s" : ""} · {org._count.products} products</p>
+                    <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{org.name}</p>
+                    <p style={{ margin: 0, fontSize: 11, color: "var(--text-3)" }}>{org._count.users} user{org._count.users !== 1 ? "s" : ""} · {org._count.products} products</p>
                   </div>
                   <span style={{ padding: "2px 9px", borderRadius: 99, background: badge.bg, color: badge.color, fontSize: 10, fontWeight: 800 }}>{plan}</span>
-                  <span style={{ fontSize: 11, color: "rgba(255,255,255,0.25)", flexShrink: 0 }}>
+                  <span style={{ fontSize: 11, color: "var(--text-3)", flexShrink: 0 }}>
                     {new Date(org.createdAt).toLocaleDateString("en-NG", { day: "numeric", month: "short" })}
                   </span>
                 </div>

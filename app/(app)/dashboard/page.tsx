@@ -24,9 +24,10 @@ export default async function DashboardPage() {
   const now = new Date();
   const sevenDaysAgo = subDays(now, 7);
 
+  const orgId = session.user.organizationId ?? "none";
   const activeBranchId = await getActiveBranchId(session.user);
-  const productBranchConds = getProductBranchConditions(activeBranchId);
-  const saleBranchConds = getSaleBranchConditions(activeBranchId);
+  const productBranchConds = getProductBranchConditions(session.user.organizationId, activeBranchId);
+  const saleBranchConds = getSaleBranchConditions(session.user.organizationId, activeBranchId);
 
   const [
     totalProducts,
@@ -52,20 +53,22 @@ export default async function DashboardPage() {
       orderBy: { quantity: "asc" },
     }).then((rows) => rows.filter((p) => p.quantity <= p.lowStockAlert).slice(0, 5)),
     db.activityLog.findMany({
+      where: { user: { organizationId: orgId } },
       orderBy: { createdAt: "desc" },
       take: 10,
       include: { user: { select: { name: true, email: true } } },
     }),
-    db.user.count({ where: { isActive: true, isSuperAdmin: false, organizationId: session.user.organizationId ?? "none", ...(activeBranchId ? { branchId: activeBranchId } : {}) } }),
+    db.user.count({ where: { isActive: true, isSuperAdmin: false, organizationId: orgId, ...(activeBranchId ? { branchId: activeBranchId } : {}) } }),
     db.notification.count({ where: { userId: session.user.id, readAt: null, status: "SENT" } }),
-    db.stockPrediction.count({ where: { urgencyLevel: "CRITICAL", product: { isActive: true } } }),
+    db.stockPrediction.count({ where: { urgencyLevel: "CRITICAL", product: { isActive: true, organizationId: orgId } } }),
     db.demandForecast.count({
       where: {
         reorderByDate: { lte: new Date(Date.now() + 7 * 86400000) },
         createdAt: { gte: subDays(new Date(), 4) },
+        product: { organizationId: orgId },
       },
     }),
-    db.weeklyInsight.findFirst({ where: { organizationId: session.user.organizationId ?? "none" }, orderBy: { createdAt: "desc" } }),
+    db.weeklyInsight.findFirst({ where: { organizationId: orgId }, orderBy: { createdAt: "desc" } }),
   ]);
 
   const chartData = await Promise.all(

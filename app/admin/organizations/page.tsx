@@ -33,12 +33,12 @@ export default async function AdminOrgsPage() {
   }));
 
   return (
-    <div style={{ padding: "32px" }}>
-      <div style={{ marginBottom: 28 }}>
-        <h1 style={{ margin: "0 0 4px", fontSize: 24, fontWeight: 800, color: "#f1f5f9", letterSpacing: "-0.02em" }}>
+    <div style={{ flex: 1, padding: 24 }}>
+      <div style={{ marginBottom: 24 }}>
+        <h1 className="lg:ml-0" style={{ margin: "0 0 4px", marginLeft: 48, fontSize: 22, fontWeight: 700, color: "var(--text)", letterSpacing: "-0.02em" }}>
           Organizations
         </h1>
-        <p style={{ margin: 0, fontSize: 14, color: "rgba(255,255,255,0.4)" }}>
+        <p style={{ margin: 0, fontSize: 13, color: "var(--text-2)" }}>
           {orgs.length} total organization{orgs.length !== 1 ? "s" : ""}
         </p>
       </div>

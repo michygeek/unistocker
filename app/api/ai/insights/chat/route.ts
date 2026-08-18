@@ -24,7 +24,8 @@ export async function POST(req: NextRequest) {
     }
     await logAiRequest(session.user.organizationId!, session.user.id, "chat");
 
-    // Fetch live business context
+    // Fetch live business context — strictly scoped to the caller's organization
+    const orgId = session.user.organizationId ?? "none";
     const since30 = subDays(new Date(), 30);
     const since7 = subDays(new Date(), 7);
 
@@ -32,29 +33,30 @@ export async function POST(req: NextRequest) {
       db.sale.aggregate({
         _sum: { total: true, profit: true },
         _count: true,
-        where: { createdAt: { gte: since30 } },
+        where: { organizationId: orgId, createdAt: { gte: since30 } },
       }),
       db.sale.aggregate({
         _sum: { total: true, profit: true },
         _count: true,
-        where: { createdAt: { gte: since7 } },
+        where: { organizationId: orgId, createdAt: { gte: since7 } },
       }),
       db.$queryRaw<Array<{ name: string; revenue: number; units: number }>>`
         SELECT p.name, SUM(si.total)::float AS revenue, SUM(si.quantity)::int AS units
         FROM "SaleItem" si
         JOIN "Product" p ON p.id = si."productId"
         JOIN "Sale" s ON s.id = si."saleId"
-        WHERE s."createdAt" >= ${since30}
+        WHERE s."createdAt" >= ${since30} AND s."organizationId" = ${orgId}
         GROUP BY p.id, p.name
         ORDER BY revenue DESC
         LIMIT 10
       `,
       db.product.findMany({
-        where: { isActive: true, quantity: { lte: db.product.fields.lowStockAlert } },
+        where: { isActive: true, organizationId: orgId, quantity: { lte: db.product.fields.lowStockAlert } },
         select: { name: true, quantity: true, lowStockAlert: true },
         take: 5,
       }).catch(() => []),
       db.activityLog.findMany({
+        where: { user: { organizationId: orgId } },
         orderBy: { createdAt: "desc" },
         take: 10,
         include: { user: { select: { name: true, role: true } } },

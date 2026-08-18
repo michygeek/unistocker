@@ -41,7 +41,7 @@ export async function recordSale(data: z.infer<typeof SaleSchema>) {
 
   const productIds = items.map((i) => i.productId);
   const products = await db.product.findMany({
-    where: { id: { in: productIds }, isActive: true },
+    where: { id: { in: productIds }, isActive: true, organizationId: session.user.organizationId ?? "none" },
   });
 
   if (products.length !== productIds.length) {

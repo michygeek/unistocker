@@ -29,7 +29,8 @@ export async function POST(req: NextRequest) {
     const products = await db.product.findMany({
       where: {
         isActive: true,
-        ...(branchId ? { branchId } : { organizationId: session.user.organizationId ?? undefined }),
+        organizationId: session.user.organizationId ?? "none",
+        ...(branchId ? { branchId } : {}),
       },
       select: { id: true, name: true, quantity: true, lowStockAlert: true },
       take: BATCH_LIMIT,

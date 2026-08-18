@@ -26,63 +26,63 @@ export default async function AdminUsersPage() {
     },
   });
 
-  const COL = "rgba(255,255,255,0.35)";
-
   return (
-    <div style={{ padding: "32px" }}>
-      <div style={{ marginBottom: 28 }}>
-        <h1 style={{ margin: "0 0 4px", fontSize: 24, fontWeight: 800, color: "#f1f5f9", letterSpacing: "-0.02em" }}>
+    <div style={{ flex: 1, padding: 24 }}>
+      <div style={{ marginBottom: 24 }}>
+        <h1 className="lg:ml-0" style={{ margin: "0 0 4px", marginLeft: 48, fontSize: 22, fontWeight: 700, color: "var(--text)", letterSpacing: "-0.02em" }}>
           Users
         </h1>
-        <p style={{ margin: 0, fontSize: 14, color: COL }}>{users.length} total users</p>
+        <p style={{ margin: 0, fontSize: 13, color: "var(--text-2)" }}>{users.length} total users</p>
       </div>
 
-      <div style={{ background: "#0C1528", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 16, overflow: "hidden" }}>
-        <div style={{
-          display: "grid", gridTemplateColumns: "2fr 2fr 1fr 0.8fr 0.8fr 1fr",
-          padding: "12px 18px", borderBottom: "1px solid rgba(255,255,255,0.06)",
-          fontSize: 11, fontWeight: 700, color: COL, textTransform: "uppercase", letterSpacing: "0.05em",
-        }}>
-          <span>Name / Email</span>
-          <span>Organization</span>
-          <span>Role</span>
-          <span>Branch</span>
-          <span>Status</span>
-          <span>Joined</span>
+      <div className="uni-card" style={{ overflow: "hidden" }}>
+        <div style={{ overflowX: "auto" }}>
+          <table className="uni-table">
+            <thead>
+              <tr>
+                <th>Name / Email</th>
+                <th>Organization</th>
+                <th>Role</th>
+                <th>Branch</th>
+                <th>Status</th>
+                <th>Joined</th>
+              </tr>
+            </thead>
+            <tbody>
+              {users.map((user) => {
+                const roleStyle = ROLE_STYLE[user.role] ?? ROLE_STYLE.STAFF;
+
+                return (
+                  <tr key={user.id}>
+                    <td>
+                      <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: "var(--text)" }}>{user.name ?? "—"}</p>
+                      <p style={{ margin: 0, fontSize: 11, color: "var(--text-3)" }}>{user.email}</p>
+                    </td>
+                    <td style={{ color: "var(--text)" }}>{user.organization?.name ?? "—"}</td>
+                    <td>
+                      <span style={{ padding: "3px 9px", borderRadius: 99, background: roleStyle.bg, color: roleStyle.color, fontSize: 11, fontWeight: 700 }}>
+                        {user.role}
+                      </span>
+                    </td>
+                    <td style={{ fontSize: 12, color: "var(--text-3)" }}>{user.branch?.name ?? "—"}</td>
+                    <td>
+                      <span style={{
+                        padding: "3px 9px", borderRadius: 99, fontSize: 11, fontWeight: 700,
+                        background: user.isActive ? "rgba(16,185,129,0.15)" : "rgba(239,68,68,0.15)",
+                        color: user.isActive ? "#34d399" : "#f87171",
+                      }}>
+                        {user.isActive ? "Active" : "Inactive"}
+                      </span>
+                    </td>
+                    <td style={{ fontSize: 12, color: "var(--text-3)" }}>
+                      {new Date(user.createdAt).toLocaleDateString("en-NG", { day: "numeric", month: "short", year: "numeric" })}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
-
-        {users.map((user, i) => {
-          const roleStyle = ROLE_STYLE[user.role] ?? ROLE_STYLE.STAFF;
-          const isEven = i % 2 === 0;
-
-          return (
-            <div key={user.id} style={{
-              display: "grid", gridTemplateColumns: "2fr 2fr 1fr 0.8fr 0.8fr 1fr",
-              padding: "13px 18px", alignItems: "center",
-              background: isEven ? "transparent" : "rgba(255,255,255,0.015)",
-              borderBottom: "1px solid rgba(255,255,255,0.04)",
-            }}>
-              <div>
-                <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: "#e2e8f0" }}>{user.name ?? "—"}</p>
-                <p style={{ margin: 0, fontSize: 11, color: COL }}>{user.email}</p>
-              </div>
-              <span style={{ fontSize: 13, color: "#e2e8f0" }}>{user.organization?.name ?? "—"}</span>
-              <span style={{ padding: "3px 9px", borderRadius: 99, background: roleStyle.bg, color: roleStyle.color, fontSize: 11, fontWeight: 700, width: "fit-content" }}>
-                {user.role}
-              </span>
-              <span style={{ fontSize: 12, color: COL }}>{user.branch?.name ?? "—"}</span>
-              <span style={{ padding: "3px 9px", borderRadius: 99, fontSize: 11, fontWeight: 700, width: "fit-content",
-                background: user.isActive ? "rgba(16,185,129,0.15)" : "rgba(239,68,68,0.15)",
-                color: user.isActive ? "#34d399" : "#f87171",
-              }}>
-                {user.isActive ? "Active" : "Inactive"}
-              </span>
-              <span style={{ fontSize: 12, color: COL }}>
-                {new Date(user.createdAt).toLocaleDateString("en-NG", { day: "numeric", month: "short", year: "numeric" })}
-              </span>
-            </div>
-          );
-        })}
       </div>
     </div>
   );

@@ -297,10 +297,15 @@ export async function updateStaffStatus(userId: string, isActive: boolean) {
   if (!session?.user) throw new Error("Unauthorized");
   if (!hasPermission(session.user.role, "staff:write")) throw new Error("Forbidden");
 
+  const target = await db.user.findFirst({
+    where: { id: userId, organizationId: session.user.organizationId ?? "none" },
+    select: { role: true },
+  });
+  if (!target) throw new Error("User not found");
+
   // Managers cannot activate/deactivate a boss account
-  if (session.user.role === "MANAGER") {
-    const target = await db.user.findUnique({ where: { id: userId }, select: { role: true } });
-    if (target?.role === "BOSS") throw new Error("Managers cannot modify boss accounts");
+  if (session.user.role === "MANAGER" && target.role === "BOSS") {
+    throw new Error("Managers cannot modify boss accounts");
   }
 
   await db.user.update({ where: { id: userId }, data: { isActive } });

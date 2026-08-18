@@ -18,8 +18,8 @@ export default async function SalesPage({ searchParams }: { searchParams: Promis
   const limit = 20;
 
   const activeBranchId = await getActiveBranchId(session.user);
-  const saleConds = getSaleBranchConditions(activeBranchId);
-  const productConds = getProductBranchConditions(activeBranchId);
+  const saleConds = getSaleBranchConditions(session.user.organizationId, activeBranchId);
+  const productConds = getProductBranchConditions(session.user.organizationId, activeBranchId);
 
   const where = { AND: saleConds };
 

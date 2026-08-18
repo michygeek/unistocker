@@ -29,6 +29,7 @@ export default async function StockAlertsPage() {
   }
 
   const predictions = await db.stockPrediction.findMany({
+    where: { product: { organizationId: session.user.organizationId ?? "none" } },
     include: {
       product: { select: { id: true, name: true, sku: true, quantity: true, lowStockAlert: true } },
     },

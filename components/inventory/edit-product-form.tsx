@@ -21,7 +21,10 @@ const schema = z.object({
   pieces: z.coerce.number().int().min(0).default(0),
   quantity: z.coerce.number().int().min(0).optional(),
   lowStockAlert: z.coerce.number().int().min(0),
-  piecesPerCarton: z.coerce.number().int().min(1).optional(),
+  piecesPerCarton: z.preprocess(
+    (v) => (v === "" || v === undefined ? undefined : v),
+    z.coerce.number().int().min(1).optional()
+  ),
   expirationDate: z.string().optional(),
   barcode: z.string().optional(),
   categoryId: z.string().optional(),
@@ -178,7 +181,9 @@ export function EditProductForm({ product, categories }: Props) {
             <div>
               <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--text-2)", marginBottom: 6 }}>Pieces per Carton</label>
               <input {...register("piecesPerCarton")} type="number" min={1} placeholder="e.g. 12" className="uni-input" />
-              <p style={{ fontSize: 12, color: "var(--text-3)", marginTop: 3 }}>Leave blank if no carton</p>
+              {errors.piecesPerCarton
+                ? <p style={{ fontSize: 12, color: "var(--danger)", marginTop: 3 }}>{errors.piecesPerCarton.message}</p>
+                : <p style={{ fontSize: 12, color: "var(--text-3)", marginTop: 3 }}>Leave blank if no carton</p>}
             </div>
 
             {/* Cost Price */}

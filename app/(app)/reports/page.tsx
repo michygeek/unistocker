@@ -54,8 +54,8 @@ export default async function ReportsPage({
   const toStr = toInputDate(toDate);
 
   const activeBranchId = await getActiveBranchId(session.user);
-  const saleConds = getSaleBranchConditions(activeBranchId);
-  const branchWhere = saleConds.length > 0 ? { AND: saleConds } : {};
+  const saleConds = getSaleBranchConditions(session.user.organizationId, activeBranchId);
+  const branchWhere = { AND: saleConds };
 
   const [allTimeStats, rangeStats, rangeSales, topProducts] = await Promise.all([
     db.sale.aggregate({

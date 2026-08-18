@@ -30,7 +30,7 @@ export default async function ForecastingPage() {
 
   // Load all active products with their latest forecast
   const products = await db.product.findMany({
-    where: { isActive: true },
+    where: { isActive: true, organizationId: session.user.organizationId ?? "none" },
     select: {
       id: true,
       name: true,

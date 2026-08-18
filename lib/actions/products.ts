@@ -138,7 +138,9 @@ export async function updateProduct(productId: string, formData: FormData) {
   if (!parsed.success) return { error: parsed.error.flatten().fieldErrors };
 
   const existing = await db.product.findUnique({ where: { id: productId } });
-  if (!existing) return { error: "Product not found" };
+  if (!existing || (existing.organizationId ?? "none") !== (session.user.organizationId ?? "none")) {
+    return { error: "Product not found" };
+  }
 
   const priceChanged =
     parsed.data.sellingPrice !== undefined &&
@@ -203,7 +205,9 @@ export async function adjustStock(
   if (!hasPermission(session.user.role, "products:write")) throw new Error("Forbidden");
 
   const product = await db.product.findUnique({ where: { id: productId } });
-  if (!product) throw new Error("Product not found");
+  if (!product || (product.organizationId ?? "none") !== (session.user.organizationId ?? "none")) {
+    throw new Error("Product not found");
+  }
 
   const delta = type === "STOCK_OUT" ? -Math.abs(quantity) : Math.abs(quantity);
   const newQty = product.quantity + delta;
@@ -250,7 +254,9 @@ export async function deleteProduct(productId: string) {
   if (!hasPermission(session.user.role, "products:delete")) throw new Error("Forbidden");
 
   const product = await db.product.findUnique({ where: { id: productId } });
-  if (!product) return { error: "Product not found" };
+  if (!product || (product.organizationId ?? "none") !== (session.user.organizationId ?? "none")) {
+    return { error: "Product not found" };
+  }
 
   if (product.imagePublicId) {
     await cloudinary.uploader.destroy(product.imagePublicId).catch(console.error);
