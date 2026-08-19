@@ -27,8 +27,8 @@ export default auth(function proxy(request) {
   if (pathname.startsWith("/api/paystack")) return;
   if (pathname.startsWith("/api/auth/verify-email")) return;
 
-  // Landing page: publicly accessible
-  if (pathname === "/") return;
+  // Landing + legal pages: publicly accessible
+  if (pathname === "/" || pathname === "/privacy" || pathname === "/terms") return;
 
   // All other routes: require authentication
   if (!session?.user) {
