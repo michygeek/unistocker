@@ -130,7 +130,7 @@ export function InstallPromptPopup() {
       }}>
         <div style={{
           width: 44, height: 44, borderRadius: 12, flexShrink: 0,
-          background: "#0D9488", display: "flex", alignItems: "center", justifyContent: "center",
+          background: "#0C973A", display: "flex", alignItems: "center", justifyContent: "center",
           overflow: "hidden",
         }}>
           <Image src="/icons/icon-96x96.png" alt="" width={30} height={30} style={{ objectFit: "contain" }} />

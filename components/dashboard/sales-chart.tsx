@@ -19,7 +19,7 @@ export function SalesChart({ data, rangeLabel }: { data: SalesData[]; rangeLabel
     return () => observer.disconnect();
   }, []);
 
-  const revenueColor = isDark ? "#2DD4BF" : "#0D9488";
+  const revenueColor = isDark ? "#64ED80" : "#0C973A";
   const profitColor  = isDark ? "#60a5fa" : "#3b82f6";
 
   return (

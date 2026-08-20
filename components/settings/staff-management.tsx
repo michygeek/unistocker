@@ -184,7 +184,7 @@ export function StaffManagement({
                       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                         <div style={{
                           width: 34, height: 34, borderRadius: "50%", flexShrink: 0,
-                          background: "linear-gradient(135deg, #0D9488, #042F2E)",
+                          background: "linear-gradient(135deg, #0C973A, #0F172A)",
                           display: "flex", alignItems: "center", justifyContent: "center",
                         }}>
                           <span style={{ color: "#FFFFFF", fontSize: 12, fontWeight: 700 }}>

@@ -126,7 +126,7 @@ export default async function ReportsPage({
     qty: Number(t._sum.quantity ?? 0),
   }));
 
-  const rankColors = ["#0D9488", "#60a5fa", "#c084fc", "#fbbf24", "#fb923c"];
+  const rankColors = ["#0C973A", "#60a5fa", "#c084fc", "#fbbf24", "#fb923c"];
 
   const rangeLabel = fromStr === toStr
     ? format(fromDate, "MMM d, yyyy")

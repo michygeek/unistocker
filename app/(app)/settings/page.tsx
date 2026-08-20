@@ -46,7 +46,7 @@ export default async function SettingsPage() {
             }}>
               <div style={{
                 width: 56, height: 56, borderRadius: 16, flexShrink: 0,
-                background: "linear-gradient(135deg, #0D9488, #042F2E)",
+                background: "linear-gradient(135deg, #0C973A, #0F172A)",
                 display: "flex", alignItems: "center", justifyContent: "center",
               }}>
                 <span style={{ color: "#FFFFFF", fontSize: 22, fontWeight: 800 }}>

@@ -52,10 +52,10 @@ export function VerifyEmailClient({ email, isExpired }: Props) {
           <>
             <div style={{
               width: 64, height: 64, borderRadius: "50%",
-              background: "rgba(13,148,136,0.15)", display: "flex",
+              background: "rgba(12,151,58,0.15)", display: "flex",
               alignItems: "center", justifyContent: "center", marginBottom: 24,
             }}>
-              <Mail size={32} style={{ color: "#0D9488" }} />
+              <Mail size={32} style={{ color: "#0C973A" }} />
             </div>
             <h1 className="auth-form-heading" style={{ marginBottom: 8 }}>Check your email</h1>
             <p className="auth-form-sub" style={{ marginBottom: 8 }}>
@@ -75,8 +75,8 @@ export function VerifyEmailClient({ email, isExpired }: Props) {
         {sent ? (
           <div style={{
             display: "flex", alignItems: "center", gap: 8, padding: "12px 20px",
-            borderRadius: 10, background: "rgba(13,148,136,0.12)",
-            border: "1px solid rgba(13,148,136,0.3)", color: "#2DD4BF",
+            borderRadius: 10, background: "rgba(12,151,58,0.12)",
+            border: "1px solid rgba(12,151,58,0.3)", color: "#64ED80",
             fontSize: 14, fontWeight: 600,
           }}>
             <CheckCircle2 size={16} />

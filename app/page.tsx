@@ -13,8 +13,8 @@ import { AppShowcase } from "@/components/landing/app-showcase";
 import { FAQ } from "@/components/landing/faq";
 
 /* ─── Static (theme-independent) accents ───────────────────────────────── */
-const ACCENT = "#0D9488";
-const ACCENT_2 = "#0F766E";
+const ACCENT = "#0C973A";
+const ACCENT_2 = "#0A7B30";
 
 /* ─── CSS ────────────────────────────────────────────────────────────────── */
 const CSS = `
@@ -27,13 +27,13 @@ const CSS = `
     --lp-soft: #F3FAF8;
     --lp-soft-border: #DCEEE8;
     --lp-nav-bg: rgba(255,255,255,0.82);
-    --lp-glow: rgba(13,148,136,0.10);
+    --lp-glow: rgba(12,151,58,0.10);
   }
   .dark .lp {
-    --lp-soft: rgba(45,212,191,0.045);
-    --lp-soft-border: rgba(45,212,191,0.14);
+    --lp-soft: rgba(100,237,128,0.045);
+    --lp-soft-border: rgba(100,237,128,0.14);
     --lp-nav-bg: rgba(15,23,42,0.82);
-    --lp-glow: rgba(45,212,191,0.14);
+    --lp-glow: rgba(100,237,128,0.14);
   }
   .lp a { text-decoration: none; }
 
@@ -59,8 +59,8 @@ const CSS = `
     to   { opacity: 1; transform: scale(1); }
   }
   @keyframes glowPulse {
-    0%, 100% { box-shadow: 0 4px 20px rgba(13,148,136,0.24); }
-    50%       { box-shadow: 0 4px 40px rgba(13,148,136,0.46); }
+    0%, 100% { box-shadow: 0 4px 20px rgba(12,151,58,0.24); }
+    50%       { box-shadow: 0 4px 40px rgba(12,151,58,0.46); }
   }
   @keyframes lineGrow {
     from { transform: scaleX(0); }
@@ -90,10 +90,39 @@ const CSS = `
   .lp-feat-card:nth-child(8) { animation: scaleIn 0.45s 0.42s ease both; }
 
   /* ══════════════════════════════════════════════
+     MARQUEE (announcement strip)
+  ══════════════════════════════════════════════ */
+  .lp-marquee {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 101;
+    height: 32px; overflow: hidden;
+    background: #0566FF;
+    display: flex; align-items: center;
+  }
+  .lp-marquee-track {
+    display: flex; align-items: center; flex-wrap: nowrap;
+    white-space: nowrap; width: max-content;
+    animation: lpMarqueeScroll 24s linear infinite;
+  }
+  .lp-marquee-item {
+    display: inline-flex; align-items: center; gap: 9px;
+    font-size: 12.5px; font-weight: 600; color: #FFFFFF; letter-spacing: 0.01em;
+    padding: 0 20px;
+  }
+  .lp-marquee-item svg { flex-shrink: 0; opacity: 0.85; }
+  .lp-marquee-dot { opacity: 0.5; }
+  @keyframes lpMarqueeScroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .lp-marquee-track { animation: none; }
+  }
+
+  /* ══════════════════════════════════════════════
      NAV
   ══════════════════════════════════════════════ */
   .lp-nav {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    position: fixed; top: 32px; left: 0; right: 0; z-index: 100;
     background: var(--lp-nav-bg);
     border-bottom: 1px solid var(--border);
     backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
@@ -150,7 +179,7 @@ const CSS = `
   .lp-hero-geo {
     position: absolute; right: 5%; top: 10%;
     width: 520px; height: 520px; border-radius: 32px;
-    border: 1px solid rgba(13,148,136,0.14);
+    border: 1px solid rgba(12,151,58,0.14);
     transform: rotate(14deg); pointer-events: none;
   }
   .lp-hero-geo::after {
@@ -184,7 +213,7 @@ const CSS = `
     border: 1.5px solid var(--border-2); color: var(--text); font-weight: 600;
     font-size: 24px; line-height: 1.5; padding: 14px 28px; border-radius: 10px; transition: all 0.18s;
   }
-  .lp-btn-sec:hover { border-color: rgba(13,148,136,0.35); background: var(--accent-sub); }
+  .lp-btn-sec:hover { border-color: rgba(12,151,58,0.35); background: var(--accent-sub); }
   .lp-hero-proof {
     display: flex; align-items: center; gap: 32px; flex-wrap: wrap;
     padding-top: 32px; border-top: 1px solid var(--border);
@@ -201,7 +230,7 @@ const CSS = `
     display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: 0.10em;
     text-transform: uppercase; color: ${ACCENT_2};
     background: var(--accent-sub); padding: 4px 12px; border-radius: 99px;
-    border: 1px solid rgba(13,148,136,0.22); margin-bottom: 14px;
+    border: 1px solid rgba(12,151,58,0.22); margin-bottom: 14px;
   }
   .lp-section-title {
     font-size: clamp(26px, 2.6vw, 32px); font-weight: 900;
@@ -236,8 +265,8 @@ const CSS = `
   }
   .lp-feat-card:hover::before { transform: scaleX(1); }
   .lp-feat-card:hover {
-    border-color: rgba(13,148,136,0.30); transform: translateY(-4px);
-    box-shadow: 0 12px 40px rgba(13,148,136,0.10), var(--shadow);
+    border-color: rgba(12,151,58,0.30); transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(12,151,58,0.10), var(--shadow);
   }
   .lp-feat-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 18px; }
   .lp-feat-title { font-size: 15.5px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
@@ -257,14 +286,14 @@ const CSS = `
   .lp-steps-line {
     position: absolute; top: 23px;
     left: calc(12.5% + 24px); right: calc(12.5% + 24px);
-    height: 1px; background: rgba(13,148,136,0.28);
+    height: 1px; background: rgba(12,151,58,0.28);
     animation: lineGrow 1s 0.5s ease both;
   }
   .lp-steps-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; }
   .lp-step { padding: 0 20px; text-align: center; }
   .lp-step-num {
     width: 48px; height: 48px; border-radius: 12px;
-    background: var(--bg-card); border: 1px solid rgba(13,148,136,0.30);
+    background: var(--bg-card); border: 1px solid rgba(12,151,58,0.30);
     color: ${ACCENT}; font-weight: 800; font-size: 16px;
     display: flex; align-items: center; justify-content: center;
     margin: 0 auto 22px; position: relative;
@@ -365,10 +394,10 @@ const CSS = `
     background: var(--bg-card); border: 1.5px solid var(--border);
     transition: border-color 0.22s, box-shadow 0.22s;
   }
-  .lp-plan-default:hover { border-color: rgba(13,148,136,0.30); box-shadow: 0 8px 32px rgba(13,148,136,0.09); }
+  .lp-plan-default:hover { border-color: rgba(12,151,58,0.30); box-shadow: 0 8px 32px rgba(12,151,58,0.09); }
   .lp-plan-hi {
-    background: var(--sidebar); border: 1.5px solid rgba(13,148,136,0.40);
-    box-shadow: 0 0 0 1px rgba(13,148,136,0.10), 0 24px 64px rgba(8,13,24,0.28);
+    background: var(--sidebar); border: 1.5px solid rgba(12,151,58,0.40);
+    box-shadow: 0 0 0 1px rgba(12,151,58,0.10), 0 24px 64px rgba(8,13,24,0.28);
   }
   .lp-plan-badge {
     position: absolute; top: -13px; left: 50%; transform: translateX(-50%);
@@ -386,7 +415,7 @@ const CSS = `
   .lp-plan-btn-hi { background: ${ACCENT}; color: #FFFFFF; }
   .lp-plan-btn-hi:hover { background: ${ACCENT_2}; }
   .lp-plan-btn-default { background: transparent; color: var(--text-2); border: 1.5px solid var(--border-2); }
-  .lp-plan-btn-default:hover { border-color: rgba(13,148,136,0.35); color: ${ACCENT}; background: var(--accent-sub); }
+  .lp-plan-btn-default:hover { border-color: rgba(12,151,58,0.35); color: ${ACCENT}; background: var(--accent-sub); }
 
   /* ══════════════════════════════════════════════
      FAQ
@@ -395,7 +424,7 @@ const CSS = `
   .lp-faq-hd { text-align: center; margin-bottom: 48px; }
   .lp-faq-list { max-width: 840px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; }
   .lp-faq-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; transition: border-color 0.2s; }
-  .lp-faq-item.on { border-color: rgba(13,148,136,0.32); }
+  .lp-faq-item.on { border-color: rgba(12,151,58,0.32); }
   .lp-faq-q { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 22px; background: transparent; border: none; text-align: left; font-size: 16px; font-weight: 700; color: var(--text); cursor: pointer; }
   .lp-faq-icon { color: ${ACCENT}; flex-shrink: 0; transition: transform 0.25s; }
   .lp-faq-item.on .lp-faq-icon { transform: rotate(45deg); }
@@ -405,10 +434,10 @@ const CSS = `
   .lp-faq-item.on .lp-faq-a { padding-bottom: 20px; }
 
   /* ══════════════════════════════════════════════
-     CTA (accent banner — always teal, theme-independent)
+     CTA (accent banner — always brand green, theme-independent)
   ══════════════════════════════════════════════ */
   .lp-cta-section {
-    background: linear-gradient(135deg, ${ACCENT_2} 0%, ${ACCENT} 55%, #0EA5A0 100%);
+    background: linear-gradient(135deg, ${ACCENT_2} 0%, ${ACCENT} 100%);
     padding: 100px 36px;
     position: relative; overflow: hidden;
   }
@@ -430,7 +459,7 @@ const CSS = `
     font-size: clamp(32px, 4vw, 54px); font-weight: 900;
     letter-spacing: -0.04em; color: #FFFFFF; line-height: 1.06; margin-bottom: 14px;
   }
-  .lp-cta-title em { font-style: normal; color: #052E2B; }
+  .lp-cta-title em { font-style: normal; color: #0F172A; }
   .lp-cta-sub { font-size: 18px; color: rgba(255,255,255,0.85); line-height: 1.6; max-width: 480px; }
   .lp-cta-right { display: flex; flex-direction: column; gap: 14px; align-items: center; flex-shrink: 0; }
   .lp-btn-accent {
@@ -438,7 +467,7 @@ const CSS = `
     background: #FFFFFF; color: ${ACCENT_2}; font-weight: 700; font-size: 24px; line-height: 1.5;
     padding: 16px 36px; border-radius: 12px; transition: all 0.20s; white-space: nowrap;
   }
-  .lp-btn-accent:hover { background: #F0FDFA; transform: translateY(-2px); }
+  .lp-btn-accent:hover { background: #F0FDF4; transform: translateY(-2px); }
   .lp-cta-micro { font-size: 13px; color: rgba(255,255,255,0.75); text-align: center; }
 
   /* ══════════════════════════════════════════════
@@ -467,7 +496,7 @@ const CSS = `
     color: var(--text-3); background: var(--bg-card-2); border: 1px solid var(--border);
     transition: color 0.15s, border-color 0.15s, background 0.15s;
   }
-  .lp-footer-social-link:hover { color: ${ACCENT}; border-color: rgba(13,148,136,0.35); background: var(--accent-sub); }
+  .lp-footer-social-link:hover { color: ${ACCENT}; border-color: rgba(12,151,58,0.35); background: var(--accent-sub); }
   .lp-footer-copy  { font-size: 13px; color: var(--text-3); }
   .lp-footer-col-title {
     font-size: 12px; font-weight: 700; color: var(--text-2);
@@ -490,7 +519,7 @@ const CSS = `
     padding: 5px 12px; border-radius: 99px; transition: all 0.18s;
   }
   .lp-hero-ai-chip svg { color: ${ACCENT}; }
-  .lp-hero-ai-chip:hover { background: var(--accent-sub); border-color: rgba(13,148,136,0.30); color: var(--text); }
+  .lp-hero-ai-chip:hover { background: var(--accent-sub); border-color: rgba(12,151,58,0.30); color: var(--text); }
 
   /* ══════════════════════════════════════════════
      AI FEATURES SECTION
@@ -514,7 +543,7 @@ const CSS = `
     display: inline-flex; align-items: center; gap: 7px;
     font-size: 12px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase;
     color: ${ACCENT_2};
-    background: var(--accent-sub); border: 1px solid rgba(13,148,136,0.26);
+    background: var(--accent-sub); border: 1px solid rgba(12,151,58,0.26);
     padding: 5px 16px; border-radius: 99px; margin-bottom: 20px;
   }
   .lp-ai-grid {
@@ -537,13 +566,13 @@ const CSS = `
   }
   .lp-ai-card:hover::after { opacity: 1; }
   .lp-ai-card:hover {
-    border-color: rgba(13,148,136,0.28);
+    border-color: rgba(12,151,58,0.28);
     transform: translateY(-4px);
-    box-shadow: var(--shadow-lg), 0 0 0 1px rgba(13,148,136,0.08);
+    box-shadow: var(--shadow-lg), 0 0 0 1px rgba(12,151,58,0.08);
   }
   .lp-ai-card-icon {
     width: 52px; height: 52px; border-radius: 14px;
-    background: var(--accent-sub); border: 1px solid rgba(13,148,136,0.24);
+    background: var(--accent-sub); border: 1px solid rgba(12,151,58,0.24);
     display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   }
   .lp-ai-card-row { display: flex; align-items: flex-start; gap: 18px; }
@@ -560,7 +589,7 @@ const CSS = `
   }
   .lp-ai-demo-pill {
     display: inline-flex; align-items: center; gap: 6px;
-    background: var(--accent-sub); border: 1px solid rgba(13,148,136,0.24);
+    background: var(--accent-sub); border: 1px solid rgba(12,151,58,0.24);
     border-radius: 8px; padding: 6px 12px;
     font-size: 13px; font-weight: 700; color: ${ACCENT_2};
     width: fit-content;
@@ -596,13 +625,16 @@ const CSS = `
     .lp-cta-inner { grid-template-columns: 1fr; gap: 40px; }
     .lp-cta-right { align-items: flex-start; }
     .lp-cta-ring { display: none; }
-    .lp-btn-pri { animation: none; box-shadow: 0 4px 20px rgba(13,148,136,0.30); }
+    .lp-btn-pri { animation: none; box-shadow: 0 4px 20px rgba(12,151,58,0.30); }
     .lp-ai-grid { grid-template-columns: 1fr; }
     .lp-show-pos { grid-template-columns: 1fr; }
     .lp-show-trow { grid-template-columns: 2fr 0.8fr 0.9fr; }
     .lp-show-trow span:nth-child(2) { display: none; }
   }
   @media (max-width: 640px) {
+    .lp-marquee { height: 28px; }
+    .lp-marquee-item { font-size: 11.5px; padding: 0 20px; }
+    .lp-nav { top: 28px; }
     .lp-nav-links, .lp-signin { display: none; }
     .lp-hero { padding: 112px 20px 72px; }
     .lp-features-section, .lp-hiw-section,
@@ -628,6 +660,7 @@ export default function LandingPage() {
   return (
     <div className="lp">
       <style>{CSS}</style>
+      <Marquee />
       <Nav />
       <Hero />
       <AIFeatures />
@@ -640,6 +673,30 @@ export default function LandingPage() {
       <CTA />
       <Footer />
       <InstallPromptPopup />
+    </div>
+  );
+}
+
+/* ─── Marquee ────────────────────────────────────────────────────────────── */
+const MARQUEE_ITEMS = [
+  { icon: Zap,     text: "New: AI Demand Forecasting is live" },
+  { icon: Camera,  text: "Snap a photo — auto-fill product details" },
+  { icon: Bot,     text: "Ask your AI Business Assistant anything, anytime" },
+  { icon: Banknote, text: "Naira-first — no currency guesswork" },
+];
+function Marquee() {
+  const items = [...MARQUEE_ITEMS, ...MARQUEE_ITEMS];
+  return (
+    <div className="lp-marquee">
+      <div className="lp-marquee-track">
+        {items.map((it, i) => (
+          <span className="lp-marquee-item" key={i}>
+            <it.icon size={12} />
+            {it.text}
+            <span className="lp-marquee-dot">•</span>
+          </span>
+        ))}
+      </div>
     </div>
   );
 }
@@ -813,11 +870,11 @@ function AIFeatures() {
 /* ─── Features ───────────────────────────────────────────────────────────── */
 const FEATURES = [
   { icon: Package,      bg: "rgba(99,102,241,0.10)",  fg: "#6366f1", title: "Smart Inventory",  desc: "Add products, set reorder levels, and track every item's complete transaction history." },
-  { icon: ShoppingCart, bg: "rgba(13,148,136,0.10)",  fg: "#0D9488", title: "Built-in POS",     desc: "Record sales in seconds. Stock updates automatically — no double entry." },
+  { icon: ShoppingCart, bg: "rgba(12,151,58,0.10)",  fg: "#0C973A", title: "Built-in POS",     desc: "Record sales in seconds. Stock updates automatically — no double entry." },
   { icon: Bell,         bg: "rgba(245,158,11,0.10)",  fg: "#f59e0b", title: "Real-Time Alerts", desc: "Push and email alerts for low stock, sales, or any stock change. Instantly." },
   { icon: BarChart3,    bg: "rgba(16,185,129,0.10)",  fg: "#10b981", title: "Profit Reports",   desc: "Revenue, cost, and profit side by side — daily, weekly, and monthly." },
   { icon: Users,        bg: "rgba(168,85,247,0.10)",  fg: "#a855f7", title: "Team Roles",       desc: "Role-based access for managers and staff. Every action logged by person." },
-  { icon: Globe,        bg: "rgba(59,130,246,0.10)",  fg: "#3b82f6", title: "Multi-Branch",     desc: "Run multiple locations from one account with separate inventory per branch." },
+  { icon: Globe,        bg: "rgba(5,102,255,0.10)",  fg: "#0566FF", title: "Multi-Branch",     desc: "Run multiple locations from one account with separate inventory per branch." },
   { icon: ShieldCheck,  bg: "rgba(239,68,68,0.10)",   fg: "#ef4444", title: "Audit Logs",       desc: "Every stock movement timestamped with who did it. Full accountability." },
   { icon: Smartphone,   bg: "rgba(251,146,60,0.10)",  fg: "#fb923c", title: "Works Offline",    desc: "Install as a PWA on any device. Data syncs automatically when back online." },
 ];
@@ -928,28 +985,28 @@ function ShopkeeperIllustration() {
     <svg width="360" height="360" viewBox="0 0 360 360" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ position: "relative", zIndex: 1, maxWidth: "100%", height: "auto" }}>
       {/* Shelf */}
       <rect x="30" y="60" width="120" height="20" rx="4" fill="var(--bg-card-2)" stroke="var(--border-2)" />
-      <rect x="42" y="30" width="26" height="30" rx="4" fill="#0D9488" opacity="0.85" />
+      <rect x="42" y="30" width="26" height="30" rx="4" fill="#0C973A" opacity="0.85" />
       <rect x="74" y="24" width="26" height="36" rx="4" fill="#6366f1" opacity="0.75" />
       <rect x="106" y="34" width="26" height="26" rx="4" fill="#f59e0b" opacity="0.80" />
 
       {/* Counter */}
       <rect x="20" y="250" width="320" height="70" rx="14" fill="var(--bg-card)" stroke="var(--border)" />
-      <rect x="20" y="250" width="320" height="10" rx="5" fill="#0D9488" opacity="0.9" />
+      <rect x="20" y="250" width="320" height="10" rx="5" fill="#0C973A" opacity="0.9" />
 
       {/* Person body */}
-      <rect x="140" y="150" width="80" height="110" rx="26" fill="#0D9488" />
-      <circle cx="180" cy="118" r="34" fill="#0F766E" />
+      <rect x="140" y="150" width="80" height="110" rx="26" fill="#0C973A" />
+      <circle cx="180" cy="118" r="34" fill="#0A7B30" />
 
       {/* Arm holding phone */}
-      <rect x="205" y="168" width="20" height="70" rx="10" fill="#0F766E" />
+      <rect x="205" y="168" width="20" height="70" rx="10" fill="#0A7B30" />
 
       {/* Phone */}
       <rect x="212" y="150" width="46" height="80" rx="10" fill="var(--bg-card)" stroke="var(--border-2)" strokeWidth="2" />
-      <rect x="220" y="162" width="30" height="4" rx="2" fill="#0D9488" opacity="0.5" />
+      <rect x="220" y="162" width="30" height="4" rx="2" fill="#0C973A" opacity="0.5" />
       <rect x="220" y="172" width="18" height="30" rx="3" fill="var(--bg-card-2)" />
-      <rect x="223" y="196" width="4" height="4" fill="#0D9488" />
-      <rect x="229" y="190" width="4" height="10" fill="#0D9488" />
-      <rect x="235" y="184" width="4" height="16" fill="#0D9488" />
+      <rect x="223" y="196" width="4" height="4" fill="#0C973A" />
+      <rect x="229" y="190" width="4" height="10" fill="#0C973A" />
+      <rect x="235" y="184" width="4" height="16" fill="#0C973A" />
       <rect x="220" y="208" width="30" height="4" rx="2" fill="var(--border-2)" />
       <rect x="220" y="216" width="20" height="4" rx="2" fill="var(--border-2)" />
 
@@ -960,8 +1017,8 @@ function ShopkeeperIllustration() {
       {/* Floating chart badge */}
       <g>
         <rect x="250" y="70" width="78" height="52" rx="12" fill="var(--bg-card)" stroke="var(--border)" />
-        <path d="M262 108 L276 92 L290 100 L304 78" stroke="#0D9488" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-        <circle cx="304" cy="78" r="4" fill="#0D9488" />
+        <path d="M262 108 L276 92 L290 100 L304 78" stroke="#0C973A" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        <circle cx="304" cy="78" r="4" fill="#0C973A" />
       </g>
     </svg>
   );
@@ -1033,7 +1090,7 @@ function Pricing() {
         {plans.map((plan) => (
           <div key={plan.name} className={`lp-plan ${plan.highlight ? "lp-plan-hi" : "lp-plan-default"}`}>
             {plan.highlight && <div className="lp-plan-badge">Most popular</div>}
-            <div className="lp-plan-name" style={{ color: plan.highlight ? "#2DD4BF" : "var(--text-3)" }}>
+            <div className="lp-plan-name" style={{ color: plan.highlight ? "#64ED80" : "var(--text-3)" }}>
               {plan.name}
             </div>
             <div style={{ display: "flex", alignItems: "baseline" }}>
@@ -1041,7 +1098,7 @@ function Pricing() {
                 {plan.price}
               </span>
               {plan.period && (
-                <span className="lp-plan-period" style={{ color: plan.highlight ? "#2DD4BF" : "var(--text-3)" }}>
+                <span className="lp-plan-period" style={{ color: plan.highlight ? "#64ED80" : "var(--text-3)" }}>
                   {plan.period}
                 </span>
               )}
@@ -1052,7 +1109,7 @@ function Pricing() {
             <ul className="lp-plan-features">
               {plan.features.map((f) => (
                 <li key={f} className="lp-plan-feature">
-                  <CheckCircle size={15} color={plan.highlight ? "#2DD4BF" : ACCENT} style={{ flexShrink: 0, marginTop: 1 }} />
+                  <CheckCircle size={15} color={plan.highlight ? "#64ED80" : ACCENT} style={{ flexShrink: 0, marginTop: 1 }} />
                   <span style={{ color: plan.highlight ? "rgba(255,255,255,0.72)" : "var(--text-2)" }}>{f}</span>
                 </li>
               ))}

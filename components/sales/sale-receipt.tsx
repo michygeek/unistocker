@@ -91,7 +91,7 @@ async function buildReceiptImage(r: ReceiptData): Promise<Blob> {
   }
 
   // App brand
-  txt("UNISTOCKER", W / 2, y + 14, { size: 11, weight: "bold", color: "#0D9488", align: "center" });
+  txt("UNISTOCKER", W / 2, y + 14, { size: 11, weight: "bold", color: "#0C973A", align: "center" });
   y += 26;
 
   // Org name
@@ -167,7 +167,7 @@ async function buildReceiptImage(r: ReceiptData): Promise<Blob> {
   txt(
     `₦${r.total.toLocaleString("en", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
     W - pad, y + 22,
-    { size: 18, weight: "bold", color: "#0D9488", align: "right" }
+    { size: 18, weight: "bold", color: "#0C973A", align: "right" }
   );
   y += 38;
 
@@ -247,7 +247,7 @@ function buildReceiptHTML(r: ReceiptData): string {
     th.r { text-align: right; }
     .total-row td { font-weight: bold; font-size: 16px; padding-top: 8px; }
     .sub-row td { color: #555; }
-    .brand { font-size: 11px; font-weight: 800; color: #0D9488; letter-spacing: 0.1em; }
+    .brand { font-size: 11px; font-weight: 800; color: #0C973A; letter-spacing: 0.1em; }
     @media print { body { padding: 0; } }
   </style></head><body>
   <div class="center" style="margin-bottom:14px">
@@ -271,7 +271,7 @@ function buildReceiptHTML(r: ReceiptData): string {
     <tr class="sub-row"><td>Subtotal</td><td style="text-align:right">₦${r.subtotal.toFixed(2)}</td></tr>
     ${r.discount > 0 ? `<tr class="sub-row"><td>Discount</td><td style="text-align:right;color:#c00">-₦${r.discount.toFixed(2)}</td></tr>` : ""}
     ${r.taxAmount > 0 ? `<tr class="sub-row"><td>Tax</td><td style="text-align:right">+₦${r.taxAmount.toFixed(2)}</td></tr>` : ""}
-    <tr class="total-row"><td>TOTAL</td><td style="text-align:right;color:#0D9488">₦${r.total.toFixed(2)}</td></tr>
+    <tr class="total-row"><td>TOTAL</td><td style="text-align:right;color:#0C973A">₦${r.total.toFixed(2)}</td></tr>
   </tbody></table>
   ${r.notes ? `<hr class="divider"><p style="color:#888;font-size:11px">Note: ${r.notes}</p>` : ""}
   <hr class="divider">

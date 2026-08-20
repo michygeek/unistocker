@@ -47,7 +47,7 @@ export function ReferralsPanel({ referralCode, referralPoints, referredOrgs, ori
           />
           <button
             onClick={copy}
-            style={{ display: "flex", alignItems: "center", gap: 6, padding: "9px 14px", borderRadius: 8, border: "none", background: "#0D9488", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer", flexShrink: 0 }}
+            style={{ display: "flex", alignItems: "center", gap: 6, padding: "9px 14px", borderRadius: 8, border: "none", background: "#0C973A", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer", flexShrink: 0 }}
           >
             {copied ? <Check size={14} /> : <Copy size={14} />}
             {copied ? "Copied" : "Copy"}
@@ -67,7 +67,7 @@ export function ReferralsPanel({ referralCode, referralPoints, referredOrgs, ori
           <p style={{ margin: 0, fontSize: 24, fontWeight: 800, color: "var(--text)" }}>{referralPoints} pts</p>
           <p style={{ margin: "2px 0 0", fontSize: 13, color: "var(--text-muted)" }}>
             = ₦{(referralPoints * NAIRA_PER_POINT).toLocaleString()} off your next subscription payment — apply it at checkout on the{" "}
-            <a href="/billing" style={{ color: "#0D9488", fontWeight: 600 }}>Billing page</a>.
+            <a href="/billing" style={{ color: "#0C973A", fontWeight: 600 }}>Billing page</a>.
           </p>
         </div>
       </div>

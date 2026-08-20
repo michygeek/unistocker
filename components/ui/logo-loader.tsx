@@ -9,8 +9,8 @@ export function LogoLoader() {
           <div
             className="absolute w-[72px] h-[72px] rounded-[22px] border-2 border-transparent animate-spin"
             style={{
-              borderTopColor: "#0D9488",
-              borderRightColor: "rgba(13,148,136,0.22)",
+              borderTopColor: "#0C973A",
+              borderRightColor: "rgba(12,151,58,0.22)",
               animationDuration: "0.9s",
             }}
           />

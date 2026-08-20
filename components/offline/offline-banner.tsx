@@ -121,7 +121,7 @@ export function OfflineBanner() {
       action: null,
     },
     syncing: {
-      bg: "rgba(13,148,136,0.95)",
+      bg: "rgba(12,151,58,0.95)",
       border: "rgba(255,255,255,0.15)",
       icon: <RefreshCw size={15} style={{ color: "#fff", animation: "spin 1s linear infinite" }} />,
       text: `Syncing ${pendingCount > 0 ? pendingCount + " operation" + (pendingCount !== 1 ? "s" : "") : ""}…`,

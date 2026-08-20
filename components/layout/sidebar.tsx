@@ -53,7 +53,7 @@ const S = {
   nav:         { flex: 1, padding: "10px 10px", display: "flex", flexDirection: "column" as const, gap: 1, overflowY: "auto" as const },
   footer:      { padding: "10px 10px 14px", borderTop: "1px solid rgba(255,255,255,0.05)" },
   userRow:     { display: "flex", alignItems: "center", gap: 10, padding: "9px 10px", marginBottom: 2 },
-  avatar:      { width: 34, height: 34, borderRadius: "50%", background: "linear-gradient(135deg, #0D9488, #042F2E)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 },
+  avatar:      { width: 34, height: 34, borderRadius: "50%", background: "linear-gradient(135deg, #0C973A, #0F172A)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 },
   avatarText:  { color: "#FFFFFF", fontSize: 14, fontWeight: 700 },
   userName:    { color: "#fff", fontSize: 14, fontWeight: 600, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const },
   userEmail:   { color: "rgba(255,255,255,0.30)", fontSize: 12, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const },

@@ -27,7 +27,7 @@ function UsageBar({ label, used, max }: { label: string; used: number; max: numb
   const pct = max === Infinity ? 0 : Math.min(100, (used / max) * 100);
   const almostFull = max !== Infinity && pct >= 80;
   const full = max !== Infinity && used >= max;
-  const barColor = full ? "#ef4444" : almostFull ? "#f59e0b" : "#0D9488";
+  const barColor = full ? "#ef4444" : almostFull ? "#f59e0b" : "#0C973A";
   return (
     <div style={{ marginBottom: 12 }}>
       <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--text-muted)", marginBottom: 5 }}>
@@ -132,9 +132,9 @@ export function BillingPage({ subscription, usage, referralPoints, successParam,
       {feedback && (
         <div style={{
           marginBottom: 20, padding: "12px 16px", borderRadius: 12,
-          background: feedback.type === "success" ? "rgba(13,148,136,0.12)" : "rgba(239,68,68,0.12)",
-          border: `1px solid ${feedback.type === "success" ? "rgba(13,148,136,0.3)" : "rgba(239,68,68,0.3)"}`,
-          color: feedback.type === "success" ? "#0D9488" : "#f87171",
+          background: feedback.type === "success" ? "rgba(12,151,58,0.12)" : "rgba(239,68,68,0.12)",
+          border: `1px solid ${feedback.type === "success" ? "rgba(12,151,58,0.3)" : "rgba(239,68,68,0.3)"}`,
+          color: feedback.type === "success" ? "#0C973A" : "#f87171",
           display: "flex", alignItems: "center", gap: 8, fontSize: 14,
         }}>
           {feedback.type === "success" ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
@@ -195,7 +195,7 @@ export function BillingPage({ subscription, usage, referralPoints, successParam,
           </p>
           <p style={{ margin: "2px 0 0", fontSize: 12, color: "var(--text-muted)" }}>
             Earn 10 points (₦800) for every friend who signs up with your code and pays for Business.{" "}
-            <a href="/settings/referrals" style={{ color: "#0D9488", fontWeight: 600 }}>Get your code</a>
+            <a href="/settings/referrals" style={{ color: "#0C973A", fontWeight: 600 }}>Get your code</a>
           </p>
         </div>
       </div>

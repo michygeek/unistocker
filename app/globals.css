@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* ═══════════════════════════════════════════════════════════════
-   DESIGN TOKENS — light mode  (white + teal)
+   DESIGN TOKENS — light mode  (white + green/blue)
 ═══════════════════════════════════════════════════════════════ */
 :root {
   --bg:            #F8FAFC;
@@ -21,11 +21,11 @@
   --sidebar-hi:    rgba(255,255,255,0.07);
   --sidebar-text:  rgba(255,255,255,0.50);
 
-  --accent:        #0D9488;
-  --accent-2:      #0F766E;
+  --accent:        #0C973A;
+  --accent-2:      #0A7B30;
   --accent-fg:     #FFFFFF;
-  --accent-sub:    rgba(13,148,136,0.09);
-  --accent-glow:   rgba(13,148,136,0.20);
+  --accent-sub:    rgba(12,151,58,0.09);
+  --accent-glow:   rgba(12,151,58,0.20);
 
   --danger:        #EF4444;
   --warning:       #F59E0B;
@@ -33,7 +33,7 @@
 
   --shadow:        0 1px 3px rgba(15,23,42,0.05), 0 4px 16px rgba(15,23,42,0.06);
   --shadow-lg:     0 8px 40px rgba(15,23,42,0.12);
-  --shadow-accent: 0 4px 24px rgba(13,148,136,0.25);
+  --shadow-accent: 0 4px 24px rgba(12,151,58,0.25);
 
   --radius:        12px;
   --radius-sm:     8px;
@@ -41,7 +41,7 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   DESIGN TOKENS — dark mode  (slate-navy + teal)
+   DESIGN TOKENS — dark mode  (slate-navy + green/blue)
 ═══════════════════════════════════════════════════════════════ */
 .dark {
   --bg:            #0F172A;
@@ -61,11 +61,11 @@
   --sidebar-hi:    rgba(255,255,255,0.04);
   --sidebar-text:  rgba(255,255,255,0.42);
 
-  --accent:        #2DD4BF;
-  --accent-2:      #14B8A6;
-  --accent-fg:     #042F2E;
-  --accent-sub:    rgba(45,212,191,0.10);
-  --accent-glow:   rgba(45,212,191,0.22);
+  --accent:        #64ED80;
+  --accent-2:      #2AE56E;
+  --accent-fg:     #0F172A;
+  --accent-sub:    rgba(100,237,128,0.10);
+  --accent-glow:   rgba(100,237,128,0.22);
 
   --danger:        #F87171;
   --warning:       #FBBF24;
@@ -73,7 +73,7 @@
 
   --shadow:        0 1px 3px rgba(0,0,0,0.40), 0 4px 16px rgba(0,0,0,0.35);
   --shadow-lg:     0 8px 48px rgba(0,0,0,0.60);
-  --shadow-accent: 0 4px 24px rgba(45,212,191,0.18);
+  --shadow-accent: 0 4px 24px rgba(100,237,128,0.18);
 }
 
 @theme inline {
@@ -102,8 +102,8 @@ body {
 ═══════════════════════════════════════════════════════════════ */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(13,148,136,0.22); border-radius: 99px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(13,148,136,0.48); }
+::-webkit-scrollbar-thumb { background: rgba(12,151,58,0.22); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(12,151,58,0.48); }
 
 /* ═══════════════════════════════════════════════════════════════
    ANIMATIONS
@@ -120,8 +120,8 @@ body {
   animation: logoGlow 1.8s ease-in-out infinite;
 }
 @keyframes logoGlow {
-  0%,100% { box-shadow: 0 0 0 0 rgba(13,148,136,0); }
-  50%      { box-shadow: 0 0 24px 6px rgba(13,148,136,0.22); }
+  0%,100% { box-shadow: 0 0 0 0 rgba(12,151,58,0); }
+  50%      { box-shadow: 0 0 24px 6px rgba(12,151,58,0.22); }
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -136,8 +136,8 @@ body {
 }
 .uni-card:hover { border-color: var(--border-2); }
 .uni-card-hover:hover {
-  border-color: rgba(13,148,136,0.22);
-  box-shadow: 0 0 0 1px rgba(13,148,136,0.08), var(--shadow);
+  border-color: rgba(12,151,58,0.22);
+  box-shadow: 0 0 0 1px rgba(12,151,58,0.08), var(--shadow);
 }
 
 .stat-card {
@@ -271,7 +271,7 @@ body {
 }
 .uni-product-card:active {
   transform: scale(0.98);
-  border-color: rgba(13,148,136,0.28);
+  border-color: rgba(12,151,58,0.28);
 }
 
 /* ═══════════════════════════════════════════════════════════════

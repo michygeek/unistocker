@@ -58,12 +58,12 @@ export function LoginForm({ showRegisteredBanner, showVerifiedBanner }: LoginFor
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       {showVerifiedBanner && (
-        <div className="auth-registered-banner" style={{ background: "rgba(13,148,136,0.12)", border: "1px solid rgba(13,148,136,0.3)" }}>
-          <div className="auth-registered-icon" style={{ background: "#0D9488" }}>
+        <div className="auth-registered-banner" style={{ background: "rgba(12,151,58,0.12)", border: "1px solid rgba(12,151,58,0.3)" }}>
+          <div className="auth-registered-icon" style={{ background: "#0C973A" }}>
             <MailCheck size={12} color="white" />
           </div>
           <div>
-            <p className="auth-registered-title" style={{ color: "#2DD4BF" }}>Email verified!</p>
+            <p className="auth-registered-title" style={{ color: "#64ED80" }}>Email verified!</p>
             <p className="auth-registered-sub">Your account is active. Sign in below.</p>
           </div>
         </div>

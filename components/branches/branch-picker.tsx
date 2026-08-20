@@ -63,7 +63,7 @@ export function BranchPicker({ branches, activeBranchId }: BranchPickerProps) {
           padding: "8px 12px",
           borderRadius: 10,
           border: "1px solid rgba(255,255,255,0.10)",
-          background: activeBranchId ? "rgba(13,148,136,0.15)" : "rgba(255,255,255,0.05)",
+          background: activeBranchId ? "rgba(12,151,58,0.15)" : "rgba(255,255,255,0.05)",
           color: "rgba(255,255,255,0.85)",
           fontSize: 13,
           fontWeight: 600,

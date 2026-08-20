@@ -144,7 +144,7 @@ export function BranchManagement({ branches, staff }: Props) {
                 </div>
                 <span style={{
                   fontSize: 11, fontWeight: 700, padding: "3px 8px", borderRadius: 6, flexShrink: 0,
-                  background: b.isActive ? "rgba(13,148,136,0.12)" : "rgba(239,68,68,0.10)",
+                  background: b.isActive ? "rgba(12,151,58,0.12)" : "rgba(239,68,68,0.10)",
                   color: b.isActive ? "var(--accent)" : "var(--danger)",
                 }}>
                   {b.isActive ? "Active" : "Inactive"}
@@ -228,7 +228,7 @@ export function BranchManagement({ branches, staff }: Props) {
                       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                         <div style={{
                           width: 30, height: 30, borderRadius: "50%",
-                          background: "linear-gradient(135deg, #0D9488, #042F2E)",
+                          background: "linear-gradient(135deg, #0C973A, #0F172A)",
                           display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
                         }}>
                           <span style={{ color: "#fff", fontSize: 11, fontWeight: 700 }}>

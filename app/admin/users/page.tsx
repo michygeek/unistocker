@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: "Users — Admin" };
 export const dynamic = "force-dynamic";
 
 const ROLE_STYLE: Record<string, { bg: string; color: string }> = {
-  BOSS:    { bg: "rgba(13,148,136,0.15)", color: "#2DD4BF" },
+  BOSS:    { bg: "rgba(12,151,58,0.15)", color: "#64ED80" },
   MANAGER: { bg: "rgba(168,85,247,0.15)", color: "#c084fc" },
   STAFF:   { bg: "rgba(100,116,139,0.15)",color: "#94a3b8" },
 };

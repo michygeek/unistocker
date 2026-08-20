@@ -127,9 +127,9 @@ export function PWAInstallButton({ variant = "sidebar" }: { variant?: Variant })
           style={{
             display: "flex", alignItems: "center", gap: 5,
             padding: "6px 11px", borderRadius: 9,
-            border: "1px solid rgba(13,148,136,0.4)",
-            background: "rgba(13,148,136,0.10)",
-            color: "#0D9488", fontSize: 12, fontWeight: 700,
+            border: "1px solid rgba(12,151,58,0.4)",
+            background: "rgba(12,151,58,0.10)",
+            color: "#0C973A", fontSize: 12, fontWeight: 700,
             cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0,
           }}
         >
@@ -149,13 +149,13 @@ export function PWAInstallButton({ variant = "sidebar" }: { variant?: Variant })
         style={{
           width: "100%", display: "flex", alignItems: "center", gap: 10,
           padding: "9px 12px", borderRadius: 10,
-          border: "1px solid rgba(13,148,136,0.35)",
-          cursor: "pointer", background: "rgba(13,148,136,0.10)",
-          color: "#2DD4BF", fontSize: 14, fontWeight: 600,
+          border: "1px solid rgba(12,151,58,0.35)",
+          cursor: "pointer", background: "rgba(12,151,58,0.10)",
+          color: "#64ED80", fontSize: 14, fontWeight: 600,
           transition: "all 0.15s", marginBottom: 6,
         }}
-        onMouseEnter={(e) => { (e.currentTarget).style.background = "rgba(13,148,136,0.2)"; }}
-        onMouseLeave={(e) => { (e.currentTarget).style.background = "rgba(13,148,136,0.10)"; }}
+        onMouseEnter={(e) => { (e.currentTarget).style.background = "rgba(12,151,58,0.2)"; }}
+        onMouseLeave={(e) => { (e.currentTarget).style.background = "rgba(12,151,58,0.10)"; }}
       >
         <Download size={15} />
         Install App

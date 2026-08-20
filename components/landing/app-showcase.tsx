@@ -88,10 +88,10 @@ export function AppShowcase() {
 
 function InventoryPanel() {
   const rows = [
-    { name: "USB-C Hub 6-in-1", sku: "SKU-2281", stock: 42, status: "In stock", color: "#0D9488" },
+    { name: "USB-C Hub 6-in-1", sku: "SKU-2281", stock: 42, status: "In stock", color: "#0C973A" },
     { name: "Wireless Mouse M2", sku: "SKU-1190", stock: 6, status: "Low", color: "#f59e0b" },
     { name: "Bluetooth Speaker", sku: "SKU-3305", stock: 0, status: "Out", color: "#ef4444" },
-    { name: "Phone Case Clear",  sku: "SKU-0447", stock: 118, status: "In stock", color: "#0D9488" },
+    { name: "Phone Case Clear",  sku: "SKU-0447", stock: 118, status: "In stock", color: "#0C973A" },
   ];
   return (
     <div className="lp-show-anim">
@@ -157,11 +157,11 @@ function AiPanel() {
         <div className="lp-show-chat-bot-hd"><Bot size={13} /> UniStocker AI</div>
         <p>Based on the last 90 days, restock these before Friday:</p>
         <div className="lp-show-ai-row" style={{ animationDelay: "0.55s" }}>
-          <TrendingUp size={13} color="#0D9488" />
+          <TrendingUp size={13} color="#0C973A" />
           <span>USB-C Hub — order 45 units · 87% confidence</span>
         </div>
         <div className="lp-show-ai-row" style={{ animationDelay: "0.68s" }}>
-          <TrendingUp size={13} color="#0D9488" />
+          <TrendingUp size={13} color="#0C973A" />
           <span>Bottled Water 75cl — order 120 units · 93% confidence</span>
         </div>
       </div>

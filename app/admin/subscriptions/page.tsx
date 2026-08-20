@@ -46,7 +46,7 @@ export default async function AdminSubscriptionsPage() {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 14, marginBottom: 24 }}>
         {[
           { label: "Monthly Revenue", value: `₦${activeMrr.toLocaleString()}`, color: "var(--accent)" },
-          { label: "Active Paid", value: activeCount, color: "#0D9488" },
+          { label: "Active Paid", value: activeCount, color: "#0C973A" },
           { label: "On Trial", value: trialCount, color: "#f59e0b" },
           { label: "Expired", value: expiredCount, color: "#f87171" },
         ].map((s) => (
